@@ -16,4 +16,17 @@ CODEBOUND is a simple game-style Python learning platform where players learn pr
 
 Dark, clean, modern, game-like, slightly futuristic, responsive, focused. No childish UI, excessive animation, giant dashboards, or cluttered HUDs.
 
-_Detailed game design will be added only as phases are authorized._
+## Core loop
+
+**Home → Choose a game → Read a short concept → Solve a challenge → Instant feedback + explanation → Earn XP → Continue**
+
+- Correct answer: +100 XP. Wrong answer: +25 XP, because a miss still teaches something. A wrong answer always explains why that choice fails.
+- Level up every 300 XP.
+
+## Games
+
+- **Bug Hunt** (playable): find the broken line in a short script and choose the patch that fixes it. 5 beginner challenges: variables, arithmetic, strings, booleans, if/else.
+- **Code Breaker** (locked): conditions.
+- **Data Sorter** (locked): lists.
+
+_More detailed game design will be added only as phases are authorized._
