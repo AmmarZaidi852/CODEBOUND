@@ -1,0 +1,118 @@
+.list-cells {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+}
+
+.list-cells__label {
+  align-self: center;
+  margin-right: 0.15rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.list-cells--indexed .list-cells__label {
+  align-self: flex-end;
+  padding-bottom: 0.65rem;
+}
+
+.list-cells__list {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.list-cells__bracket {
+  padding-bottom: 0.35rem;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+.list-cells__items {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  align-items: flex-end;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  animation: cell-in 0.15s ease-out;
+}
+
+.list-cell__index {
+  font-size: 0.7rem;
+  color: var(--color-accent);
+}
+
+.list-cell__value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface-2);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-strong);
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+button.list-cell__value {
+  cursor: pointer;
+}
+
+button.list-cell__value:hover:not(:disabled) {
+  border-color: var(--color-text-muted);
+}
+
+button.list-cell__value:disabled {
+  cursor: default;
+}
+
+.list-cell.picked .list-cell__value {
+  border-color: var(--color-accent);
+  background: rgba(56, 232, 198, 0.1);
+}
+
+.list-cell.correct .list-cell__value {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.list-cell.wrong .list-cell__value {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.list-cells__empty {
+  align-self: center;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+@keyframes cell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
