@@ -6,13 +6,19 @@ interface ConceptCardProps {
   lesson: string
 }
 
+/** Short concept primer shown above a challenge. */
 function ConceptCard({ concept, lesson }: ConceptCardProps) {
   return (
     <section className="concept-card" aria-label="Concept">
-      <p className="concept-card__name">{concept}</p>
-      <p>
-        <InlineCode text={lesson} />
-      </p>
+      <div>
+        <p className="concept-card__name">
+          <span className="concept-card__tag">Intel</span>
+          {concept}
+        </p>
+        <p>
+          <InlineCode text={lesson} />
+        </p>
+      </div>
     </section>
   )
 }

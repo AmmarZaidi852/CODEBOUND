@@ -3,12 +3,13 @@ import {
   isCorrectFix,
   type BugHuntChallenge,
 } from '../challenges/bugHunt.ts'
+import ActionBar from '../components/ActionBar.tsx'
 import ChoiceList from '../components/ChoiceList.tsx'
 import CodeBlock from '../components/CodeBlock.tsx'
 import ConceptCard from '../components/ConceptCard.tsx'
 import FeedbackPanel from '../components/FeedbackPanel.tsx'
+import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
-import RunProgress from '../components/RunProgress.tsx'
 import RunSummary from '../components/RunSummary.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { bugHuntChallenges } from '../content/bugHuntChallenges.ts'
@@ -48,12 +49,14 @@ function BugHuntScreen({
 
   if (finished) {
     return (
-      <div className="screen">
+      <div className="screen" data-theme="bug-hunt">
         <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
+          art="bug-hunt"
           eyebrow="Bug Hunt · complete"
           title="All bugs squashed"
           message="You worked through every broken script. Nice hunting."
+          xp={xp}
           runXp={runXp}
           total={challenges.length}
           solved={solved}
@@ -69,26 +72,40 @@ function BugHuntScreen({
   const selectedFix = challenge.fixes.find((f) => f.id === selectedId)
 
   return (
-    <div className="screen">
+    <div className="screen" data-theme="bug-hunt">
       <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
       <main className="game">
-        <RunProgress label="Bug Hunt" index={index} total={challenges.length} />
+        <GameHud
+          art="bug-hunt"
+          name="Bug Hunt"
+          index={index}
+          total={challenges.length}
+          status={{
+            label: 'System',
+            value: !result
+              ? 'Corrupted'
+              : result.correct
+                ? 'Patched'
+                : 'Still corrupted',
+            state: !result ? 'idle' : result.correct ? 'ok' : 'fail',
+          }}
+        />
 
-        <h1 className="game__title" ref={titleRef} tabIndex={-1}>
-          {challenge.title}
-        </h1>
-
-        <ConceptCard concept={challenge.concept} lesson={challenge.lesson} />
-
-        <div className="bug-hunt__mission">
-          <p>
-            <strong>Mission:</strong> {challenge.mission}
+        <header className="mission panel">
+          <p className="mission__id">
+            Bug {String(index + 1).padStart(2, '0')} · Find and patch
           </p>
-          <p>
-            <strong>Expected output:</strong>{' '}
+          <h1 className="game__title" ref={titleRef} tabIndex={-1}>
+            {challenge.title}
+          </h1>
+          <p className="mission__objective">{challenge.mission}</p>
+          <p className="bug-hunt__expected">
+            <span className="mission__label">Expected output</span>
             <code>{challenge.expectedOutput}</code>
           </p>
-        </div>
+        </header>
+
+        <ConceptCard concept={challenge.concept} lesson={challenge.lesson} />
 
         <CodeBlock
           fileName={`bug_${String(index + 1).padStart(2, '0')}.py`}
@@ -114,14 +131,12 @@ function BugHuntScreen({
         />
 
         {!result && (
-          <button
-            type="button"
-            className="btn btn--primary game__submit"
+          <ActionBar
+            hint={selectedId ? 'Patch loaded' : 'Pick a patch'}
+            label="Apply patch"
             disabled={!selectedId}
             onClick={() => submit(isCorrectFix(challenge, selectedId ?? ''))}
-          >
-            Apply patch
-          </button>
+          />
         )}
 
         {result && (

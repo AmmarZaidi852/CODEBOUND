@@ -1,8 +1,8 @@
 .code-block {
   margin: 0;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius);
-  background: #080b12;
+  background: var(--color-inset);
   overflow: hidden;
 }
 
@@ -10,11 +10,11 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.55rem 0.9rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
+  padding: 0.4rem 0.8rem;
+  border-bottom: 2px solid var(--color-border);
+  background: var(--color-surface-2);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--color-text-muted);
 }
 
@@ -24,19 +24,29 @@
 }
 
 .code-block__dots span {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  background: var(--color-border);
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--color-border-strong);
+}
+
+.code-block__dots span:first-child {
+  background: var(--tone);
 }
 
 .code-block__body {
+  position: relative;
   margin: 0;
   padding: 0.75rem 0;
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 0.95rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.75;
+  /* Faint scanlines: texture only, kept well below text contrast. */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 3px,
+    rgba(255, 255, 255, 0.018) 3px 4px
+  );
 }
 
 .code-block__line {
@@ -69,14 +79,20 @@
 
 .code-block__slot {
   padding: 0 0.3em;
-  border: 1px dashed var(--color-text-muted);
-  border-radius: 4px;
-  color: var(--color-text-muted);
+  border: 1px dashed var(--tone);
+  color: var(--tone);
+  animation: slot-wait 1.6s ease-in-out infinite;
 }
 
 .code-block__slot--filled {
   border-style: solid;
-  border-color: var(--color-accent);
-  background: rgba(56, 232, 198, 0.08);
+  background: var(--tone-wash);
   color: var(--color-text-strong);
+  animation: none;
+}
+
+@keyframes slot-wait {
+  50% {
+    border-color: var(--color-border-strong);
+  }
 }

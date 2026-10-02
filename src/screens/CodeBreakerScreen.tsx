@@ -5,13 +5,15 @@ import {
   isCorrectOption,
   type CodeBreakerChallenge,
 } from '../challenges/codeBreaker.ts'
+import ActionBar from '../components/ActionBar.tsx'
 import ChoiceList from '../components/ChoiceList.tsx'
 import CodeBlock from '../components/CodeBlock.tsx'
 import ConceptCard from '../components/ConceptCard.tsx'
 import FeedbackPanel from '../components/FeedbackPanel.tsx'
+import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
-import RunProgress from '../components/RunProgress.tsx'
 import RunSummary from '../components/RunSummary.tsx'
+import type { StatusState } from '../components/StatusBadge.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { codeBreakerChallenges } from '../content/codeBreakerChallenges.ts'
 import { useChallengeRun } from '../game/useChallengeRun.ts'
@@ -34,19 +36,10 @@ const lockLabels: Record<LockState, string> = {
   failed: 'Still locked',
 }
 
-function LockIcon({ open }: { open: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-      <path
-        d={open ? 'M8 11V7a4 4 0 0 1 7.5-2' : 'M8 11V7a4 4 0 0 1 8 0v4'}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor" />
-    </svg>
-  )
+const lockStates: Record<LockState, StatusState> = {
+  locked: 'idle',
+  unlocked: 'ok',
+  failed: 'fail',
 }
 
 function CodeBreakerScreen({
@@ -73,12 +66,14 @@ function CodeBreakerScreen({
 
   if (finished) {
     return (
-      <div className="screen">
+      <div className="screen" data-theme="code-breaker">
         <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
+          art="code-breaker"
           eyebrow="Code Breaker · complete"
           title="All locks broken"
           message="Every security node is open. Your logic held up."
+          xp={xp}
           runXp={runXp}
           total={challenges.length}
           solved={solved}
@@ -101,30 +96,30 @@ function CodeBreakerScreen({
   const slotValue = result ? correctOption.code : (selectedOption?.code ?? null)
 
   return (
-    <div className="screen">
+    <div className="screen" data-theme="code-breaker">
       <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
       <main className="game">
-        <RunProgress
-          label="Code Breaker"
+        <GameHud
+          art="code-breaker"
+          name="Code Breaker"
           index={index}
           total={challenges.length}
+          status={{
+            label: 'Security',
+            value: lockLabels[lockState],
+            state: lockStates[lockState],
+          }}
         />
 
-        <section className={`access-panel access-panel--${lockState}`}>
-          <header className="access-panel__header">
-            <div>
-              <p className="access-panel__node">Security {challenge.node}</p>
-              <h1 className="game__title" ref={titleRef} tabIndex={-1}>
-                {challenge.system}
-              </h1>
-            </div>
-            <p className="lock-status" role="status">
-              <LockIcon open={lockState === 'unlocked'} />
-              {lockLabels[lockState]}
-            </p>
-          </header>
-          <p className="access-panel__rule">
-            <span className="access-panel__label">Rule</span>
+        <section className={`mission panel access-panel--${lockState}`}>
+          <p className="mission__id">
+            Security {challenge.node} · Break the lock
+          </p>
+          <h1 className="game__title" ref={titleRef} tabIndex={-1}>
+            {challenge.system}
+          </h1>
+          <p className="mission__objective">
+            <span className="mission__label">Rule</span>
             {challenge.rule}
           </p>
           <dl className="access-panel__state" aria-label="System state">
@@ -162,14 +157,12 @@ function CodeBreakerScreen({
         />
 
         {!result && (
-          <button
-            type="button"
-            className="btn btn--primary game__submit"
+          <ActionBar
+            hint={selectedId ? 'Logic loaded' : 'Pick the logic'}
+            label="Attempt unlock"
             disabled={!selectedId}
             onClick={() => submit(isCorrectOption(challenge, selectedId ?? ''))}
-          >
-            Attempt unlock
-          </button>
+          />
         )}
 
         {result && (

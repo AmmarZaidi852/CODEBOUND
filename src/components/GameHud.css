@@ -1,0 +1,70 @@
+.game-hud {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  padding: 0.55rem 0.8rem;
+  background: var(--color-inset);
+}
+
+.game-hud__art {
+  width: 3.5rem;
+  padding: 0.2rem;
+  border: 2px solid var(--color-border);
+  background: var(--tone-wash);
+}
+
+.game-hud__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.game-hud__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+.game-hud__progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.7rem;
+}
+
+.game-hud__count {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-strong);
+}
+
+.game-hud__bar {
+  flex: 1;
+  min-width: 6rem;
+  max-width: 12rem;
+  height: 0.6rem;
+}
+
+@media (max-width: 560px) {
+  .game-hud {
+    grid-template-columns: auto 1fr;
+  }
+
+  .game-hud__art {
+    width: 3rem;
+  }
+
+  .game-hud .status-badge {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}

@@ -4,16 +4,19 @@ import {
   type DataAnswer,
   type DataSorterChallenge,
 } from '../challenges/dataSorter.ts'
+import ActionBar from '../components/ActionBar.tsx'
 import CodeBlock from '../components/CodeBlock.tsx'
 import ConceptCard from '../components/ConceptCard.tsx'
 import FeedbackPanel from '../components/FeedbackPanel.tsx'
+import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
 import ListCells, { type CellState } from '../components/ListCells.tsx'
 import type { RunResult } from '../game/useChallengeRun.ts'
 
 interface DataSorterRoundProps {
   challenge: DataSorterChallenge
-  number: number
+  index: number
+  total: number
   result: RunResult | null
   isLast: boolean
   onSubmit: (correct: boolean) => void
@@ -29,7 +32,8 @@ interface DataSorterRoundProps {
  */
 function DataSorterRound({
   challenge,
-  number,
+  index,
+  total,
   result,
   isLast,
   onSubmit,
@@ -53,11 +57,11 @@ function DataSorterRound({
     answer = { kind: 'build', values: built }
   }
 
-  function pickState(index: number): CellState {
+  function pickState(i: number): CellState {
     if (task.kind !== 'pick') return ''
-    if (!locked) return index === picked ? 'picked' : ''
-    if (index === task.answerIndex) return 'correct'
-    return index === picked ? 'wrong' : ''
+    if (!locked) return i === picked ? 'picked' : ''
+    if (i === task.answerIndex) return 'correct'
+    return i === picked ? 'wrong' : ''
   }
 
   const builtState: CellState = !locked
@@ -65,18 +69,30 @@ function DataSorterRound({
     : result.correct
       ? 'correct'
       : 'wrong'
-  const terminalNumber = String(number).padStart(2, '0')
+  const terminalNumber = String(index + 1).padStart(2, '0')
   // Only worth showing when the code changed the list or produced output.
   const showResult = task.kind === 'build' || challenge.ops !== undefined
 
   return (
     <>
-      <section className="data-terminal">
-        <p className="data-terminal__id">Data {challenge.terminal}</p>
+      <GameHud
+        art="data-sorter"
+        name="Data Sorter"
+        index={index}
+        total={total}
+        status={{
+          label: 'Data core',
+          value: !locked ? 'Online' : result.correct ? 'Sorted' : 'Mismatch',
+          state: !locked ? 'idle' : result.correct ? 'ok' : 'fail',
+        }}
+      />
+
+      <section className="mission panel">
+        <p className="mission__id">Data {challenge.terminal} · Process</p>
         <h1 className="game__title" ref={titleRef} tabIndex={-1}>
           {challenge.name}
         </h1>
-        <p className="data-terminal__instruction">
+        <p className="mission__objective">
           <InlineCode text={challenge.instruction} />
         </p>
       </section>
@@ -88,10 +104,10 @@ function DataSorterRound({
         lines={challenge.code}
       />
 
-      <section className="data-panel" aria-label="Data">
+      <section className="data-panel panel" aria-label="Data">
         {task.kind === 'pick' ? (
           <>
-            <p className="data-panel__hint">Tap a cell</p>
+            <p className="hint-label data-panel__hint">Tap a cell</p>
             <ListCells
               label={`${challenge.variable} =`}
               values={challenge.input}
@@ -106,13 +122,13 @@ function DataSorterRound({
           </>
         ) : (
           <>
-            <p className="data-panel__hint">Starting list</p>
+            <p className="hint-label data-panel__hint">Starting list</p>
             <ListCells
               label={`${challenge.variable} =`}
               values={challenge.input}
               showIndexes={challenge.showIndexes}
             />
-            <p className="data-panel__hint">Your answer</p>
+            <p className="hint-label data-panel__hint">Your answer</p>
             <ListCells
               label={task.targetLabel}
               values={built}
@@ -151,14 +167,12 @@ function DataSorterRound({
       </section>
 
       {!result && (
-        <button
-          type="button"
-          className="btn btn--primary game__submit"
+        <ActionBar
+          hint={answer ? 'Data ready' : 'Awaiting data'}
+          label="Submit"
           disabled={!answer}
           onClick={() => answer && onSubmit(isCorrectAnswer(challenge, answer))}
-        >
-          Submit
-        </button>
+        />
       )}
 
       {result && (

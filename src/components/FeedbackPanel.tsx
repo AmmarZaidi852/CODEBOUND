@@ -17,6 +17,10 @@ interface FeedbackPanelProps {
   children: ReactNode
 }
 
+/**
+ * Result terminal: a SYSTEM ONLINE / SYSTEM ERROR strip for the game framing,
+ * then plain-language teaching underneath.
+ */
 function FeedbackPanel({
   correct,
   xpEarned,
@@ -33,23 +37,35 @@ function FeedbackPanel({
       className={`feedback ${correct ? 'feedback--correct' : 'feedback--wrong'}`}
       aria-live="polite"
     >
-      <div className="feedback__header">
+      <div className="feedback__strip">
+        <span className="feedback__status">
+          <span className="feedback__icon" aria-hidden="true" />
+          {correct ? 'System online' : 'System error'}
+        </span>
+        {xpEarned > 0 && <span className="feedback__xp">+{xpEarned} XP</span>}
+      </div>
+      <div className="feedback__body">
         <h2 ref={headingRef} tabIndex={-1}>
           {title}
         </h2>
-        {xpEarned > 0 && <span className="feedback__xp">+{xpEarned} XP</span>}
+        {!correct && whyNot && (
+          <p className="feedback__why-not">
+            <InlineCode text={whyNot} />
+          </p>
+        )}
+        {children}
+        {actions ?? (
+          <div className="feedback__actions">
+            <button
+              type="button"
+              className="btn btn--primary btn--large btn--go"
+              onClick={onNext}
+            >
+              {isLast ? 'Finish' : 'Next challenge'}
+            </button>
+          </div>
+        )}
       </div>
-      {!correct && whyNot && (
-        <p className="feedback__why-not">
-          <InlineCode text={whyNot} />
-        </p>
-      )}
-      {children}
-      {actions ?? (
-        <button type="button" className="btn btn--primary" onClick={onNext}>
-          {isLast ? 'Finish' : 'Next challenge'}
-        </button>
-      )}
     </section>
   )
 }

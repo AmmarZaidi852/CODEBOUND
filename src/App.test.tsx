@@ -4,6 +4,7 @@ import App from './App.tsx'
 import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
 import { codeBreakerChallenges } from './content/codeBreakerChallenges.ts'
 import { dataSorterChallenges } from './content/dataSorterChallenges.ts'
+import { expectStep } from './test/progress.ts'
 
 describe('App', () => {
   it('shows the home screen with title, tagline, and starting progress', () => {
@@ -44,7 +45,7 @@ describe('App', () => {
         name: dataSorterChallenges[0].name,
       }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Data Sorter · 1/7')).toBeInTheDocument()
+    expectStep('Data Sorter', 1, 7)
   })
 
   it('opens Code Breaker from game selection', () => {
@@ -58,7 +59,7 @@ describe('App', () => {
         name: codeBreakerChallenges[0].system,
       }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Code Breaker · 1/5')).toBeInTheDocument()
+    expectStep('Code Breaker', 1, 5)
   })
 
   it('returns home from game selection', () => {
@@ -130,7 +131,7 @@ describe('App', () => {
 
     // Re-entering Bug Hunt starts a fresh run but keeps the session XP.
     fireEvent.click(screen.getByRole('button', { name: 'Play Bug Hunt' }))
-    expect(screen.getByText('Bug Hunt · 1/5')).toBeInTheDocument()
+    expectStep('Bug Hunt', 1, 5)
     expect(screen.getByText('125 XP')).toBeInTheDocument()
   })
 

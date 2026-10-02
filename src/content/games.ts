@@ -5,7 +5,8 @@ export interface GameInfo {
   id: GameId
   name: string
   description: string
-  concept: string
+  /** Area status readout shown on the cartridge, e.g. "Corrupted". */
+  status: string
   playable: boolean
 }
 
@@ -14,28 +15,28 @@ export const games: GameInfo[] = [
     id: 'bug-hunt',
     name: 'Bug Hunt',
     description: 'Fix broken Python code.',
-    concept: 'Python basics',
+    status: 'Corrupted',
     playable: true,
   },
   {
     id: 'code-breaker',
     name: 'Code Breaker',
     description: 'Use Python logic to unlock security systems.',
-    concept: 'Conditions & logic',
+    status: 'Locked',
     playable: true,
   },
   {
     id: 'data-sorter',
     name: 'Data Sorter',
     description: 'Manipulate Python lists and data.',
-    concept: 'Lists & data',
+    status: 'Online',
     playable: true,
   },
   {
     id: 'function-forge',
     name: 'Function Forge',
     description: 'Build and use Python functions.',
-    concept: 'Functions',
+    status: 'Ready',
     playable: true,
   },
 ]

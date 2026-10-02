@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { CodeBreakerChallenge } from '../challenges/codeBreaker.ts'
 import { codeBreakerChallenges } from '../content/codeBreakerChallenges.ts'
 import CodeBreakerScreen from './CodeBreakerScreen.tsx'
+import { expectStep } from '../test/progress.ts'
 
 function option(challenge: CodeBreakerChallenge, correct: boolean) {
   return challenge.options.find(
@@ -32,7 +33,7 @@ describe('CodeBreakerScreen', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: first.system }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Code Breaker · 1/5')).toBeInTheDocument()
+    expectStep('Code Breaker', 1, 5)
     expect(screen.getByRole('status')).toHaveTextContent('Locked')
     expect(screen.getByText(first.rule)).toBeInTheDocument()
     expect(screen.getByText(first.state[0].name)).toBeInTheDocument()
@@ -116,7 +117,7 @@ describe('CodeBreakerScreen', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: second.system }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Code Breaker · 2/5')).toBeInTheDocument()
+    expectStep('Code Breaker', 2, 5)
     expect(screen.getByRole('status')).toHaveTextContent('Locked')
     expect(
       screen.getByRole('button', { name: 'Attempt unlock' }),

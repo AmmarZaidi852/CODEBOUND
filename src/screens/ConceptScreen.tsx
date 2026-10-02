@@ -6,11 +6,12 @@ import {
   type MicroAnswer,
 } from '../challenges/foundations.ts'
 import ChoiceList from '../components/ChoiceList.tsx'
+import ActionBar from '../components/ActionBar.tsx'
 import CodeBlock from '../components/CodeBlock.tsx'
 import FeedbackPanel from '../components/FeedbackPanel.tsx'
+import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
 import ListCells, { type CellState } from '../components/ListCells.tsx'
-import RunProgress from '../components/RunProgress.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { games } from '../content/games.ts'
 import { XP_CONCEPT } from '../game/xp.ts'
@@ -90,14 +91,25 @@ function ConceptScreen({
   }
 
   return (
-    <div className="screen">
+    <div className="screen" data-theme="foundations">
       <TopBar xp={xp} backLabel="Foundations" onBack={onBack} />
       <main className="game">
-        <RunProgress label="Python Foundations" index={index} total={total} />
+        <GameHud
+          art="foundations"
+          name="Python Foundations"
+          index={index}
+          total={total}
+          unit="Lesson"
+          status={{
+            label: 'Training',
+            value: result || alreadyCompleted ? 'Complete' : 'Active',
+            state: result || alreadyCompleted ? 'ok' : 'idle',
+          }}
+        />
 
-        <header className="concept">
-          <p className="concept__number">
-            Foundation {String(index + 1).padStart(2, '0')}
+        <header className="concept mission panel">
+          <p className="mission__id">
+            Training module {String(index + 1).padStart(2, '0')}
             {alreadyCompleted && ' · completed'}
           </p>
           <h1 className="game__title" ref={titleRef} tabIndex={-1}>
@@ -115,8 +127,8 @@ function ConceptScreen({
           </p>
         </div>
 
-        <section className="concept__try" aria-label="Try it">
-          <p className="eyebrow">Try it</p>
+        <section className="concept__try panel" aria-label="Try it">
+          <p className="eyebrow">Code terminal · Try it</p>
           {micro.kind === 'choice' ? (
             <>
               {micro.code && <CodeBlock fileName="try.py" lines={micro.code} />}
@@ -151,14 +163,12 @@ function ConceptScreen({
         </section>
 
         {!result && (
-          <button
-            type="button"
-            className="btn btn--primary game__submit"
+          <ActionBar
+            hint={answer ? 'Answer locked in' : 'Choose an answer'}
+            label="Check answer"
             disabled={!answer}
             onClick={check}
-          >
-            Check answer
-          </button>
+          />
         )}
 
         {result && (
@@ -173,7 +183,7 @@ function ConceptScreen({
                 {game && (
                   <button
                     type="button"
-                    className="btn btn--primary"
+                    className="btn btn--primary btn--large btn--go"
                     onClick={onPractise}
                   >
                     Practise in {game.name}
@@ -181,7 +191,7 @@ function ConceptScreen({
                 )}
                 <button
                   type="button"
-                  className={game ? 'btn' : 'btn btn--primary'}
+                  className={`btn btn--large ${game ? '' : 'btn--primary btn--go'}`}
                   onClick={onNext}
                 >
                   {nextTitle

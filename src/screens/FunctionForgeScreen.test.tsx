@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { FunctionForgeChallenge } from '../challenges/functionForge.ts'
 import { functionForgeChallenges } from '../content/functionForgeChallenges.ts'
 import FunctionForgeScreen from './FunctionForgeScreen.tsx'
+import { expectStep } from '../test/progress.ts'
 
 const byId = (id: string) => functionForgeChallenges.find((c) => c.id === id)!
 
@@ -52,13 +53,13 @@ function renderGame(challenges?: FunctionForgeChallenge[]) {
 }
 
 describe('FunctionForgeScreen', () => {
-  it('opens on the first module with an idle status', () => {
+  it('opens on the first module with a ready status', () => {
     renderGame()
     expect(
       screen.getByRole('heading', { level: 1, name: 'Define It' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Function Forge · 1/7')).toBeInTheDocument()
-    expect(screen.getByRole('status')).toHaveTextContent('Idle')
+    expectStep('Function Forge', 1, 7)
+    expect(screen.getByRole('status')).toHaveTextContent('Ready')
     expect(screen.getByRole('button', { name: 'Run module' })).toBeDisabled()
   })
 
@@ -197,9 +198,7 @@ describe('FunctionForgeScreen', () => {
     const { onEarnXp, onExit } = renderGame()
 
     functionForgeChallenges.forEach((challenge, i) => {
-      expect(
-        screen.getByText(`Function Forge · ${i + 1}/7`),
-      ).toBeInTheDocument()
+      expectStep('Function Forge', i + 1, 7)
       // Miss the call and multiple-parameter modules, solve the rest.
       answer(
         challenge,

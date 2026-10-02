@@ -1,13 +1,6 @@
-.bug-hunt__mission {
+.bug-hunt__expected {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.bug-hunt__mission p {
-  margin: 0;
-}
-
-.bug-hunt__mission strong {
-  color: var(--color-text-strong);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0;
 }

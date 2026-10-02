@@ -5,6 +5,7 @@ import type { Concept } from './challenges/foundations.ts'
 import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
 import { foundations } from './content/foundations.ts'
 import { functionForgeChallenges } from './content/functionForgeChallenges.ts'
+import { expectStep } from './test/progress.ts'
 
 /** Answers the open concept's micro-challenge correctly. */
 function answerConcept(concept: Concept) {
@@ -100,7 +101,7 @@ describe('Python Foundations flow', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Data types' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Python Foundations · 2/8')).toBeInTheDocument()
+    expectStep('Python Foundations', 2, 8, 'Lesson')
   })
 
   it('launches the linked game from a concept and returns to the path with progress kept', () => {
@@ -112,7 +113,7 @@ describe('Python Foundations flow', () => {
     )
 
     // Bug Hunt plays as normal and its XP adds to the same total.
-    expect(screen.getByText('Bug Hunt · 1/5')).toBeInTheDocument()
+    expectStep('Bug Hunt', 1, 5)
     const bug = bugHuntChallenges[0]
     const fix = bug.fixes.find((f) => f.id === bug.correctFixId)!
     fireEvent.click(
@@ -181,14 +182,14 @@ describe('Python Foundations flow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
     expect(screen.getAllByRole('button', { name: /^Play / })).toHaveLength(4)
 
-    for (const [game, progress] of [
-      ['Bug Hunt', 'Bug Hunt · 1/5'],
-      ['Code Breaker', 'Code Breaker · 1/5'],
-      ['Data Sorter', 'Data Sorter · 1/7'],
-      ['Function Forge', 'Function Forge · 1/7'],
-    ]) {
+    for (const [game, total] of [
+      ['Bug Hunt', 5],
+      ['Code Breaker', 5],
+      ['Data Sorter', 7],
+      ['Function Forge', 7],
+    ] as const) {
       fireEvent.click(screen.getByRole('button', { name: `Play ${game}` }))
-      expect(screen.getByText(progress)).toBeInTheDocument()
+      expectStep(game, 1, total)
       fireEvent.click(screen.getByRole('button', { name: /Games/ }))
       expect(
         screen.getByRole('heading', { name: 'Choose your game' }),
@@ -215,7 +216,7 @@ describe('Python Foundations flow', () => {
     fireEvent.click(
       screen.getByRole('button', { name: 'Practise in Function Forge' }),
     )
-    expect(screen.getByText('Function Forge · 1/7')).toBeInTheDocument()
+    expectStep('Function Forge', 1, 7)
     expect(
       screen.getByRole('button', { name: '← Foundations' }),
     ).toBeInTheDocument()

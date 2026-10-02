@@ -1,4 +1,6 @@
-import TopBar from '../components/TopBar.tsx'
+import PixelProgress from '../components/PixelProgress.tsx'
+import PixelSprite from '../components/PixelSprite.tsx'
+import XpBadge from '../components/XpBadge.tsx'
 import './HomeScreen.css'
 
 interface HomeScreenProps {
@@ -9,6 +11,7 @@ interface HomeScreenProps {
   onPlay: () => void
 }
 
+/** Title screen: logo, hero terminal, the two ways in, and player stats. */
 function HomeScreen({ xp, learned, onLearn, onPlay }: HomeScreenProps) {
   const learnLabel =
     learned.done === 0
@@ -18,30 +21,55 @@ function HomeScreen({ xp, learned, onLearn, onPlay }: HomeScreenProps) {
         : 'REVIEW FOUNDATIONS'
 
   return (
-    <div className="screen">
-      <TopBar xp={xp} />
+    <div className="screen" data-theme="foundations">
       <main className="home">
-        <p className="eyebrow home__prompt">&gt; python.init()</p>
-        <h1 className="home__logo">CODEBOUND</h1>
-        <p className="home__tagline">Learn Python. Play the Code.</p>
-        <div className="home__actions">
+        <div className="home__hero">
+          <div className="home__crt">
+            <PixelSprite id="hero" />
+          </div>
+        </div>
+
+        <div className="home__title">
+          <p className="home__prompt">
+            &gt; python.init()
+            <span className="cursor" aria-hidden="true" />
+          </p>
+          <h1 className="home__logo">CODEBOUND</h1>
+          <p className="home__tagline">Learn Python. Play the Code.</p>
+        </div>
+
+        <div className="home__menu">
           <button
             type="button"
-            className="btn btn--primary home__play"
+            className="btn btn--primary btn--large btn--go home__start"
             onClick={onLearn}
           >
             {learnLabel}
           </button>
-          <button type="button" className="btn home__play" onClick={onPlay}>
+          <div className="home__path">
+            <span>
+              Python Foundations · {learned.done}/{learned.total} concepts
+            </span>
+            <PixelProgress
+              className="home__path-bar"
+              value={learned.done}
+              total={learned.total}
+            />
+          </div>
+          <button
+            type="button"
+            className="btn btn--large home__play"
+            onClick={onPlay}
+          >
             PLAY
           </button>
+          <p className="home__hint">Jump into any of the four games</p>
         </div>
-        <p className="home__progress">
-          Python Foundations · {learned.done}/{learned.total} concepts
-        </p>
-        <p className="home__hint">
-          Short coding games · real Python concepts · instant feedback
-        </p>
+
+        <div className="home__player">
+          <span className="home__player-label">Player</span>
+          <XpBadge xp={xp} large />
+        </div>
       </main>
     </div>
   )

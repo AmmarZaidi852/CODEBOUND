@@ -11,7 +11,11 @@ function TopBar({ xp, backLabel, onBack }: TopBarProps) {
   return (
     <header className="top-bar">
       {onBack ? (
-        <button type="button" className="btn btn--ghost" onClick={onBack}>
+        <button
+          type="button"
+          className="btn btn--ghost top-bar__back"
+          onClick={onBack}
+        >
           ← {backLabel}
         </button>
       ) : (

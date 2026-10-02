@@ -1,0 +1,30 @@
+.pixel-progress {
+  --segment-on: var(--tone);
+  --segment-off: var(--color-border);
+
+  display: inline-flex;
+  gap: 3px;
+  height: 0.75rem;
+}
+
+.pixel-progress span {
+  flex: 1;
+  min-width: 4px;
+  background: var(--segment-off);
+  transition: background 0.3s;
+}
+
+.pixel-progress .on {
+  background: var(--segment-on);
+}
+
+.pixel-progress .current {
+  background: var(--color-text-strong);
+  animation: segment-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes segment-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}

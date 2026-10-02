@@ -1,5 +1,4 @@
 import type { DataSorterChallenge } from '../challenges/dataSorter.ts'
-import RunProgress from '../components/RunProgress.tsx'
 import RunSummary from '../components/RunSummary.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { dataSorterChallenges } from '../content/dataSorterChallenges.ts'
@@ -38,12 +37,14 @@ function DataSorterScreen({
 
   if (finished) {
     return (
-      <div className="screen">
+      <div className="screen" data-theme="data-sorter">
         <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
+          art="data-sorter"
           eyebrow="Data Sorter · complete"
           title="All data sorted"
           message="Every terminal is processed. You can read and reshape lists."
+          xp={xp}
           runXp={runXp}
           total={challenges.length}
           solved={solved}
@@ -57,18 +58,14 @@ function DataSorterScreen({
   const challenge = challenges[index]
 
   return (
-    <div className="screen">
+    <div className="screen" data-theme="data-sorter">
       <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
       <main className="game">
-        <RunProgress
-          label="Data Sorter"
-          index={index}
-          total={challenges.length}
-        />
         <DataSorterRound
           key={challenge.id}
           challenge={challenge}
-          number={index + 1}
+          index={index}
+          total={challenges.length}
           result={result}
           isLast={isLast}
           onSubmit={submit}

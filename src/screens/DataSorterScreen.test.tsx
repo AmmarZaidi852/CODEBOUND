@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { DataSorterChallenge } from '../challenges/dataSorter.ts'
 import { dataSorterChallenges } from '../content/dataSorterChallenges.ts'
 import DataSorterScreen from './DataSorterScreen.tsx'
+import { expectStep } from '../test/progress.ts'
 
 const byId = (id: string) => dataSorterChallenges.find((c) => c.id === id)!
 
@@ -56,7 +57,7 @@ describe('DataSorterScreen', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: first.name }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Data Sorter · 1/7')).toBeInTheDocument()
+    expectStep('Data Sorter', 1, 7)
     for (const value of first.input) {
       expect(
         screen.getByRole('button', { name: String(value) }),
@@ -183,7 +184,7 @@ describe('DataSorterScreen', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: second.name }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Data Sorter · 2/7')).toBeInTheDocument()
+    expectStep('Data Sorter', 2, 7)
     expect(screen.getByRole('button', { name: 'Submit' })).toBeDisabled()
   })
 

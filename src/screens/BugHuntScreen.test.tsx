@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { BugHuntChallenge } from '../challenges/bugHunt.ts'
 import { bugHuntChallenges } from '../content/bugHuntChallenges.ts'
 import BugHuntScreen from './BugHuntScreen.tsx'
+import { expectStep } from '../test/progress.ts'
 
 function fixLabel(challenge: BugHuntChallenge, correct: boolean) {
   const fix = challenge.fixes.find(
@@ -33,7 +34,7 @@ describe('BugHuntScreen', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: first.title }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Bug Hunt · 1/5')).toBeInTheDocument()
+    expectStep('Bug Hunt', 1, 5)
     expect(screen.getByText(first.concept)).toBeInTheDocument()
     expect(screen.getAllByRole('radio')).toHaveLength(first.fixes.length)
   })
@@ -97,7 +98,7 @@ describe('BugHuntScreen', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: second.title }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Bug Hunt · 2/5')).toBeInTheDocument()
+    expectStep('Bug Hunt', 2, 5)
     expect(screen.getByRole('button', { name: 'Apply patch' })).toBeDisabled()
   })
 

@@ -8,17 +8,20 @@ import {
   type ForgeAnswer,
   type FunctionForgeChallenge,
 } from '../challenges/functionForge.ts'
+import ActionBar from '../components/ActionBar.tsx'
 import ChoiceList from '../components/ChoiceList.tsx'
 import CodeBlock from '../components/CodeBlock.tsx'
 import ConceptCard from '../components/ConceptCard.tsx'
 import FeedbackPanel from '../components/FeedbackPanel.tsx'
 import FunctionPipeline from '../components/FunctionPipeline.tsx'
+import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
 import type { RunResult } from '../game/useChallengeRun.ts'
 
 interface FunctionForgeRoundProps {
   challenge: FunctionForgeChallenge
-  number: number
+  index: number
+  total: number
   result: RunResult | null
   isLast: boolean
   onSubmit: (correct: boolean) => void
@@ -27,7 +30,8 @@ interface FunctionForgeRoundProps {
   feedbackRef: RefObject<HTMLHeadingElement | null>
 }
 
-const statusLabels = { idle: 'Idle', online: 'Online', fault: 'Fault' }
+const statusLabels = { idle: 'Ready', online: 'Online', fault: 'Fault' }
+const statusStates = { idle: 'idle', online: 'ok', fault: 'fail' } as const
 
 /**
  * One Function Forge module. Holds the player's in-progress answer
@@ -36,7 +40,8 @@ const statusLabels = { idle: 'Idle', online: 'Online', fault: 'Fault' }
  */
 function FunctionForgeRound({
   challenge,
-  number,
+  index,
+  total,
   result,
   isLast,
   onSubmit,
@@ -116,19 +121,24 @@ function FunctionForgeRound({
 
   return (
     <>
-      <section className={`forge-module forge-module--${status}`}>
-        <header className="forge-module__header">
-          <div>
-            <p className="forge-module__id">Function {challenge.module}</p>
-            <h1 className="game__title" ref={titleRef} tabIndex={-1}>
-              {challenge.title}
-            </h1>
-          </div>
-          <p className="forge-status" role="status">
-            {statusLabels[status]}
-          </p>
-        </header>
-        <p className="forge-module__instruction">
+      <GameHud
+        art="function-forge"
+        name="Function Forge"
+        index={index}
+        total={total}
+        status={{
+          label: 'Forge',
+          value: statusLabels[status],
+          state: statusStates[status],
+        }}
+      />
+
+      <section className={`mission panel forge-module--${status}`}>
+        <p className="mission__id">Function {challenge.module} · Build</p>
+        <h1 className="game__title" ref={titleRef} tabIndex={-1}>
+          {challenge.title}
+        </h1>
+        <p className="mission__objective">
           <InlineCode text={challenge.instruction} />
         </p>
       </section>
@@ -136,7 +146,7 @@ function FunctionForgeRound({
       <ConceptCard concept={challenge.concept} lesson={challenge.lesson} />
 
       <CodeBlock
-        fileName={`module_${String(number).padStart(2, '0')}.py`}
+        fileName={`module_${String(index + 1).padStart(2, '0')}.py`}
         lines={codeLines}
         slot={slot}
       />
@@ -151,10 +161,10 @@ function FunctionForgeRound({
         />
       )}
 
-      <section className="forge-bench" aria-label="Workbench">
+      <section className="forge-bench panel" aria-label="Workbench">
         {task.kind === 'assemble' && (
           <>
-            <p className="forge-bench__hint">Tap tokens in order</p>
+            <p className="hint-label">Tap tokens in order</p>
             <div
               className="forge-bench__built"
               role="group"
@@ -205,7 +215,7 @@ function FunctionForgeRound({
 
         {task.kind === 'args' && (
           <>
-            <p className="forge-bench__hint">Fill the arguments</p>
+            <p className="hint-label">Fill the arguments</p>
             <div className="forge-call" role="group" aria-label="Call">
               <span className="forge-call__name">{call?.name}(</span>
               {task.params.map((param, slotIndex) => {
@@ -271,16 +281,14 @@ function FunctionForgeRound({
       </section>
 
       {!result && (
-        <button
-          type="button"
-          className="btn btn--primary game__submit"
+        <ActionBar
+          hint={answer ? 'Module configured' : 'Configure the module'}
+          label="Run module"
           disabled={!answer}
           onClick={() =>
             answer && onSubmit(isCorrectForgeAnswer(challenge, answer))
           }
-        >
-          Run module
-        </button>
+        />
       )}
 
       {result && (

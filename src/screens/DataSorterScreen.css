@@ -1,50 +1,14 @@
-.data-terminal {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.1rem 1.25rem;
-  border: 1px solid var(--color-border);
-  border-top: 3px solid var(--color-accent);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-}
-
-.data-terminal p {
-  margin: 0;
-}
-
-.data-terminal__id {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.data-terminal__instruction {
-  color: var(--color-text-strong);
-}
-
+/* The list workspace: starting data, your answer, and value tiles. */
 .data-panel {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  padding: 1.1rem 1.25rem 1.25rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: #080b12;
+  padding: 1.1rem 1.15rem 1.2rem;
+  background: var(--color-inset);
 }
 
 .data-panel p {
   margin: 0;
-}
-
-.data-panel__hint {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
 }
 
 .data-panel__hint:not(:first-child) {
@@ -54,36 +18,45 @@
 .data-panel__pool {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.55rem;
   margin-top: 0.25rem;
   padding-top: 0.9rem;
-  border-top: 1px dashed var(--color-border);
+  border-top: 2px dashed var(--color-border);
 }
 
+/* A value tile: a small chunky data block. */
 .data-tile {
-  min-width: 2.75rem;
-  height: 2.75rem;
-  padding: 0 0.6rem;
-  border: 1px solid var(--color-accent);
-  border-radius: 6px;
-  background: rgba(56, 232, 198, 0.08);
+  min-width: 3rem;
+  height: 3rem;
+  padding: 0 0.7rem;
+  border: 2px solid var(--tone);
+  border-radius: var(--radius);
+  background: var(--tone-wash);
+  box-shadow: 0 3px 0 0 var(--tone-dim);
   font-family: var(--font-mono);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text-strong);
   cursor: pointer;
   transition:
     opacity 0.15s,
-    background 0.15s;
+    background 0.15s,
+    transform 0.08s;
 }
 
 .data-tile:hover:not(:disabled) {
-  background: rgba(56, 232, 198, 0.18);
+  background: color-mix(in srgb, var(--tone) 20%, transparent);
+}
+
+.data-tile:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: none;
 }
 
 .data-tile:disabled {
   border-color: var(--color-border);
   background: transparent;
+  box-shadow: none;
   opacity: 0.35;
   cursor: default;
 }

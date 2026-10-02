@@ -1,5 +1,4 @@
 import type { FunctionForgeChallenge } from '../challenges/functionForge.ts'
-import RunProgress from '../components/RunProgress.tsx'
 import RunSummary from '../components/RunSummary.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { functionForgeChallenges } from '../content/functionForgeChallenges.ts'
@@ -38,12 +37,14 @@ function FunctionForgeScreen({
 
   if (finished) {
     return (
-      <div className="screen">
+      <div className="screen" data-theme="function-forge">
         <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
+          art="function-forge"
           eyebrow="Function Forge · complete"
           title="All modules online"
           message="You defined, called, and built Python functions. The forge is running."
+          xp={xp}
           runXp={runXp}
           total={challenges.length}
           solved={solved}
@@ -57,18 +58,14 @@ function FunctionForgeScreen({
   const challenge = challenges[index]
 
   return (
-    <div className="screen">
+    <div className="screen" data-theme="function-forge">
       <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
       <main className="game">
-        <RunProgress
-          label="Function Forge"
-          index={index}
-          total={challenges.length}
-        />
         <FunctionForgeRound
           key={challenge.id}
           challenge={challenge}
-          number={index + 1}
+          index={index}
+          total={challenges.length}
           result={result}
           isLast={isLast}
           onSubmit={submit}

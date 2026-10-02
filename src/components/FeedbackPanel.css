@@ -1,55 +1,102 @@
 .feedback {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  padding: 1.25rem;
-  border: 1px solid;
+  --result: var(--color-success);
+  --result-bg: var(--color-success-bg);
+
+  border: 2px solid var(--result);
   border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 4px var(--result-bg);
   animation: feedback-in 0.25s ease-out;
+}
+
+.feedback--wrong {
+  --result: var(--color-danger);
+  --result-bg: var(--color-danger-bg);
+  animation:
+    feedback-in 0.25s ease-out,
+    feedback-shake 0.3s 0.05s;
 }
 
 .feedback p {
   margin: 0;
 }
 
-.feedback--correct {
-  border-color: var(--color-success);
-  background: var(--color-success-bg);
-}
-
-.feedback--wrong {
-  border-color: var(--color-danger);
-  background: var(--color-danger-bg);
-}
-
-.feedback__header {
+/* Status strip: SYSTEM ONLINE ......... +100 XP */
+.feedback__strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  padding: 0.4rem 1rem;
+  background: var(--result);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-on-tone);
 }
 
-.feedback__header h2 {
-  margin: 0;
-  font-size: 1.3rem;
+.feedback__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.feedback__header h2:focus {
-  outline: none;
+/* Pixel tick or cross. */
+.feedback__icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  background: currentColor;
+  clip-path: polygon(0 55%, 15% 40%, 38% 62%, 85% 10%, 100% 25%, 38% 92%);
 }
 
-.feedback--correct h2 {
-  color: var(--color-success);
-}
-
-.feedback--wrong h2 {
-  color: var(--color-danger);
+.feedback--wrong .feedback__icon {
+  clip-path: polygon(
+    0 18%,
+    18% 0,
+    50% 32%,
+    82% 0,
+    100% 18%,
+    68% 50%,
+    100% 82%,
+    82% 100%,
+    50% 68%,
+    18% 100%,
+    0 82%,
+    32% 50%
+  );
 }
 
 .feedback__xp {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--color-accent);
+  padding: 0 0.45rem;
+  background: var(--color-on-tone);
+  color: var(--result);
+  animation: xp-pop 0.5s 0.15s ease-out backwards;
+}
+
+.feedback__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.1rem 1.15rem 1.25rem;
+}
+
+.feedback__body h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--result);
+}
+
+.feedback__body h2:focus {
+  outline: none;
+}
+
+/* "Why your pick fails" reads like a terminal error line. */
+.feedback__why-not {
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-text-strong);
 }
 
 /* Label / text pairs a game can pass as children. */
@@ -57,13 +104,17 @@
 .feedback__explanation {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 0.5rem 1rem;
+  gap: 0.6rem 1rem;
   margin: 0;
 }
 
 .feedback__explanation dt {
-  font-weight: 600;
-  color: var(--color-text-strong);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 .feedback__explanation dd {
@@ -73,33 +124,62 @@
 .feedback__fix-code {
   display: block;
   width: fit-content;
+  max-width: 100%;
   margin-bottom: 0.35rem;
+  border-left: 3px solid var(--color-success);
+  background: var(--color-inset);
+  padding: 0.25em 0.6em;
   color: var(--color-success);
-}
-
-.feedback .btn {
-  align-self: flex-start;
+  overflow-wrap: anywhere;
 }
 
 .feedback__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 @media (max-width: 560px) {
   .feedback__explanation {
     grid-template-columns: 1fr;
+    gap: 0.2rem;
   }
 
   .feedback__explanation dd {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .feedback__actions .btn {
+    flex: 1 1 100%;
   }
 }
 
 @keyframes feedback-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
+  }
+}
+
+@keyframes feedback-shake {
+  25% {
+    translate: -4px 0;
+  }
+  50% {
+    translate: 4px 0;
+  }
+  75% {
+    translate: -2px 0;
+  }
+}
+
+@keyframes xp-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.2);
   }
 }

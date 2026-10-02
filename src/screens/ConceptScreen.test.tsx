@@ -48,7 +48,7 @@ describe('ConceptScreen', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Variables' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Foundation 01')).toBeInTheDocument()
+    expect(screen.getByText('Training module 01')).toBeInTheDocument()
     expect(screen.getByText('score = 100')).toBeInTheDocument()
     expect(
       screen.getByText('What does this example print?'),

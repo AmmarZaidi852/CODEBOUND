@@ -1,24 +1,19 @@
-.concept {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.concept p {
-  margin: 0;
-}
-
-.concept__number {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.concept__summary {
-  font-size: 1.15rem;
+/* One lesson, framed as a training terminal. */
+.concept .concept__summary {
+  position: relative;
+  padding-left: 1.4rem;
+  font-size: 1.1rem;
   color: var(--color-text-strong);
+}
+
+/* Terminal prompt before the one-sentence idea. */
+.concept__summary::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--tone);
 }
 
 .concept__example {
@@ -29,6 +24,8 @@
 
 .concept__note {
   margin: 0;
+  padding-left: 0.9rem;
+  border-left: 3px solid var(--color-border-strong);
   font-size: 0.95rem;
 }
 
@@ -36,15 +33,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
-  padding: 1.1rem 1.25rem 1.25rem;
-  border: 1px solid var(--color-border);
-  border-top: 3px solid var(--color-accent);
-  border-radius: var(--radius);
-  background: var(--color-surface);
+  padding: 1rem 1.15rem 1.2rem;
+  background: var(--color-inset);
 }
 
 .concept__prompt {
   margin: 0;
   font-weight: 600;
+  font-size: 1.05rem;
   color: var(--color-text-strong);
 }
