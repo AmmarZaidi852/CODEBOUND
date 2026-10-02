@@ -27,6 +27,6 @@ Dark, clean, modern, game-like, slightly futuristic, responsive, focused. No chi
 
 - **Bug Hunt** (playable): find the broken line in a short script and choose the patch that fixes it. 5 beginner challenges: variables, arithmetic, strings, booleans, if/else.
 - **Code Breaker** (playable): break 5 security locks with logic instead of fixing bugs. Each lock shows a rule and the system's current values. The player picks the condition or operator that enforces the rule (it fills a slot in the lock's code), or predicts what the code prints. Lessons cover `if`, comparison operators, `if / elif / else`, `and` / `or` / `not`, and combined conditions. A lock status badge shows Locked → Unlocked / Still locked.
-- **Data Sorter** (locked): lists.
+- **Data Sorter** (playable): organise data in 7 terminals by working with the list itself instead of picking from text answers. The player taps a cell ("what is at index 2?", "what does `pop(2)` remove?") or builds the resulting list from value tiles (assignment, `append()`, combined operations, `for`-loop output with `len()`). Lists are drawn as cells with zero-based index labels. Feedback shows the resulting list, what happened step by step, and the rule to remember.
 
 _More detailed game design will be added only as phases are authorized._
