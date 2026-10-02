@@ -8,8 +8,11 @@ interface FeedbackPanelProps {
   title: string
   /** Why the player's pick failed (wrong answers only). */
   whyNot?: string
-  isLast: boolean
-  onNext: () => void
+  /** Default action: a Next challenge / Finish button. */
+  isLast?: boolean
+  onNext?: () => void
+  /** Replaces the default Next button, e.g. with several choices. */
+  actions?: ReactNode
   headingRef: RefObject<HTMLHeadingElement | null>
   children: ReactNode
 }
@@ -21,6 +24,7 @@ function FeedbackPanel({
   whyNot,
   isLast,
   onNext,
+  actions,
   headingRef,
   children,
 }: FeedbackPanelProps) {
@@ -33,7 +37,7 @@ function FeedbackPanel({
         <h2 ref={headingRef} tabIndex={-1}>
           {title}
         </h2>
-        <span className="feedback__xp">+{xpEarned} XP</span>
+        {xpEarned > 0 && <span className="feedback__xp">+{xpEarned} XP</span>}
       </div>
       {!correct && whyNot && (
         <p className="feedback__why-not">
@@ -41,9 +45,11 @@ function FeedbackPanel({
         </p>
       )}
       {children}
-      <button type="button" className="btn btn--primary" onClick={onNext}>
-        {isLast ? 'Finish' : 'Next challenge'}
-      </button>
+      {actions ?? (
+        <button type="button" className="btn btn--primary" onClick={onNext}>
+          {isLast ? 'Finish' : 'Next challenge'}
+        </button>
+      )}
     </section>
   )
 }

@@ -11,6 +11,8 @@ interface DataSorterScreenProps {
   xp: number
   onEarnXp: (amount: number) => void
   onExit: () => void
+  /** Where leaving the game goes, e.g. "Games" or "Foundations". */
+  exitLabel?: string
   challenges?: DataSorterChallenge[]
 }
 
@@ -18,6 +20,7 @@ function DataSorterScreen({
   xp,
   onEarnXp,
   onExit,
+  exitLabel = 'Games',
   challenges = dataSorterChallenges,
 }: DataSorterScreenProps) {
   const {
@@ -36,7 +39,7 @@ function DataSorterScreen({
   if (finished) {
     return (
       <div className="screen">
-        <TopBar xp={xp} backLabel="Games" onBack={onExit} />
+        <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
           eyebrow="Data Sorter · complete"
           title="All data sorted"
@@ -45,6 +48,7 @@ function DataSorterScreen({
           total={challenges.length}
           solved={solved}
           onExit={onExit}
+          exitLabel={`Back to ${exitLabel.toLowerCase()}`}
         />
       </div>
     )
@@ -54,7 +58,7 @@ function DataSorterScreen({
 
   return (
     <div className="screen">
-      <TopBar xp={xp} backLabel="Games" onBack={onExit} />
+      <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
       <main className="game">
         <RunProgress
           label="Data Sorter"

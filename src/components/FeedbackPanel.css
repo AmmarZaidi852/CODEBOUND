@@ -81,6 +81,12 @@
   align-self: flex-start;
 }
 
+.feedback__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
 @media (max-width: 560px) {
   .feedback__explanation {
     grid-template-columns: 1fr;

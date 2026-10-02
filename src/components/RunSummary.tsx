@@ -8,6 +8,7 @@ interface RunSummaryProps {
   total: number
   solved: number
   onExit: () => void
+  exitLabel?: string
 }
 
 /** Completion screen body shown at the end of a game's challenge run. */
@@ -19,6 +20,7 @@ function RunSummary({
   total,
   solved,
   onExit,
+  exitLabel = 'Back to games',
 }: RunSummaryProps) {
   return (
     <main className="run-summary">
@@ -42,7 +44,7 @@ function RunSummary({
         </div>
       </dl>
       <button type="button" className="btn btn--primary" onClick={onExit}>
-        Back to games
+        {exitLabel}
       </button>
     </main>
   )

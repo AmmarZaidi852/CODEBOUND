@@ -7,7 +7,7 @@ export interface ChoiceItem {
 }
 
 interface ChoiceListProps {
-  legend: string
+  legend: ReactNode
   items: ChoiceItem[]
   selectedId: string | null
   correctId: string

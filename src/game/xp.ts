@@ -1,6 +1,8 @@
 export const XP_CORRECT = 100
 export const XP_INCORRECT = 25
 export const XP_PER_LEVEL = 300
+/** Small one-time reward for finishing a Python Foundations concept. */
+export const XP_CONCEPT = 25
 
 /** XP awarded for finishing a challenge. Failing still teaches something, so it still pays a little. */
 export function xpForResult(correct: boolean): number {

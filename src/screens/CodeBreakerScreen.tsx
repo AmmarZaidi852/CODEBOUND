@@ -21,6 +21,8 @@ interface CodeBreakerScreenProps {
   xp: number
   onEarnXp: (amount: number) => void
   onExit: () => void
+  /** Where leaving the game goes, e.g. "Games" or "Foundations". */
+  exitLabel?: string
   challenges?: CodeBreakerChallenge[]
 }
 
@@ -51,6 +53,7 @@ function CodeBreakerScreen({
   xp,
   onEarnXp,
   onExit,
+  exitLabel = 'Games',
   challenges = codeBreakerChallenges,
 }: CodeBreakerScreenProps) {
   const {
@@ -71,7 +74,7 @@ function CodeBreakerScreen({
   if (finished) {
     return (
       <div className="screen">
-        <TopBar xp={xp} backLabel="Games" onBack={onExit} />
+        <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
           eyebrow="Code Breaker · complete"
           title="All locks broken"
@@ -80,6 +83,7 @@ function CodeBreakerScreen({
           total={challenges.length}
           solved={solved}
           onExit={onExit}
+          exitLabel={`Back to ${exitLabel.toLowerCase()}`}
         />
       </div>
     )
@@ -98,7 +102,7 @@ function CodeBreakerScreen({
 
   return (
     <div className="screen">
-      <TopBar xp={xp} backLabel="Games" onBack={onExit} />
+      <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
       <main className="game">
         <RunProgress
           label="Code Breaker"

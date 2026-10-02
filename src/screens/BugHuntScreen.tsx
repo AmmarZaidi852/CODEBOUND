@@ -19,6 +19,8 @@ interface BugHuntScreenProps {
   xp: number
   onEarnXp: (amount: number) => void
   onExit: () => void
+  /** Where leaving the game goes, e.g. "Games" or "Foundations". */
+  exitLabel?: string
   challenges?: BugHuntChallenge[]
 }
 
@@ -26,6 +28,7 @@ function BugHuntScreen({
   xp,
   onEarnXp,
   onExit,
+  exitLabel = 'Games',
   challenges = bugHuntChallenges,
 }: BugHuntScreenProps) {
   const {
@@ -46,7 +49,7 @@ function BugHuntScreen({
   if (finished) {
     return (
       <div className="screen">
-        <TopBar xp={xp} backLabel="Games" onBack={onExit} />
+        <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
           eyebrow="Bug Hunt · complete"
           title="All bugs squashed"
@@ -55,6 +58,7 @@ function BugHuntScreen({
           total={challenges.length}
           solved={solved}
           onExit={onExit}
+          exitLabel={`Back to ${exitLabel.toLowerCase()}`}
         />
       </div>
     )
@@ -66,7 +70,7 @@ function BugHuntScreen({
 
   return (
     <div className="screen">
-      <TopBar xp={xp} backLabel="Games" onBack={onExit} />
+      <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
       <main className="game">
         <RunProgress label="Bug Hunt" index={index} total={challenges.length} />
 
