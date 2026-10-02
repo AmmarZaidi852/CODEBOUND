@@ -4,6 +4,7 @@ import App from './App.tsx'
 import type { Concept } from './challenges/foundations.ts'
 import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
 import { foundations } from './content/foundations.ts'
+import { functionForgeChallenges } from './content/functionForgeChallenges.ts'
 
 /** Answers the open concept's micro-challenge correctly. */
 function answerConcept(concept: Concept) {
@@ -168,6 +169,72 @@ describe('Python Foundations flow', () => {
     expect(
       within(card('Data Sorter')).getByText(/Lists · Indexing · Loops/),
     ).toBeInTheDocument()
+    expect(
+      within(card('Function Forge')).getByText('Functions', {
+        selector: '.game-card__learn',
+      }),
+    ).toBeInTheDocument()
+  })
+
+  it('shows four playable games, each opening from game selection', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
+    expect(screen.getAllByRole('button', { name: /^Play / })).toHaveLength(4)
+
+    for (const [game, progress] of [
+      ['Bug Hunt', 'Bug Hunt · 1/5'],
+      ['Code Breaker', 'Code Breaker · 1/5'],
+      ['Data Sorter', 'Data Sorter · 1/7'],
+      ['Function Forge', 'Function Forge · 1/7'],
+    ]) {
+      fireEvent.click(screen.getByRole('button', { name: `Play ${game}` }))
+      expect(screen.getByText(progress)).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: /Games/ }))
+      expect(
+        screen.getByRole('heading', { name: 'Choose your game' }),
+      ).toBeInTheDocument()
+    }
+  })
+
+  it('practises Functions in Function Forge and returns to Foundations with progress kept', () => {
+    openFoundations()
+    fireEvent.click(screen.getByRole('button', { name: 'Start Variables' }))
+    // Work through to Functions.
+    foundations.slice(0, -1).forEach((concept, i) => {
+      answerConcept(concept)
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: `Next concept: ${foundations[i + 1].title}`,
+        }),
+      )
+    })
+    const functions = foundations.at(-1)!
+    answerConcept(functions)
+    expect(screen.getByText('200 XP')).toBeInTheDocument()
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Practise in Function Forge' }),
+    )
+    expect(screen.getByText('Function Forge · 1/7')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: '← Foundations' }),
+    ).toBeInTheDocument()
+
+    // Play the first module, then leave.
+    for (const token of functionForgeChallenges[0].task.kind === 'assemble'
+      ? functionForgeChallenges[0].task.answer
+      : []) {
+      fireEvent.click(screen.getByRole('button', { name: `Add ${token}` }))
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Run module' }))
+    expect(screen.getByText('300 XP')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '← Foundations' }))
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Python Foundations' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('8 / 8 concepts completed')).toBeInTheDocument()
+    expect(screen.getByText('300 XP')).toBeInTheDocument()
   })
 
   it('still returns to game selection when a game is opened directly', () => {
