@@ -39,9 +39,12 @@ export function useChallengeRun(
     if (!result) setSelectedId(id)
   }
 
-  /** Records the answer once. Later calls for the same challenge are ignored. */
+  /**
+   * Records the answer once; later calls for the same challenge are ignored.
+   * Screens only enable submitting once the player has an answer.
+   */
   function submit(correct: boolean) {
-    if (!selectedId || result) return
+    if (result) return
     const xpEarned = xpForResult(correct)
     setResult({ correct, xpEarned })
     setRunXp((sum) => sum + xpEarned)
