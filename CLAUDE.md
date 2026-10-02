@@ -16,20 +16,27 @@ Priority order: **fun interactive learning > complexity > visual spectacle.**
 - **Preserve working functionality.** Every change must leave the app running, tested, and buildable.
 - Use existing Claude Code skills/workflows when they fit, instead of inventing elaborate custom systems. Leave room for the user to do work themselves.
 
-## Workflow after each meaningful piece of work
+## GitHub workflow (mandatory, every phase)
+
+Before starting work: check `git status` and `git diff`.
+
+After **each** meaningful completed piece (not just at the end of a phase):
 
 1. Run tests: `npm test`
 2. Run lint: `npm run lint` (and `npm run format:check`)
 3. Run the build: `npm run build`
-4. Verify the app in the browser (`npm run dev`) when UI changed.
-5. Check `git status` and inspect `git diff`.
+4. Verify the app still works (in the browser via `npm run dev` when UI changed).
+5. Review `git status` and `git diff`.
 6. Make a small, focused commit with a clear message, e.g.
-   `feat: add game shell`, `fix: correct challenge validation`, `ui: improve challenge interface`, `docs: ...`, `chore: ...`
-7. Push to GitHub.
+   `feat: add challenge selection screen`, `feat: add bug hunt game`, `fix: correct challenge validation`, `ui: improve game interface`, `docs: ...`, `chore: ...`
+7. **Push to GitHub immediately** (`git push`). Completed work must not stay local-only.
 
-- Do not bundle unrelated changes into one giant commit.
-- Never force-push or rewrite history unless the user explicitly says so.
-- At the end of each phase, update `PROJECT_MEMORY.md`.
+Rules:
+
+- Keep commits small and logically grouped — never one giant commit per phase.
+- Never force-push, rewrite history, or reset/delete remote work unless the user explicitly authorizes it.
+- If authentication, the remote, or any GitHub configuration problem blocks a push: **stop** and tell the user exactly what needs fixing. Do not keep going with local-only commits.
+- At the end of each phase: update `PROJECT_MEMORY.md`, push, confirm the final commit is on the remote (`git status` shows up to date with `origin/main`), and report the **commit hash, commit message, and push status**. The working tree must be clean.
 
 ## Visual direction
 
