@@ -1,0 +1,89 @@
+.pipeline {
+  --pipe-color: var(--color-border);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem 0.75rem;
+  margin: 0;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #080b12;
+  font-family: var(--font-mono);
+}
+
+.pipeline.ok {
+  --pipe-color: var(--color-success);
+}
+
+.pipeline.fault {
+  --pipe-color: var(--color-danger);
+}
+
+.pipeline__stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.pipeline__label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Keep the target value's own case (e.g. "Hello Alex"). */
+.pipeline__target {
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--color-text-strong);
+}
+
+.pipeline__inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pipeline__value,
+.pipeline__fn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface-2);
+  font-weight: 600;
+  color: var(--color-text-strong);
+  overflow-wrap: anywhere;
+}
+
+.pipeline__value--empty {
+  border-style: dashed;
+  color: var(--color-text-muted);
+}
+
+.pipeline__fn {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.pipeline__output {
+  border-color: var(--pipe-color);
+  transition: border-color 0.3s;
+}
+
+.pipeline__arrow {
+  padding-bottom: 0.45rem;
+  color: var(--color-text-muted);
+}
+
+.pipeline__none {
+  font-size: 0.8rem;
+  line-height: 2.25rem;
+  color: var(--color-text-muted);
+}
