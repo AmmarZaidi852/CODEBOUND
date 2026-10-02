@@ -1,15 +1,21 @@
 :root {
   --color-bg: #0b0f17;
   --color-surface: #121826;
+  --color-surface-2: #182033;
   --color-border: #243044;
   --color-text: #b7c2d6;
   --color-text-strong: #eef3fb;
   --color-text-muted: #6f7d94;
   --color-accent: #38e8c6;
   --color-accent-glow: rgba(56, 232, 198, 0.35);
+  --color-success: #4ade80;
+  --color-success-bg: rgba(74, 222, 128, 0.08);
+  --color-danger: #f87171;
+  --color-danger-bg: rgba(248, 113, 113, 0.08);
 
   --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --radius: 10px;
 
   color-scheme: dark;
   font-family: var(--font-sans);
@@ -28,4 +34,95 @@
 body {
   margin: 0;
   background: var(--color-bg);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text-strong);
+  line-height: 1.2;
+}
+
+code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--color-surface-2);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--color-text-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-text-strong);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #04120f;
+}
+
+.btn--primary:hover:not(:disabled) {
+  box-shadow: 0 0 20px var(--color-accent-glow);
+}
+
+.btn--ghost {
+  padding: 0.5rem 0.75rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }
