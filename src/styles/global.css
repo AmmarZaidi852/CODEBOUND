@@ -1,0 +1,31 @@
+:root {
+  --color-bg: #0b0f17;
+  --color-surface: #121826;
+  --color-border: #243044;
+  --color-text: #b7c2d6;
+  --color-text-strong: #eef3fb;
+  --color-text-muted: #6f7d94;
+  --color-accent: #38e8c6;
+  --color-accent-glow: rgba(56, 232, 198, 0.35);
+
+  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  color-scheme: dark;
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+}
