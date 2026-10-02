@@ -1,28 +1,119 @@
-:root {
-  --color-bg: #0b0f17;
-  --color-surface: #121826;
-  --color-surface-2: #182033;
-  --color-border: #243044;
-  --color-text: #b7c2d6;
-  --color-text-strong: #eef3fb;
-  --color-text-muted: #6f7d94;
-  --color-accent: #38e8c6;
-  --color-accent-glow: rgba(56, 232, 198, 0.35);
-  --color-success: #4ade80;
-  --color-success-bg: rgba(74, 222, 128, 0.08);
-  --color-danger: #f87171;
-  --color-danger-bg: rgba(248, 113, 113, 0.08);
+/*
+ * Pixel fonts often draw 5 like S and 1 like l. Inside display text,
+ * digits come from a local monospace face instead, so numbers stay exact.
+ */
+@font-face {
+  font-family: 'CB Digits';
+  src:
+    local('Cascadia Mono'), local('Consolas'), local('SF Mono'), local('Menlo'),
+    local('DejaVu Sans Mono');
+  unicode-range: U+0030-0039;
+}
 
+/*
+ * CODEBOUND design tokens.
+ * Every colour, font, and size used by components comes from here.
+ * See DESIGN.md → "Visual language" for how they are meant to be used.
+ */
+:root {
+  /* Surfaces: deep navy, from page to inset terminal. */
+  --color-bg: #070a13;
+  --color-surface: #0e1424;
+  --color-surface-2: #151d33;
+  --color-inset: #04060d;
+  --color-border: #263150;
+  --color-border-strong: #3b4870;
+
+  /* Text. Muted still clears 4.5:1 on every surface. */
+  --color-text: #c3cde2;
+  --color-text-strong: #f2f6ff;
+  --color-text-muted: #8391ae;
+  /* Text on a solid tone fill (primary buttons, status strips). */
+  --color-on-tone: #050810;
+
+  /* Signal palette. Green is the brand; the others mark game areas. */
+  --green: #3dff9a;
+  --green-dim: #13804b;
+  --cyan: #3ee0ff;
+  --cyan-dim: #13738a;
+  --amber: #ffc23d;
+  --amber-dim: #9a6a0c;
+  --magenta: #ff5ad9;
+  --magenta-dim: #8d2378;
+  --violet: #ab8cff;
+  --violet-dim: #5a3fb0;
+  --red: #ff5f6d;
+
+  --color-accent: var(--green);
+  --color-success: var(--green);
+  --color-success-bg: rgba(61, 255, 154, 0.07);
+  --color-danger: var(--red);
+  --color-danger-bg: rgba(255, 95, 109, 0.08);
+
+  /* The current area's colour. Screens override it with data-theme. */
+  --tone: var(--green);
+  --tone-dim: var(--green-dim);
+
+  /* Pixel-art sprite colours. */
+  --px-outline: #03050b;
+  --px-dark: #1a2340;
+  --px-mid: #2d3a5e;
+  --px-light: #51628f;
+  --px-shine: #9aaed6;
+  --px-white: #f2f6ff;
+  --px-screen: #02040a;
+
+  --font-display:
+    'CB Digits', 'Pixelify Sans Variable', 'Courier New', monospace;
   --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
-  --radius: 10px;
+  --font-mono:
+    ui-monospace, 'Cascadia Code', 'Cascadia Mono', Consolas, monospace;
+
+  /* Corners are square. A single small radius softens inputs only. */
+  --radius: 2px;
+  --px: 3px;
 
   color-scheme: dark;
   font-family: var(--font-sans);
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Derived from --tone. Declared on every themed element (not only :root)
+ * so it is recomputed from that element's tone instead of inheriting green.
+ */
+:root,
+[data-theme] {
+  --tone-wash: color-mix(in srgb, var(--tone) 9%, transparent);
+}
+
+/* Area colours. Set on a screen's root element. */
+[data-theme='foundations'] {
+  --tone: var(--green);
+  --tone-dim: var(--green-dim);
+}
+
+[data-theme='bug-hunt'] {
+  --tone: var(--amber);
+  --tone-dim: var(--amber-dim);
+}
+
+[data-theme='code-breaker'] {
+  --tone: var(--magenta);
+  --tone-dim: var(--magenta-dim);
+}
+
+[data-theme='data-sorter'] {
+  --tone: var(--cyan);
+  --tone-dim: var(--cyan-dim);
+}
+
+[data-theme='function-forge'] {
+  --tone: var(--violet);
+  --tone-dim: var(--violet-dim);
 }
 
 *,
@@ -33,14 +124,22 @@
 
 body {
   margin: 0;
-  background: var(--color-bg);
+  /* A faint dot grid, like a circuit board under the UI. */
+  background:
+    radial-gradient(circle at 50% 0%, #0f1834 0%, transparent 60%),
+    radial-gradient(rgba(130, 150, 200, 0.07) 1px, transparent 1px) 0 0 / 22px
+      22px,
+    var(--color-bg);
 }
 
 h1,
 h2,
 h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
   color: var(--color-text-strong);
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
 }
 
 /* Show operators exactly as typed: no `>=` → `≥` style font ligatures. */
@@ -51,7 +150,7 @@ pre {
 
 code {
   padding: 0.1em 0.35em;
-  border-radius: 4px;
+  border-radius: var(--radius);
   background: var(--color-surface-2);
   font-family: var(--font-mono);
   font-size: 0.9em;
@@ -59,8 +158,8 @@ code {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--tone);
+  outline-offset: 3px;
 }
 
 .screen {
@@ -73,79 +172,195 @@ code {
 .game {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.1rem;
   width: 100%;
-  max-width: 760px;
+  max-width: 780px;
   margin: 0 auto;
-  padding: 0.5rem 1rem 4rem;
+  padding: 0.25rem 1rem 2rem;
 }
 
 .game__title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: clamp(1.6rem, 5vw, 2rem);
 }
 
 .game__title:focus {
   outline: none;
 }
 
-.game__submit {
-  align-self: flex-start;
-}
-
+/* Small uppercase label: "SELECT GAME", "TRY IT", … */
 .eyebrow {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--tone);
 }
 
+/*
+ * Buttons: chunky, square, pixel-font labels with a 3px "pressable" base.
+ * Primary = the one main action on a screen. Default = secondary.
+ * Ghost = navigation and small utilities.
+ */
 .btn {
+  --btn-bg: var(--color-surface-2);
+  --btn-fg: var(--color-text-strong);
+  --btn-edge: var(--color-border-strong);
+  --btn-base: #050811;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.7rem 1.4rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-surface);
-  font: inherit;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.25rem;
+  border: 2px solid var(--btn-edge);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+  box-shadow: 0 var(--px) 0 0 var(--btn-base);
+  font-family: var(--font-display);
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--color-text-strong);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--btn-fg);
   cursor: pointer;
   transition:
+    transform 0.08s,
+    box-shadow 0.08s,
     border-color 0.15s,
-    box-shadow 0.15s,
     background 0.15s;
 }
 
 .btn:hover:not(:disabled) {
-  border-color: var(--color-accent);
+  --btn-edge: var(--tone);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(var(--px));
+  box-shadow: 0 0 0 0 var(--btn-base);
 }
 
 .btn:disabled {
-  opacity: 0.45;
+  --btn-fg: var(--color-text-muted);
+  --btn-edge: var(--color-border);
+  --btn-bg: var(--color-surface);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
 .btn--primary {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: #04120f;
+  --btn-bg: var(--tone);
+  --btn-edge: var(--tone);
+  --btn-fg: var(--color-on-tone);
+  --btn-base: var(--tone-dim);
 }
 
 .btn--primary:hover:not(:disabled) {
-  box-shadow: 0 0 20px var(--color-accent-glow);
+  --btn-edge: var(--color-text-strong);
+}
+
+/* A disabled primary keeps its colour hint so the next step stays obvious. */
+.btn--primary:disabled {
+  --btn-edge: color-mix(in srgb, var(--tone) 35%, var(--color-border));
+  --btn-fg: color-mix(in srgb, var(--tone) 55%, var(--color-text-muted));
 }
 
 .btn--ghost {
-  padding: 0.5rem 0.75rem;
-  border-color: transparent;
-  background: transparent;
-  color: var(--color-text);
+  --btn-bg: transparent;
+  --btn-edge: transparent;
+  --btn-fg: var(--color-text);
+  min-height: 2.5rem;
+  padding: 0.4rem 0.7rem;
+  box-shadow: none;
+}
+
+.btn--ghost:hover:not(:disabled) {
+  --btn-edge: transparent;
+  --btn-fg: var(--tone);
+}
+
+.btn--ghost:active:not(:disabled) {
+  transform: none;
+}
+
+.btn--large {
+  min-height: 3.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1.2rem;
+}
+
+/* Pixel arrow after "go" style buttons. */
+.btn--go::after {
+  content: '';
+  width: 0.45em;
+  height: 0.75em;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+/*
+ * Panel: the shared frame for HUDs, missions, and terminals.
+ * Square, 2px border, with small tone-coloured corner brackets.
+ */
+.panel {
+  position: relative;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 0 solid var(--tone);
+  pointer-events: none;
+}
+
+.panel::before {
+  top: -2px;
+  left: -2px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+
+.panel::after {
+  right: -2px;
+  bottom: -2px;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+}
+
+/* Blinking terminal cursor. */
+.cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  margin-left: 0.15em;
+  vertical-align: -0.12em;
+  background: currentColor;
+  animation: cursor-blink 1.1s steps(1) infinite;
+}
+
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -155,4 +370,49 @@ code {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* Mission header: challenge number, title, and objective. */
+.mission {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 1.15rem 1.1rem;
+}
+
+.mission p {
+  margin: 0;
+}
+
+.mission__id {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+.mission__objective {
+  font-size: 1.05rem;
+  color: var(--color-text-strong);
+}
+
+.mission__label {
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* "Tap a cell", "Starting list": small hints inside interactive areas. */
+.hint-label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
