@@ -30,12 +30,12 @@ Home offers two ways in: **Start / Continue Learning** (the Python Foundations p
 
 Eight short lessons in order: Variables → Data types → Operators → Conditions → Lists → Indexing → Loops → Functions. Each is one screen: a one-sentence idea, a tiny example, one quick micro-challenge, and feedback. Then the player either practises in the linked game or moves to the next concept.
 
-| Concepts                                         | Practised in                  |
-| ------------------------------------------------ | ----------------------------- |
-| Variables, Data types                            | Bug Hunt                      |
-| Operators, Conditions                            | Code Breaker                  |
-| Lists, Indexing, Loops                           | Data Sorter                   |
-| Functions (`def`, parameters, `return`, calling) | Micro-challenge only, for now |
+| Concepts                                         | Practised in   |
+| ------------------------------------------------ | -------------- |
+| Variables, Data types                            | Bug Hunt       |
+| Operators, Conditions                            | Code Breaker   |
+| Lists, Indexing, Loops                           | Data Sorter    |
+| Functions (`def`, parameters, `return`, calling) | Function Forge |
 
 Variables starts open. Answering a concept's micro-challenge completes it and unlocks the next. Completed concepts stay open for review.
 
@@ -43,6 +43,7 @@ Variables starts open. Answering a concept's micro-challenge completes it and un
 
 - **Bug Hunt** (playable): find the broken line in a short script and choose the patch that fixes it. 5 beginner challenges: variables, arithmetic, strings, booleans, if/else.
 - **Code Breaker** (playable): break 5 security locks with logic instead of fixing bugs. Each lock shows a rule and the system's current values. The player picks the condition or operator that enforces the rule (it fills a slot in the lock's code), or predicts what the code prints. Lessons cover `if`, comparison operators, `if / elif / else`, `and` / `or` / `not`, and combined conditions. A lock status badge shows Locked → Unlocked / Still locked.
+- **Function Forge** (playable): configure 7 function "modules" (define → call → one parameter → `return` → two parameters → trace → build). The player assembles code from tokens, taps arguments into a call's parameter slots, or picks a line / predicts a return value. The code updates live, and an INPUT → `function()` → OUTPUT pipeline shows the call; after running, a wrong call shows what it really returned (e.g. `-7` or a `NameError`). Module status goes Idle → Online / Fault.
 - **Data Sorter** (playable): organise data in 7 terminals by working with the list itself instead of picking from text answers. The player taps a cell ("what is at index 2?", "what does `pop(2)` remove?") or builds the resulting list from value tiles (assignment, `append()`, combined operations, `for`-loop output with `len()`). Lists are drawn as cells with zero-based index labels. Feedback shows the resulting list, what happened step by step, and the rule to remember.
 
 _More detailed game design will be added only as phases are authorized._
