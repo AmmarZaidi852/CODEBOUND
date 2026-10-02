@@ -23,7 +23,7 @@ function GameSelectScreen({ xp, onBack, onSelect }: GameSelectScreenProps) {
             >
               <div className="game-card__meta">
                 <span className="game-card__concept">{game.concept}</span>
-                <span>{game.playable ? 'Ready' : 'Coming soon'}</span>
+                <span>{game.playable ? 'Playable' : 'Coming soon'}</span>
               </div>
               <h2 className="game-card__name">{game.name}</h2>
               <p className="game-card__description">{game.description}</p>

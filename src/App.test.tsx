@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import App from './App.tsx'
 import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
+import { codeBreakerChallenges } from './content/codeBreakerChallenges.ts'
 
 describe('App', () => {
   it('shows the home screen with title, tagline, and starting progress', () => {
@@ -14,7 +15,7 @@ describe('App', () => {
     expect(screen.getByText('0 XP')).toBeInTheDocument()
   })
 
-  it('opens game selection from PLAY with Bug Hunt playable and the rest locked', () => {
+  it('opens game selection from PLAY with Bug Hunt and Code Breaker playable and Data Sorter locked', () => {
     render(<App />)
     fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
 
@@ -23,11 +24,25 @@ describe('App', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Play Bug Hunt' })).toBeEnabled()
     expect(
-      screen.getByRole('button', { name: 'Code Breaker is locked' }),
-    ).toBeDisabled()
+      screen.getByRole('button', { name: 'Play Code Breaker' }),
+    ).toBeEnabled()
     expect(
       screen.getByRole('button', { name: 'Data Sorter is locked' }),
     ).toBeDisabled()
+  })
+
+  it('opens Code Breaker from game selection', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Play Code Breaker' }))
+
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: codeBreakerChallenges[0].system,
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Code Breaker · 1/5')).toBeInTheDocument()
   })
 
   it('returns home from game selection', () => {

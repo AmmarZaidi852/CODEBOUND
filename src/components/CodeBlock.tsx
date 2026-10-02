@@ -5,9 +5,27 @@ interface CodeBlockProps {
   lines: string[]
   /** 1-based line number to mark as the bug. */
   highlightLine?: number
+  /** Renders `marker` in the code as a slot showing `value` (or the marker while empty). */
+  slot?: { marker: string; value: string | null }
 }
 
-function CodeBlock({ fileName, lines, highlightLine }: CodeBlockProps) {
+function renderLine(line: string, slot: CodeBlockProps['slot']) {
+  if (!slot || !line.includes(slot.marker)) return line
+  const [before, after] = line.split(slot.marker)
+  return (
+    <>
+      {before}
+      <span
+        className={`code-block__slot${slot.value ? ' code-block__slot--filled' : ''}`}
+      >
+        {slot.value ?? slot.marker}
+      </span>
+      {after}
+    </>
+  )
+}
+
+function CodeBlock({ fileName, lines, highlightLine, slot }: CodeBlockProps) {
   return (
     <figure className="code-block">
       <figcaption className="code-block__header">
@@ -27,7 +45,7 @@ function CodeBlock({ fileName, lines, highlightLine }: CodeBlockProps) {
             <span className="code-block__number" aria-hidden="true">
               {i + 1}
             </span>
-            <code>{line}</code>
+            <code>{renderLine(line, slot)}</code>
           </div>
         ))}
       </pre>

@@ -66,3 +66,17 @@
   font-size: inherit;
   white-space: pre;
 }
+
+.code-block__slot {
+  padding: 0 0.3em;
+  border: 1px dashed var(--color-text-muted);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+}
+
+.code-block__slot--filled {
+  border-style: solid;
+  border-color: var(--color-accent);
+  background: rgba(56, 232, 198, 0.08);
+  color: var(--color-text-strong);
+}
