@@ -83,4 +83,38 @@ describe('App', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('500 XP')).toBeInTheDocument()
   })
+
+  it('shares one XP total across Bug Hunt and Code Breaker', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
+
+    // Bug Hunt: one correct answer, then leave mid-run.
+    fireEvent.click(screen.getByRole('button', { name: 'Play Bug Hunt' }))
+    const bug = bugHuntChallenges[0]
+    const fix = bug.fixes.find((f) => f.id === bug.correctFixId)!
+    fireEvent.click(
+      screen.getByRole('radio', { name: `Line ${fix.line} ${fix.code}` }),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Apply patch' }))
+    expect(screen.getByText('100 XP')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Games/ }))
+
+    // Code Breaker: one wrong answer adds to the same total.
+    fireEvent.click(screen.getByRole('button', { name: 'Play Code Breaker' }))
+    expect(screen.getByText('100 XP')).toBeInTheDocument()
+    const lock = codeBreakerChallenges[0]
+    const wrong = lock.options.find((o) => o.id !== lock.correctOptionId)!
+    fireEvent.click(screen.getByRole('radio', { name: wrong.code }))
+    fireEvent.click(screen.getByRole('button', { name: 'Attempt unlock' }))
+    expect(screen.getByText('125 XP')).toBeInTheDocument()
+
+    // Back on the selection screen the total is unchanged (no double award).
+    fireEvent.click(screen.getByRole('button', { name: /Games/ }))
+    expect(screen.getByText('125 XP')).toBeInTheDocument()
+
+    // Re-entering Bug Hunt starts a fresh run but keeps the session XP.
+    fireEvent.click(screen.getByRole('button', { name: 'Play Bug Hunt' }))
+    expect(screen.getByText('Bug Hunt · 1/5')).toBeInTheDocument()
+    expect(screen.getByText('125 XP')).toBeInTheDocument()
+  })
 })
