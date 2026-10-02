@@ -15,7 +15,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
     instruction:
       'Lists keep items in the order they were written. Tap the score that comes last.',
     task: { kind: 'pick', answerIndex: 3 },
-    result: { label: 'scores', values: [12, 18, 7, 21] },
+    result: { label: 'scores =', values: [12, 18, 7, 21] },
     explanation: {
       steps:
         '`scores` holds four numbers. The last one written, 21, sits at the right-hand end of the list.',
@@ -37,7 +37,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
     code: ['scores = [12, 18, 7, 21]', 'print(scores[2])'],
     instruction: 'Tap the value that `scores[2]` gives back.',
     task: { kind: 'pick', answerIndex: 2 },
-    result: { label: 'scores', values: [12, 18, 7, 21] },
+    result: { label: 'scores =', values: [12, 18, 7, 21] },
     explanation: {
       steps:
         'Index 0 is 12, index 1 is 18, index 2 is 7. So `print(scores[2])` prints 7.',
@@ -66,7 +66,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
       targetLabel: 'scores',
     },
     ops: [{ op: 'set', index: 1, value: 20 }],
-    result: { label: 'scores', values: [12, 20, 7, 21] },
+    result: { label: 'scores =', values: [12, 20, 7, 21] },
     explanation: {
       steps:
         '`scores[1] = 20` swaps the item at index 1 (18) for 20. Nothing else moves.',
@@ -94,7 +94,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
       targetLabel: 'scores',
     },
     ops: [{ op: 'append', value: 25 }],
-    result: { label: 'scores', values: [12, 20, 7, 25] },
+    result: { label: 'scores =', values: [12, 20, 7, 25] },
     explanation: {
       steps:
         '`append(25)` adds 25 as a new item at the end. The list grows from 3 items to 4.',
@@ -117,7 +117,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
     instruction: 'Tap the item that `scores.pop(2)` removes.',
     task: { kind: 'pick', answerIndex: 2 },
     ops: [{ op: 'pop', index: 2 }],
-    result: { label: 'scores', values: [12, 20, 25] },
+    result: { label: 'scores =', values: [12, 20, 25] },
     explanation: {
       steps:
         '`pop(2)` removes the item at index 2 (7), so `removed` is 7. 25 shifts left, and `scores` becomes `[12, 20, 25]`.',
@@ -154,7 +154,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
       { op: 'append', value: 9 },
       { op: 'pop', index: 1 },
     ],
-    result: { label: 'items', values: [4, 2, 9] },
+    result: { label: 'items =', values: [4, 2, 9] },
     explanation: {
       steps:
         '`append(9)` gives `[4, 7, 2, 9]`. Then `pop(1)` removes index 1 (7), leaving `[4, 2, 9]`.',
@@ -189,7 +189,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
       answer: [6, 10, 16, 3],
       targetLabel: 'Printed values',
     },
-    result: { label: 'Printed', values: [6, 10, 16, 3] },
+    result: { label: 'Printed values', values: [6, 10, 16, 3] },
     explanation: {
       steps:
         'The loop runs three times: 3 → 6, 5 → 10, 8 → 16. Then `len(signals)` counts the items and prints 3.',

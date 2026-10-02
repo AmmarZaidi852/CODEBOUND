@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import type { GameId } from './content/games.ts'
 import BugHuntScreen from './screens/BugHuntScreen.tsx'
 import CodeBreakerScreen from './screens/CodeBreakerScreen.tsx'
+import DataSorterScreen from './screens/DataSorterScreen.tsx'
 import GameSelectScreen from './screens/GameSelectScreen.tsx'
 import HomeScreen from './screens/HomeScreen.tsx'
 
-type Screen = 'home' | 'select' | 'bug-hunt' | 'code-breaker'
+type Screen = 'home' | 'select' | GameId
 
 function App() {
   const [screen, setScreen] = useState<Screen>('home')
@@ -22,14 +24,16 @@ function App() {
     return <CodeBreakerScreen xp={xp} onEarnXp={earnXp} onExit={backToGames} />
   }
 
+  if (screen === 'data-sorter') {
+    return <DataSorterScreen xp={xp} onEarnXp={earnXp} onExit={backToGames} />
+  }
+
   if (screen === 'select') {
     return (
       <GameSelectScreen
         xp={xp}
         onBack={() => setScreen('home')}
-        onSelect={(id) => {
-          if (id === 'bug-hunt' || id === 'code-breaker') setScreen(id)
-        }}
+        onSelect={setScreen}
       />
     )
   }

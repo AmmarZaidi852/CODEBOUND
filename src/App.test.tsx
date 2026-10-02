@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import App from './App.tsx'
 import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
 import { codeBreakerChallenges } from './content/codeBreakerChallenges.ts'
+import { dataSorterChallenges } from './content/dataSorterChallenges.ts'
 
 describe('App', () => {
   it('shows the home screen with title, tagline, and starting progress', () => {
@@ -15,7 +16,7 @@ describe('App', () => {
     expect(screen.getByText('0 XP')).toBeInTheDocument()
   })
 
-  it('opens game selection from PLAY with Bug Hunt and Code Breaker playable and Data Sorter locked', () => {
+  it('opens game selection from PLAY with all three games playable', () => {
     render(<App />)
     fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
 
@@ -27,8 +28,23 @@ describe('App', () => {
       screen.getByRole('button', { name: 'Play Code Breaker' }),
     ).toBeEnabled()
     expect(
-      screen.getByRole('button', { name: 'Data Sorter is locked' }),
-    ).toBeDisabled()
+      screen.getByRole('button', { name: 'Play Data Sorter' }),
+    ).toBeEnabled()
+    expect(screen.queryByRole('button', { name: /is locked/ })).toBeNull()
+  })
+
+  it('opens Data Sorter from game selection', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Play Data Sorter' }))
+
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: dataSorterChallenges[0].name,
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Data Sorter · 1/7')).toBeInTheDocument()
   })
 
   it('opens Code Breaker from game selection', () => {

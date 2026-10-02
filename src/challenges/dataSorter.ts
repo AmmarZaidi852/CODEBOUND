@@ -41,7 +41,7 @@ export interface DataSorterChallenge {
   task: DataTask
   /** Operations the code performs on `input`, when it changes the list. */
   ops?: ListOp[]
-  /** The list after the code runs, shown in feedback. */
+  /** The list (or printed values) after the code runs, shown in feedback. Label e.g. "scores =". */
   result: { label: string; values: number[] }
   explanation: {
     /** What the code did, step by step. */

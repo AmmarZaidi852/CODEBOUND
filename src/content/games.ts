@@ -27,7 +27,7 @@ export const games: GameInfo[] = [
     id: 'data-sorter',
     name: 'Data Sorter',
     description: 'Manipulate Python lists and data.',
-    concept: 'Lists',
-    playable: false,
+    concept: 'Lists & data',
+    playable: true,
   },
 ]
