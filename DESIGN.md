@@ -18,10 +18,26 @@ Dark, clean, modern, game-like, slightly futuristic, responsive, focused. No chi
 
 ## Core loop
 
-**Home → Choose a game → Read a short concept → Solve a challenge → Instant feedback + explanation → Earn XP → Continue**
+**Learn a concept → Try a tiny example → Play a challenge → Get feedback → Progress**
+
+Home offers two ways in: **Start / Continue Learning** (the Python Foundations path) and **Play** (straight to game selection). The path guides; it never traps the player in a course.
 
 - Correct answer: +100 XP. Wrong answer: +25 XP, because a miss still teaches something. A wrong answer always explains why that choice fails.
 - Level up every 300 XP.
+- Finishing a Foundations concept for the first time gives a small +25 XP.
+
+## Python Foundations
+
+Eight short lessons in order: Variables → Data types → Operators → Conditions → Lists → Indexing → Loops → Functions. Each is one screen: a one-sentence idea, a tiny example, one quick micro-challenge, and feedback. Then the player either practises in the linked game or moves to the next concept.
+
+| Concepts                                         | Practised in                  |
+| ------------------------------------------------ | ----------------------------- |
+| Variables, Data types                            | Bug Hunt                      |
+| Operators, Conditions                            | Code Breaker                  |
+| Lists, Indexing, Loops                           | Data Sorter                   |
+| Functions (`def`, parameters, `return`, calling) | Micro-challenge only, for now |
+
+Variables starts open. Answering a concept's micro-challenge completes it and unlocks the next. Completed concepts stay open for review.
 
 ## Games
 

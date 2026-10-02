@@ -9,13 +9,14 @@ index.html                  HTML entry
 public/                     Static files served as-is (favicon)
 src/
   main.tsx                  Mounts <App /> and loads global styles
-  App.tsx                   Holds session state (current screen, XP) and switches screens
-  screens/                  Full-page screens: Home, GameSelect, BugHunt, CodeBreaker, DataSorter (+ DataSorterRound)
+  App.tsx                   Holds session state (screen, XP, completed concepts) and switches screens
+  screens/                  Full-page screens: Home, GameSelect, Foundations, Concept, BugHunt, CodeBreaker, DataSorter (+ DataSorterRound)
   components/               Reusable UI (see below)
-  content/                  Static data: game list and each game's challenges
+  content/                  Static data: game list, each game's challenges, Python Foundations concepts
   challenges/               Challenge types, deterministic validation, listOps (tiny list model)
   game/xp.ts                XP rewards and level maths
   game/useChallengeRun.ts   Shared state for playing through a challenge sequence
+  game/foundationsProgress.ts  Unlock / current / progress rules for Python Foundations
   styles/global.css         Design tokens (CSS variables), buttons, shared game layout
   test/setup.ts             Vitest setup (jest-dom matchers, cleanup)
 ```
@@ -31,6 +32,11 @@ Tests sit next to the code they cover (`*.test.ts[x]`).
   - `CodeBreakerChallenge`: a security rule, a system-state readout, lock code with an optional `____` slot, and options that either fill the slot or predict the output.
   - Both kinds of answers extend `Choice` (`id`, optional `whyNot`) from `src/challenges/choice.ts`.
   - `DataSorterChallenge`: a starting list, code, and a task that is either `pick` (tap a list cell, checked by index) or `build` (assemble a list from value tiles, checked by exact order). `ops` describes what the code does to the list; tests run them through `listOps.ts` to prove every answer and result matches Python.
+- **Python Foundations** (`src/content/foundations.ts`, types in `src/challenges/foundations.ts`): 8 `Concept`s in learning order, each with a summary, tiny example, a `MicroChallenge` (`choice` or `pick`), an explanation, and the `game` that practises it (`null` for Functions). This is separate from game challenges on purpose: concepts are one-question lessons, not challenge runs.
+  - Progression state is a `completed: ConceptId[]` list in `App.tsx`. `foundationsProgress.ts` derives everything else: the first concept is open, each later one unlocks when the previous is completed, and "current" is the first incomplete concept.
+  - Completing a concept (answering its micro-challenge) awards `XP_CONCEPT` once; reviewing gives nothing.
+  - A game opened from a concept gets `exitLabel="Foundations"` and returns to the path; opened from game selection it returns there.
+  - Game cards list the concepts they practise, derived from each concept's `game`.
 - **Validation** is deterministic and client-side: a chosen id, tapped index, or built list is compared with the challenge data. No Python is executed.
 - **Styling** is plain CSS: shared tokens, buttons, and the `.game` column layout in `global.css`; each screen/component keeps its own CSS file next to it.
 
@@ -46,7 +52,7 @@ A game screen owns its layout and content, and composes these:
 | `CodeBlock`       | Editor-style code with optional highlighted line and fillable slot.                                                                                                                 |
 | `ChoiceList`      | Radio choices that lock and mark correct/wrong after submit.                                                                                                                        |
 | `ListCells`       | A Python list drawn as `[ cells ]` with optional zero-based index labels and clickable cells.                                                                                       |
-| `FeedbackPanel`   | Success/fail header, XP earned, why a wrong pick fails, game-specific explanation, Next/Finish.                                                                                     |
+| `FeedbackPanel`   | Success/fail header, XP earned (hidden when 0), why a wrong pick fails, explanation, and Next/Finish or custom `actions`.                                                           |
 | `RunSummary`      | Completion screen: XP earned, challenges completed, solved first try, back to games.                                                                                                |
 
 Games whose answer is more than one choice keep it in a per-challenge component remounted with `key` (see `DataSorterRound`).
