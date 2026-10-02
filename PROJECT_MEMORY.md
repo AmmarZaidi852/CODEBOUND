@@ -1,8 +1,9 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 0 — Foundation (complete)
-- **Next authorized phase:** none — wait for the user to authorize Phase 1
+- **Current phase:** Phase 1 — First playable learning loop (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 2.
+- **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
 
@@ -10,16 +11,26 @@ React 19 · TypeScript 6 · Vite 8 · Vitest 5 (+ Testing Library, jsdom) · ESL
 
 ## Implemented
 
-- Project scaffold with dev / test / lint / format / typecheck / build scripts
-- Minimal dark title screen (`src/screens/TitleScreen.tsx`) and global design tokens
-- Smoke test for the app
-- Docs: `CLAUDE.md`, `DESIGN.md`, `ARCHITECTURE.md`, this file
+- **Phase 0:** scaffold with dev / test / lint / format / typecheck / build scripts; docs (`CLAUDE.md`, `DESIGN.md`, `ARCHITECTURE.md`, this file).
+- **Phase 1:**
+  - Home screen: logo, "Learn Python. Play the Code.", PLAY, XP/level badge.
+  - Game selection: Bug Hunt (playable), Code Breaker and Data Sorter (locked).
+  - Bug Hunt: 5 sequential beginner challenges (variables, arithmetic, strings, booleans, if/else). Concept primer → mission + expected output → buggy code → choose a patch → feedback with the bug line highlighted, why a wrong pick fails, and an explanation.
+  - XP: +100 correct, +25 wrong, level every 300 XP. Session-only (React state in `App.tsx`).
+  - Completion screen: XP earned, challenges completed, fixed first try, back to games.
+  - Tests: XP maths, validation, content integrity, Bug Hunt gameplay, and a full app loop.
+
+See `ARCHITECTURE.md` for where things live.
 
 ## Not implemented (by design)
 
-Player movement, maps, NPCs, dialogue, lessons, challenges, Python execution, AI mentor, progression/XP, skill trees, accounts, databases, routing, state management.
+Python execution, typed-code answers, persistence (XP resets on reload), Code Breaker and Data Sorter gameplay, accounts, databases, backend, routing, maps/NPCs/dialogue, AI mentor, skill trees, leaderboards.
+
+## Known limitations
+
+- Replaying Bug Hunt awards XP again (acceptable while XP is session-only).
 
 ## Git
 
 - Branch: `main`
-- Last code/docs commit of Phase 0: `7c5f5a1` (this file is committed right after it)
+- Last code commit of Phase 1: `d097c07` (this file is committed right after it)
