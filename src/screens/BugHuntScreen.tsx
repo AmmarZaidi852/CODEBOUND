@@ -53,7 +53,7 @@ function BugHuntScreen({
         <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
           art="bug-hunt"
-          eyebrow="Bug Hunt · complete"
+          gameName="Bug Hunt"
           title="All bugs squashed"
           message="You worked through every broken script. Nice hunting."
           xp={xp}

@@ -70,7 +70,7 @@ function CodeBreakerScreen({
         <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
           art="code-breaker"
-          eyebrow="Code Breaker · complete"
+          gameName="Code Breaker"
           title="All locks broken"
           message="Every security node is open. Your logic held up."
           xp={xp}

@@ -41,7 +41,7 @@ function FunctionForgeScreen({
         <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
           art="function-forge"
-          eyebrow="Function Forge · complete"
+          gameName="Function Forge"
           title="All modules online"
           message="You defined, called, and built Python functions. The forge is running."
           xp={xp}

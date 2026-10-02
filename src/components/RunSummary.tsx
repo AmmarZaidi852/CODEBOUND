@@ -6,7 +6,7 @@ import './RunSummary.css'
 
 interface RunSummaryProps {
   art: SpriteId
-  eyebrow: string
+  gameName: string
   title: string
   message: string
   /** Session XP, for the level meter. */
@@ -21,7 +21,7 @@ interface RunSummaryProps {
 /** Completion screen body shown at the end of a game's challenge run. */
 function RunSummary({
   art,
-  eyebrow,
+  gameName,
   title,
   message,
   xp,
@@ -38,8 +38,7 @@ function RunSummary({
         <span className="run-summary__burst" />
         <PixelSprite id={art} />
       </div>
-      <p className="run-summary__stamp">Mission complete</p>
-      <p className="eyebrow">{eyebrow}</p>
+      <p className="run-summary__stamp">{gameName} · Mission complete</p>
       <h1 className="run-summary__title">{title}</h1>
       <p>{message}</p>
       <dl className="run-summary__stats">

@@ -41,7 +41,7 @@ function DataSorterScreen({
         <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
         <RunSummary
           art="data-sorter"
-          eyebrow="Data Sorter · complete"
+          gameName="Data Sorter"
           title="All data sorted"
           message="Every terminal is processed. You can read and reshape lists."
           xp={xp}

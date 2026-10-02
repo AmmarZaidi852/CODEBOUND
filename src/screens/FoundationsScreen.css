@@ -179,6 +179,12 @@
   min-width: 6.5rem;
 }
 
+/* The row already says LOCKED; keep its button quiet. */
+.concept-row.locked .btn {
+  --btn-edge: transparent;
+  --btn-bg: transparent;
+}
+
 .foundations__done {
   margin: 1.25rem 0 0;
   font-family: var(--font-display);
