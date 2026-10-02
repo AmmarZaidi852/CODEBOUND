@@ -7,5 +7,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // Full play-through tests click through every challenge and can exceed
+    // the 5s default on a busy machine.
+    testTimeout: 15000,
   },
 })
