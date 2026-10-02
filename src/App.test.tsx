@@ -133,4 +133,45 @@ describe('App', () => {
     expect(screen.getByText('Bug Hunt · 1/5')).toBeInTheDocument()
     expect(screen.getByText('125 XP')).toBeInTheDocument()
   })
+
+  it('carries XP from Bug Hunt and Code Breaker into Data Sorter and back', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
+
+    // Bug Hunt: +100.
+    fireEvent.click(screen.getByRole('button', { name: 'Play Bug Hunt' }))
+    const bug = bugHuntChallenges[0]
+    const fix = bug.fixes.find((f) => f.id === bug.correctFixId)!
+    fireEvent.click(
+      screen.getByRole('radio', { name: `Line ${fix.line} ${fix.code}` }),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Apply patch' }))
+    fireEvent.click(screen.getByRole('button', { name: /Games/ }))
+
+    // Code Breaker: +100.
+    fireEvent.click(screen.getByRole('button', { name: 'Play Code Breaker' }))
+    const lock = codeBreakerChallenges[0]
+    const unlock = lock.options.find((o) => o.id === lock.correctOptionId)!
+    fireEvent.click(screen.getByRole('radio', { name: unlock.code }))
+    fireEvent.click(screen.getByRole('button', { name: 'Attempt unlock' }))
+    fireEvent.click(screen.getByRole('button', { name: /Games/ }))
+
+    // Data Sorter starts with the XP from both games, then adds to it.
+    fireEvent.click(screen.getByRole('button', { name: 'Play Data Sorter' }))
+    expect(screen.getByText('200 XP')).toBeInTheDocument()
+    const first = dataSorterChallenges[0]
+    if (first.task.kind !== 'pick') throw new Error('expected a pick task')
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: String(first.input[first.task.answerIndex]),
+      }),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
+    expect(screen.getByText('300 XP')).toBeInTheDocument()
+    expect(screen.getByText('LV 2')).toBeInTheDocument()
+
+    // Leaving keeps the total, with no extra award.
+    fireEvent.click(screen.getByRole('button', { name: /Games/ }))
+    expect(screen.getByText('300 XP')).toBeInTheDocument()
+  })
 })
