@@ -1,10 +1,9 @@
+import { getChoice, type Choice } from './choice.ts'
+
 /** One candidate patch: replace a single line of the snippet with new code. */
-export interface BugFix {
-  id: string
+export interface BugFix extends Choice {
   line: number
   code: string
-  /** Shown when the player picks this fix and it is wrong. */
-  whyNot?: string
 }
 
 export interface BugHuntChallenge {
@@ -34,9 +33,5 @@ export function isCorrectFix(
 }
 
 export function getCorrectFix(challenge: BugHuntChallenge): BugFix {
-  const fix = challenge.fixes.find((f) => f.id === challenge.correctFixId)
-  if (!fix) {
-    throw new Error(`Challenge "${challenge.id}" has no correct fix`)
-  }
-  return fix
+  return getChoice(challenge.fixes, challenge.correctFixId)
 }

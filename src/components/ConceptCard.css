@@ -1,0 +1,19 @@
+.concept-card {
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--color-surface);
+}
+
+.concept-card p {
+  margin: 0;
+}
+
+.concept-card .concept-card__name {
+  margin-bottom: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
