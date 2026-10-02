@@ -274,6 +274,6 @@ export const foundations: Concept[] = [
     },
     explanation:
       'Calling `add(2, 3)` sets `a` to 2 and `b` to 3, so `return a + b` sends back 5.',
-    game: null,
+    game: 'function-forge',
   },
 ]

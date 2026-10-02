@@ -12,7 +12,8 @@
 
 .game-select__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  /* Two columns on wide screens (a 2 × 2 grid of games), one on phones. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
   gap: 1rem;
   margin: 0;
   padding: 0;

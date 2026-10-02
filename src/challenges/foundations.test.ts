@@ -52,15 +52,15 @@ describe('Python Foundations content', () => {
     },
   )
 
-  it('links concepts to playable games, with Functions as a standalone foundation', () => {
+  it('links every concept to a playable game', () => {
     const playable = games.filter((g) => g.playable).map((g) => g.id)
     for (const concept of foundations) {
-      if (concept.game) expect(playable).toContain(concept.game)
+      expect(playable).toContain(concept.game)
     }
     expect(byId('variables').game).toBe('bug-hunt')
     expect(byId('conditions').game).toBe('code-breaker')
     expect(byId('indexing').game).toBe('data-sorter')
-    expect(byId('functions').game).toBeNull()
+    expect(byId('functions').game).toBe('function-forge')
   })
 
   it('gives every playable game at least one concept', () => {

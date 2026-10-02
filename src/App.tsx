@@ -9,6 +9,7 @@ import CodeBreakerScreen from './screens/CodeBreakerScreen.tsx'
 import ConceptScreen from './screens/ConceptScreen.tsx'
 import DataSorterScreen from './screens/DataSorterScreen.tsx'
 import FoundationsScreen from './screens/FoundationsScreen.tsx'
+import FunctionForgeScreen from './screens/FunctionForgeScreen.tsx'
 import GameSelectScreen from './screens/GameSelectScreen.tsx'
 import HomeScreen from './screens/HomeScreen.tsx'
 
@@ -54,6 +55,9 @@ function App() {
   if (screen === 'bug-hunt') return <BugHuntScreen {...gameProps} />
   if (screen === 'code-breaker') return <CodeBreakerScreen {...gameProps} />
   if (screen === 'data-sorter') return <DataSorterScreen {...gameProps} />
+  if (screen === 'function-forge') {
+    return <FunctionForgeScreen {...gameProps} />
+  }
 
   if (screen === 'select') {
     return (

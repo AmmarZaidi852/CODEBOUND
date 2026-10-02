@@ -129,7 +129,7 @@ describe('ConceptScreen', () => {
     expect(onNext).toHaveBeenCalled()
   })
 
-  it('ends Functions with a micro-challenge and no game', () => {
+  it('ends Functions with a micro-challenge and practice in Function Forge', () => {
     const functions = byId('functions')
     renderConcept(functions, { nextTitle: null })
     expect(screen.getByText(/What does/)).toHaveTextContent(
@@ -140,8 +140,8 @@ describe('ConceptScreen', () => {
 
     expect(screen.getByRole('heading', { name: 'Got it!' })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: /Practise in/ }),
-    ).not.toBeInTheDocument()
+      screen.getByRole('button', { name: 'Practise in Function Forge' }),
+    ).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Back to Foundations' }),
     ).toBeInTheDocument()

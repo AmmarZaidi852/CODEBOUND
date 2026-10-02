@@ -1,4 +1,5 @@
-export type GameId = 'bug-hunt' | 'code-breaker' | 'data-sorter'
+export type GameId =
+  'bug-hunt' | 'code-breaker' | 'data-sorter' | 'function-forge'
 
 export interface GameInfo {
   id: GameId
@@ -28,6 +29,13 @@ export const games: GameInfo[] = [
     name: 'Data Sorter',
     description: 'Manipulate Python lists and data.',
     concept: 'Lists & data',
+    playable: true,
+  },
+  {
+    id: 'function-forge',
+    name: 'Function Forge',
+    description: 'Build and use Python functions.',
+    concept: 'Functions',
     playable: true,
   },
 ]
