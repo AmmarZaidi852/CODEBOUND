@@ -22,11 +22,25 @@
   font-size: 1.15rem;
 }
 
-.home__play {
+.home__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
   margin-top: 1.5rem;
-  padding: 0.9rem 3.5rem;
+}
+
+.home__play {
+  padding: 0.9rem 2.5rem;
   font-size: 1.1rem;
   letter-spacing: 0.2em;
+}
+
+.home__progress {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-accent);
 }
 
 .home__hint {

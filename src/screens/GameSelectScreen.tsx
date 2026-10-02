@@ -1,4 +1,5 @@
 import TopBar from '../components/TopBar.tsx'
+import { foundations } from '../content/foundations.ts'
 import { games, type GameId } from '../content/games.ts'
 import './GameSelectScreen.css'
 
@@ -27,6 +28,13 @@ function GameSelectScreen({ xp, onBack, onSelect }: GameSelectScreenProps) {
               </div>
               <h2 className="game-card__name">{game.name}</h2>
               <p className="game-card__description">{game.description}</p>
+              <p className="game-card__learn">
+                <span>Learn</span>{' '}
+                {foundations
+                  .filter((c) => c.game === game.id)
+                  .map((c) => c.title)
+                  .join(' · ')}
+              </p>
               <button
                 type="button"
                 className={game.playable ? 'btn btn--primary' : 'btn'}
