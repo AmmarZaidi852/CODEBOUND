@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ConceptId } from './challenges/foundations.ts'
 import { foundations } from './content/foundations.ts'
 import type { GameId } from './content/games.ts'
@@ -24,6 +24,11 @@ function App() {
   const [conceptId, setConceptId] = useState<ConceptId>(foundations[0].id)
   // Games opened from a lesson return to the learning path.
   const [gameExit, setGameExit] = useState<'select' | 'foundations'>('select')
+
+  // Every screen starts at the top, not at the previous screen's scroll.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [screen, conceptId])
 
   // Shared by every game so XP carries across the whole session.
   const earnXp = (amount: number) => setXp((total) => total + amount)
