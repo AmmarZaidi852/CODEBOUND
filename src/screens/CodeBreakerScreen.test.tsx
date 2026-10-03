@@ -26,7 +26,11 @@ function answer(challenge: CodeBreakerChallenge, correct: boolean) {
 function renderGame() {
   const onExit = vi.fn()
   renderWithProgress(
-    <CodeBreakerScreen onPlayAgain={vi.fn()} onExit={onExit} />,
+    <CodeBreakerScreen
+      challenges={codeBreakerChallenges}
+      onPlayAgain={vi.fn()}
+      onExit={onExit}
+    />,
   )
   return { onExit }
 }
@@ -58,7 +62,11 @@ describe('CodeBreakerScreen', () => {
 
   it('slots the selected condition into the lock code', () => {
     const { container } = renderWithProgress(
-      <CodeBreakerScreen onPlayAgain={() => {}} onExit={() => {}} />,
+      <CodeBreakerScreen
+        challenges={codeBreakerChallenges}
+        onPlayAgain={() => {}}
+        onExit={() => {}}
+      />,
     )
     const slot = () => container.querySelector('.code-block__slot')
     expect(slot()).toHaveTextContent('____')

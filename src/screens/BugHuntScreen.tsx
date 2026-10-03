@@ -1,3 +1,4 @@
+import { isCodeChallenge, type CodeChallenge } from '../challenges/code.ts'
 import {
   getCorrectFix,
   isCorrectFix,
@@ -12,8 +13,9 @@ import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
 import RunSummary from '../components/RunSummary.tsx'
 import TopBar from '../components/TopBar.tsx'
-import { bugHuntChallenges } from '../content/bugHuntChallenges.ts'
+import { bugHuntModules } from '../content/gameChallenges.ts'
 import { useChallengeRun, type RunStart } from '../game/useChallengeRun.ts'
+import CodeRound, { type CodeRoundTheme } from './CodeRound.tsx'
 import './BugHuntScreen.css'
 
 interface BugHuntScreenProps {
@@ -23,15 +25,32 @@ interface BugHuntScreenProps {
   onExit: () => void
   /** Where leaving the game goes, e.g. "Games" or "Foundations". */
   exitLabel?: string
-  challenges?: BugHuntChallenge[]
+  /** Modules in play order: this game's challenges and write modules. */
+  challenges?: (BugHuntChallenge | CodeChallenge)[]
 }
+
+const pad = (n: number) => String(n).padStart(2, '0')
+
+/** How this game dresses its "write" modules. */
+const codeTheme = (index: number): CodeRoundTheme => ({
+  game: 'bug-hunt',
+  name: 'Bug Hunt',
+  status: {
+    label: 'System',
+    idle: 'Corrupted',
+    ok: 'Patched',
+    fail: 'Still corrupted',
+  },
+  titles: { ok: 'Bug squashed!', fail: 'Not quite' },
+  label: `Bug ${pad(index + 1)} · Write the fix`,
+})
 
 function BugHuntScreen({
   startAt = 'continue',
   onPlayAgain,
   onExit,
   exitLabel = 'Games',
-  challenges = bugHuntChallenges,
+  challenges = bugHuntModules,
 }: BugHuntScreenProps) {
   const {
     index,
@@ -45,6 +64,7 @@ function BugHuntScreen({
     feedbackRef,
     select,
     submit,
+    retry,
     next,
   } = useChallengeRun('bug-hunt', challenges, startAt)
 
@@ -68,6 +88,31 @@ function BugHuntScreen({
   }
 
   const challenge = challenges[index]
+
+  if (isCodeChallenge(challenge)) {
+    return (
+      <div className="screen" data-theme="bug-hunt">
+        <TopBar backLabel={exitLabel} onBack={onExit} />
+        <main className="game">
+          <CodeRound
+            key={challenge.id}
+            challenge={challenge}
+            theme={codeTheme(index)}
+            index={index}
+            total={challenges.length}
+            states={states}
+            result={result}
+            isLast={isLast}
+            onSubmit={submit}
+            onRetry={retry}
+            onNext={next}
+            titleRef={titleRef}
+            feedbackRef={feedbackRef}
+          />
+        </main>
+      </div>
+    )
+  }
   const correctFix = getCorrectFix(challenge)
   const selectedFix = challenge.fixes.find((f) => f.id === selectedId)
 

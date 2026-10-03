@@ -10,8 +10,6 @@ export interface LockOption extends Choice {
 
 export interface CodeBreakerChallenge {
   id: string
-  /** Short node label, e.g. "Node 01". */
-  node: string
   /** Name of the security system being broken. */
   system: string
   concept: string

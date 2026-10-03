@@ -3,7 +3,6 @@ import type { DataSorterChallenge } from '../challenges/dataSorter.ts'
 export const dataSorterChallenges: DataSorterChallenge[] = [
   {
     id: 'lists',
-    terminal: 'Terminal 01',
     name: 'Score Feed',
     concept: 'Lists',
     lesson:
@@ -26,7 +25,6 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'indexing',
-    terminal: 'Terminal 02',
     name: 'Index Probe',
     concept: 'Indexing',
     lesson:
@@ -49,7 +47,6 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'set-item',
-    terminal: 'Terminal 03',
     name: 'Patch Record',
     concept: 'Changing an item',
     lesson:
@@ -77,7 +74,6 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'append',
-    terminal: 'Terminal 04',
     name: 'Intake Queue',
     concept: 'append()',
     lesson:
@@ -105,7 +101,6 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'pop',
-    terminal: 'Terminal 05',
     name: 'Purge Slot',
     concept: 'pop()',
     lesson:
@@ -129,7 +124,6 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'combined',
-    terminal: 'Terminal 06',
     name: 'Batch Process',
     concept: 'Combining operations',
     lesson:
@@ -166,7 +160,6 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'for-loop',
-    terminal: 'Terminal 07',
     name: 'Signal Doubler',
     concept: 'for loops & len()',
     lesson:

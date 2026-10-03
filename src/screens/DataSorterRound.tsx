@@ -93,7 +93,7 @@ function DataSorterRound({
       />
 
       <section className="mission panel">
-        <p className="mission__id">Data {challenge.terminal} · Process</p>
+        <p className="mission__id">Data Terminal {terminalNumber} · Process</p>
         <h1 className="game__title" ref={titleRef} tabIndex={-1}>
           {challenge.name}
         </h1>

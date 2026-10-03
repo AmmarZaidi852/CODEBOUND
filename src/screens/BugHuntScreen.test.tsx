@@ -26,7 +26,14 @@ function answer(challenge: BugHuntChallenge, correct: boolean) {
 
 function renderGame() {
   const onExit = vi.fn()
-  renderWithProgress(<BugHuntScreen onPlayAgain={vi.fn()} onExit={onExit} />)
+  // This game's own challenges; write modules are covered by CodeRound tests.
+  renderWithProgress(
+    <BugHuntScreen
+      challenges={bugHuntChallenges}
+      onPlayAgain={vi.fn()}
+      onExit={onExit}
+    />,
+  )
   return { onExit }
 }
 

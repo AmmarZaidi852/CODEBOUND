@@ -113,7 +113,7 @@ describe('Python Foundations flow', () => {
     )
 
     // Bug Hunt plays as normal and its XP adds to the same total.
-    expectStep('Bug Hunt', 1, 5)
+    expectStep('Bug Hunt', 1, 7)
     const bug = bugHuntChallenges[0]
     const fix = bug.fixes.find((f) => f.id === bug.correctFixId)!
     fireEvent.click(
@@ -183,10 +183,10 @@ describe('Python Foundations flow', () => {
     expect(screen.getAllByRole('button', { name: /^Play / })).toHaveLength(4)
 
     for (const [game, total] of [
-      ['Bug Hunt', 5],
-      ['Code Breaker', 5],
-      ['Data Sorter', 7],
-      ['Function Forge', 7],
+      ['Bug Hunt', 7],
+      ['Code Breaker', 7],
+      ['Data Sorter', 9],
+      ['Function Forge', 10],
     ] as const) {
       fireEvent.click(screen.getByRole('button', { name: `Play ${game}` }))
       expectStep(game, 1, total)
@@ -216,7 +216,7 @@ describe('Python Foundations flow', () => {
     fireEvent.click(
       screen.getByRole('button', { name: 'Practise in Function Forge' }),
     )
-    expectStep('Function Forge', 1, 7)
+    expectStep('Function Forge', 1, 10)
     expect(
       screen.getByRole('button', { name: '← Foundations' }),
     ).toBeInTheDocument()

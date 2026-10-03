@@ -1,3 +1,4 @@
+import { isCodeChallenge, type CodeChallenge } from '../challenges/code.ts'
 import {
   CODE_SLOT,
   getCorrectOption,
@@ -15,8 +16,9 @@ import InlineCode from '../components/InlineCode.tsx'
 import RunSummary from '../components/RunSummary.tsx'
 import type { StatusState } from '../components/StatusBadge.tsx'
 import TopBar from '../components/TopBar.tsx'
-import { codeBreakerChallenges } from '../content/codeBreakerChallenges.ts'
+import { codeBreakerModules } from '../content/gameChallenges.ts'
 import { useChallengeRun, type RunStart } from '../game/useChallengeRun.ts'
+import CodeRound, { type CodeRoundTheme } from './CodeRound.tsx'
 import './CodeBreakerScreen.css'
 
 interface CodeBreakerScreenProps {
@@ -26,7 +28,8 @@ interface CodeBreakerScreenProps {
   onExit: () => void
   /** Where leaving the game goes, e.g. "Games" or "Foundations". */
   exitLabel?: string
-  challenges?: CodeBreakerChallenge[]
+  /** Modules in play order: this game's challenges and write modules. */
+  challenges?: (CodeBreakerChallenge | CodeChallenge)[]
 }
 
 type LockState = 'locked' | 'unlocked' | 'failed'
@@ -43,12 +46,28 @@ const lockStates: Record<LockState, StatusState> = {
   failed: 'fail',
 }
 
+const pad = (n: number) => String(n).padStart(2, '0')
+
+/** How this game dresses its "write" modules. */
+const codeTheme = (index: number): CodeRoundTheme => ({
+  game: 'code-breaker',
+  name: 'Code Breaker',
+  status: {
+    label: 'Security',
+    idle: 'Locked',
+    ok: 'Unlocked',
+    fail: 'Still locked',
+  },
+  titles: { ok: 'Lock broken!', fail: 'Access denied' },
+  label: `Security Node ${pad(index + 1)} · Write the logic`,
+})
+
 function CodeBreakerScreen({
   startAt = 'continue',
   onPlayAgain,
   onExit,
   exitLabel = 'Games',
-  challenges = codeBreakerChallenges,
+  challenges = codeBreakerModules,
 }: CodeBreakerScreenProps) {
   const {
     index,
@@ -62,6 +81,7 @@ function CodeBreakerScreen({
     feedbackRef,
     select,
     submit,
+    retry,
     next,
   } = useChallengeRun('code-breaker', challenges, startAt)
 
@@ -85,6 +105,31 @@ function CodeBreakerScreen({
   }
 
   const challenge = challenges[index]
+
+  if (isCodeChallenge(challenge)) {
+    return (
+      <div className="screen" data-theme="code-breaker">
+        <TopBar backLabel={exitLabel} onBack={onExit} />
+        <main className="game">
+          <CodeRound
+            key={challenge.id}
+            challenge={challenge}
+            theme={codeTheme(index)}
+            index={index}
+            total={challenges.length}
+            states={states}
+            result={result}
+            isLast={isLast}
+            onSubmit={submit}
+            onRetry={retry}
+            onNext={next}
+            titleRef={titleRef}
+            feedbackRef={feedbackRef}
+          />
+        </main>
+      </div>
+    )
+  }
   const correctOption = getCorrectOption(challenge)
   const selectedOption = challenge.options.find((o) => o.id === selectedId)
   const lockState: LockState = !result
@@ -114,7 +159,7 @@ function CodeBreakerScreen({
 
         <section className={`mission panel access-panel--${lockState}`}>
           <p className="mission__id">
-            Security {challenge.node} · Break the lock
+            Security Node {pad(index + 1)} · Break the lock
           </p>
           <h1 className="game__title" ref={titleRef} tabIndex={-1}>
             {challenge.system}

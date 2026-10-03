@@ -49,7 +49,7 @@ function renderGame(challenges?: FunctionForgeChallenge[]) {
     <FunctionForgeScreen
       onPlayAgain={vi.fn()}
       onExit={onExit}
-      challenges={challenges}
+      challenges={challenges ?? functionForgeChallenges}
     />,
   )
   return { onExit }

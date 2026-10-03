@@ -1,0 +1,173 @@
+/* CODEBOUND terminal: same frame as CodeBlock, but you can type in it. */
+.code-terminal {
+  --frame: var(--color-border);
+
+  border: 2px solid var(--frame);
+  border-radius: var(--radius);
+  background: var(--color-inset);
+  transition: border-color 0.2s;
+}
+
+.code-terminal:focus-within {
+  --frame: var(--tone);
+}
+
+.code-terminal.ok {
+  --frame: var(--color-success);
+}
+
+.code-terminal.fail {
+  --frame: var(--color-danger);
+}
+
+.code-terminal__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.25rem 0 0.8rem;
+  border-bottom: 2px solid var(--frame);
+  background: var(--color-surface-2);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.code-terminal__dots {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.code-terminal__dots span {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--color-border-strong);
+}
+
+.code-terminal__dots span:first-child {
+  background: var(--tone);
+}
+
+.code-terminal__lock {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.code-terminal__reset {
+  margin-left: auto;
+  /* A full-size tap target, even in the slim header. */
+  min-height: 2.75rem;
+  font-size: 0.9rem;
+}
+
+.code-terminal__body {
+  display: flex;
+  /* Long lines scroll inside the editor, never the page. */
+  min-width: 0;
+  padding: 0.65rem 0;
+  font-family: var(--font-mono);
+  /* 16px keeps phones from zooming in on focus. */
+  font-size: 1rem;
+  line-height: 1.75;
+  font-variant-ligatures: none;
+  tab-size: 4;
+}
+
+.code-terminal__gutter {
+  flex: none;
+  width: 2.75rem;
+  margin: 0;
+  padding-right: 0.9rem;
+  font: inherit;
+  text-align: right;
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+.code-terminal__editor {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* The textarea and its highlighted copy share exact metrics. */
+.code-terminal__layer,
+.code-terminal__input {
+  margin: 0;
+  padding: 0 1rem 0 0;
+  border: 0;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: 0;
+  white-space: pre;
+  tab-size: inherit;
+}
+
+.code-terminal__layer {
+  position: absolute;
+  inset: 0 auto auto 0;
+  min-width: 100%;
+  pointer-events: none;
+  color: var(--color-text-strong);
+}
+
+.code-terminal__input {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  resize: none;
+  background: transparent;
+  /* Text comes from the layer; the caret and selection stay visible. */
+  color: transparent;
+  caret-color: var(--tone);
+  outline: none;
+}
+
+.code-terminal__input::selection {
+  background: color-mix(in srgb, var(--tone) 35%, transparent);
+  color: transparent;
+}
+
+.code-terminal__input[readonly] {
+  cursor: default;
+}
+
+.tk-comment {
+  color: var(--color-text-muted);
+}
+
+.tk-string {
+  color: var(--amber);
+}
+
+.tk-number {
+  color: var(--green);
+}
+
+.tk-keyword {
+  color: var(--magenta);
+}
+
+.tk-builtin {
+  color: var(--cyan);
+}
+
+/* Windows high-contrast: drop the overlay trick and show real text. */
+@media (forced-colors: active) {
+  .code-terminal__layer {
+    display: none;
+  }
+
+  .code-terminal__input {
+    color: CanvasText;
+  }
+}
+
+.code-terminal:has(.code-terminal__input:focus-visible) {
+  outline: 2px solid var(--tone);
+  outline-offset: 3px;
+}

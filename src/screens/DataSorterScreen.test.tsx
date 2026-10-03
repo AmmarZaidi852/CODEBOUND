@@ -47,7 +47,7 @@ function renderGame(challenges?: DataSorterChallenge[]) {
     <DataSorterScreen
       onPlayAgain={vi.fn()}
       onExit={onExit}
-      challenges={challenges}
+      challenges={challenges ?? dataSorterChallenges}
     />,
   )
   return { onExit }

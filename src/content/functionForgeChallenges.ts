@@ -8,7 +8,6 @@ function unquote(literal: string): string | null {
 export const functionForgeChallenges: FunctionForgeChallenge[] = [
   {
     id: 'define',
-    module: 'Module 01',
     title: 'Define It',
     concept: 'def',
     lesson:
@@ -33,7 +32,6 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'call',
-    module: 'Module 02',
     title: 'Call It',
     concept: 'Calling a function',
     lesson:
@@ -77,7 +75,6 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'one-parameter',
-    module: 'Module 03',
     title: 'One Parameter',
     concept: 'Parameters & arguments',
     lesson:
@@ -109,7 +106,6 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'return',
-    module: 'Module 04',
     title: 'Return',
     concept: 'return',
     lesson:
@@ -147,7 +143,6 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'multiple-parameters',
-    module: 'Module 05',
     title: 'Two Inputs',
     concept: 'Multiple parameters',
     lesson:
@@ -179,7 +174,6 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'predict',
-    module: 'Module 06',
     title: 'Trace It',
     concept: 'Tracing a function',
     lesson:
@@ -217,7 +211,6 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'build',
-    module: 'Module 07',
     title: 'Forge It',
     concept: 'Building a function',
     lesson:

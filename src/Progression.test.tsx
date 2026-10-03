@@ -1,16 +1,16 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import App from './App.tsx'
-import type { BugHuntChallenge } from './challenges/bugHunt.ts'
-import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
 import { codeBreakerChallenges } from './content/codeBreakerChallenges.ts'
 import { foundations } from './content/foundations.ts'
+import { bugHuntModules } from './content/gameChallenges.ts'
 import {
   applyAnswer,
   newProgress,
   type Progress,
 } from './progression/progress.ts'
 import { saveProgress, STORAGE_KEY } from './progression/storage.ts'
+import { answerBugHunt, nextModule } from './test/play.ts'
 import { expectStep } from './test/progress.ts'
 import { expectStat, expectTotalXp } from './test/render.tsx'
 
@@ -23,23 +23,15 @@ function reload(unmount: () => void) {
 const click = (name: string | RegExp) =>
   fireEvent.click(screen.getByRole('button', { name }))
 
-function patch(challenge: BugHuntChallenge, correct: boolean) {
-  const fix = challenge.fixes.find(
-    (f) => (f.id === challenge.correctFixId) === correct,
-  )!
-  fireEvent.click(
-    screen.getByRole('radio', { name: `Line ${fix.line} ${fix.code}` }),
-  )
-  click('Apply patch')
-}
+/** Answers Bug Hunt module `i` (a patch or a write module). */
+const patch = (i: number, correct: boolean) =>
+  answerBugHunt(bugHuntModules[i], correct)
 
 /** Plays Bug Hunt from the current module to the end with these results. */
 function playBugHunt(results: boolean[], from = 0) {
   results.forEach((correct, i) => {
-    patch(bugHuntChallenges[from + i], correct)
-    click(
-      from + i === bugHuntChallenges.length - 1 ? 'Finish' : 'Next challenge',
-    )
+    patch(from + i, correct)
+    nextModule(from + i === bugHuntModules.length - 1)
   })
 }
 
@@ -47,7 +39,7 @@ function playBugHunt(results: boolean[], from = 0) {
 function savedBugHunt(results: boolean[]): Progress {
   let p = newProgress()
   results.forEach((correct, i) => {
-    p = applyAnswer(p, 'bug-hunt', bugHuntChallenges[i].id, correct).progress
+    p = applyAnswer(p, 'bug-hunt', bugHuntModules[i].id, correct).progress
   })
   return p
 }
@@ -81,7 +73,7 @@ describe('persistent progress', () => {
     fireEvent.click(screen.getByRole('radio', { name: option.code }))
     click('Check answer')
     click('Practise in Bug Hunt')
-    patch(bugHuntChallenges[0], true)
+    patch(0, true)
     expectTotalXp(125)
 
     reload(unmount)
@@ -111,7 +103,7 @@ describe('persistent progress', () => {
       within(card('Bug Hunt')).getByText('In progress'),
     ).toBeInTheDocument()
     expect(
-      within(card('Bug Hunt')).getByText('Modules 01 / 05'),
+      within(card('Bug Hunt')).getByText('Modules 01 / 07'),
     ).toBeInTheDocument()
   })
 
@@ -119,7 +111,7 @@ describe('persistent progress', () => {
     const { unmount } = render(<App />)
     click('PLAY')
     click('Play Bug Hunt')
-    playBugHunt([true, true, true, true, true])
+    playBugHunt([true, true, true, true, true, true, true])
     expect(screen.getByText('Bug Hunt · Game mastered')).toBeInTheDocument()
 
     reload(unmount)
@@ -129,11 +121,11 @@ describe('persistent progress', () => {
     expect(within(card('Bug Hunt')).getByText('Patched')).toBeInTheDocument()
     expect(within(card('Code Breaker')).getByText('Locked')).toBeInTheDocument()
     expect(
-      within(card('Bug Hunt')).getByText('Modules 05 / 05'),
+      within(card('Bug Hunt')).getByText('Modules 07 / 07'),
     ).toBeInTheDocument()
     expect(within(card('Code Breaker')).getByText('New')).toBeInTheDocument()
-    expectTotalXp(500)
-    expect(screen.getByText('LV 2')).toBeInTheDocument()
+    expectTotalXp(700)
+    expect(screen.getByText('LV 3')).toBeInTheDocument()
   })
 
   it('does not replay XP or level-up feedback when progress is restored', () => {
@@ -147,17 +139,17 @@ describe('persistent progress', () => {
 
 describe('cartridge status', () => {
   it.each([
-    ['New', [], 'Modules 00 / 05', ['Play Bug Hunt']],
+    ['New', [], 'Modules 00 / 07', ['Play Bug Hunt']],
     [
       'In progress',
       [true, false],
-      'Modules 01 / 05',
+      'Modules 01 / 07',
       ['Continue Bug Hunt', 'Replay Bug Hunt from the start'],
     ],
     [
       'Mastered',
-      [true, true, true, true, true],
-      'Modules 05 / 05',
+      [true, true, true, true, true, true, true],
+      'Modules 07 / 07',
       ['Replay Bug Hunt'],
     ],
   ] as const)('shows %s', (label, results, count, buttons) => {
@@ -172,8 +164,8 @@ describe('cartridge status', () => {
   })
 
   it('shows Complete when every module is solved but not all first try', () => {
-    let p = savedBugHunt([true, false, true, true, true])
-    p = applyAnswer(p, 'bug-hunt', bugHuntChallenges[1].id, true).progress
+    let p = savedBugHunt([true, false, true, true, true, true, true])
+    p = applyAnswer(p, 'bug-hunt', bugHuntModules[1].id, true).progress
     saveProgress(p)
     openGames()
     expect(within(card('Bug Hunt')).getByText('Complete')).toBeInTheDocument()
@@ -185,53 +177,53 @@ describe('continue, replay and mastery', () => {
     saveProgress(savedBugHunt([true, false]))
     openGames()
     click('Continue Bug Hunt')
-    expectStep('Bug Hunt', 2, 5)
+    expectStep('Bug Hunt', 2, 7)
   })
 
   it('replays a finished game from module 01 without paying XP again', () => {
-    saveProgress(savedBugHunt([true, true, true, true, true]))
+    saveProgress(savedBugHunt([true, true, true, true, true, true, true]))
     openGames()
     click('Replay Bug Hunt')
-    expectStep('Bug Hunt', 1, 5)
+    expectStep('Bug Hunt', 1, 7)
     expect(
       screen.getByText('Mastered', { selector: '.game-hud__mark' }),
     ).toBeInTheDocument()
 
-    patch(bugHuntChallenges[0], true)
+    patch(0, true)
     expect(screen.getByText('Replay · no XP')).toBeInTheDocument()
     expect(screen.queryByText(/^\+\d+ XP$/)).toBeNull()
-    expectTotalXp(500)
+    expectTotalXp(700)
 
     // A wrong replay answer neither pays nor removes mastery.
     click('Next challenge')
-    patch(bugHuntChallenges[1], false)
-    expectTotalXp(500)
+    patch(1, false)
+    expectTotalXp(700)
     click('Next challenge')
-    playBugHunt([true, true, true], 2)
+    playBugHunt([true, true, true, true, true], 2)
     expect(screen.getByText('Bug Hunt · Replay')).toBeInTheDocument()
     expectStat('XP earned', '+0')
-    expectStat('Mastered', '5/5')
+    expectStat('Mastered', '7/7')
     expect(
       screen.getByText(/XP for these modules was already earned/),
     ).toBeInTheDocument()
   })
 
   it('completes, but does not master, a module missed on the first try', () => {
-    saveProgress(savedBugHunt([true, false, true, true, true]))
+    saveProgress(savedBugHunt([true, false, true, true, true, true, true]))
     openGames()
     click('Continue Bug Hunt')
-    expectStep('Bug Hunt', 2, 5)
-    patch(bugHuntChallenges[1], true)
+    expectStep('Bug Hunt', 2, 7)
+    patch(1, true)
     // Tops the module up to 100 XP in total (25 already paid).
     expect(screen.getByText('+75 XP')).toBeInTheDocument()
     expect(
       screen.queryByText('Mastered', { selector: '.feedback__mastered' }),
     ).toBeNull()
     click('Next challenge')
-    playBugHunt([true, true, true], 2)
+    playBugHunt([true, true, true, true, true], 2)
     expect(screen.getByText('Bug Hunt · Mission complete')).toBeInTheDocument()
-    expectStat('Modules complete', '5/5')
-    expectStat('Mastered', '4/5')
+    expectStat('Modules complete', '7/7')
+    expectStat('Mastered', '6/7')
   })
 
   it('marks a first-try win as mastered', () => {
@@ -250,10 +242,10 @@ describe('continue, replay and mastery', () => {
   it('offers to retry unfinished modules from the completion screen', () => {
     openGames()
     click('Play Bug Hunt')
-    playBugHunt([true, false, true, true, true])
+    playBugHunt([true, false, true, true, true, true, true])
     expect(screen.getByText('1 module left to complete.')).toBeInTheDocument()
     click('Retry unfinished')
-    expectStep('Bug Hunt', 2, 5)
+    expectStep('Bug Hunt', 2, 7)
   })
 })
 

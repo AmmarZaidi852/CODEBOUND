@@ -51,8 +51,6 @@ export type ForgeAnswer =
 
 export interface FunctionForgeChallenge {
   id: string
-  /** Short module label, e.g. "Module 01". */
-  module: string
   title: string
   concept: string
   /** Short concept primer. Backticks mark inline code. */

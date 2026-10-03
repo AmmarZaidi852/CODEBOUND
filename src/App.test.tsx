@@ -4,6 +4,8 @@ import App from './App.tsx'
 import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
 import { codeBreakerChallenges } from './content/codeBreakerChallenges.ts'
 import { dataSorterChallenges } from './content/dataSorterChallenges.ts'
+import { bugHuntModules } from './content/gameChallenges.ts'
+import { answerBugHunt, nextModule } from './test/play.ts'
 import { expectStep } from './test/progress.ts'
 
 describe('App', () => {
@@ -45,7 +47,7 @@ describe('App', () => {
         name: dataSorterChallenges[0].name,
       }),
     ).toBeInTheDocument()
-    expectStep('Data Sorter', 1, 7)
+    expectStep('Data Sorter', 1, 9)
   })
 
   it('opens Code Breaker from game selection', () => {
@@ -59,7 +61,7 @@ describe('App', () => {
         name: codeBreakerChallenges[0].system,
       }),
     ).toBeInTheDocument()
-    expectStep('Code Breaker', 1, 5)
+    expectStep('Code Breaker', 1, 7)
   })
 
   it('returns home from game selection', () => {
@@ -74,31 +76,23 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
     fireEvent.click(screen.getByRole('button', { name: 'Play Bug Hunt' }))
 
-    bugHuntChallenges.forEach((challenge, i) => {
-      const fix = challenge.fixes.find((f) => f.id === challenge.correctFixId)!
-      fireEvent.click(
-        screen.getByRole('radio', { name: `Line ${fix.line} ${fix.code}` }),
-      )
-      fireEvent.click(screen.getByRole('button', { name: 'Apply patch' }))
+    // Patches and write modules alike, all solved first try.
+    bugHuntModules.forEach((module, i) => {
+      answerBugHunt(module, true)
       expect(screen.getByText(`${(i + 1) * 100} XP`)).toBeInTheDocument()
-      fireEvent.click(
-        screen.getByRole('button', {
-          name:
-            i === bugHuntChallenges.length - 1 ? 'Finish' : 'Next challenge',
-        }),
-      )
+      nextModule(i === bugHuntModules.length - 1)
     })
 
     expect(
       screen.getByRole('heading', { name: 'All bugs squashed' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('LV 2')).toBeInTheDocument()
+    expect(screen.getByText('LV 3')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
     expect(
       screen.getByRole('heading', { name: 'Choose your game' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('500 XP')).toBeInTheDocument()
+    expect(screen.getByText('700 XP')).toBeInTheDocument()
   })
 
   it('shares one XP total across Bug Hunt and Code Breaker', () => {
@@ -132,7 +126,7 @@ describe('App', () => {
     // Re-entering Bug Hunt continues at the first unfinished module and
     // keeps the XP total.
     fireEvent.click(screen.getByRole('button', { name: 'Continue Bug Hunt' }))
-    expectStep('Bug Hunt', 2, 5)
+    expectStep('Bug Hunt', 2, 7)
     expect(screen.getByText('125 XP')).toBeInTheDocument()
   })
 

@@ -24,8 +24,6 @@ export type DataAnswer =
 
 export interface DataSorterChallenge {
   id: string
-  /** Short terminal label, e.g. "Terminal 01". */
-  terminal: string
   name: string
   concept: string
   /** Short concept primer. Backticks mark inline code. */
