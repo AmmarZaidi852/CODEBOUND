@@ -18,6 +18,11 @@
   background: var(--segment-on);
 }
 
+/* Mastered: a bright top edge on a filled segment. */
+.pixel-progress .mastered {
+  box-shadow: inset 0 3px 0 0 var(--color-text-strong);
+}
+
 .pixel-progress .current {
   background: var(--color-text-strong);
   animation: segment-pulse 1.6s ease-in-out infinite;

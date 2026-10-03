@@ -1,9 +1,14 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { CodeBreakerChallenge } from '../challenges/codeBreaker.ts'
 import { codeBreakerChallenges } from '../content/codeBreakerChallenges.ts'
 import CodeBreakerScreen from './CodeBreakerScreen.tsx'
 import { expectStep } from '../test/progress.ts'
+import {
+  expectStat,
+  expectTotalXp,
+  renderWithProgress,
+} from '../test/render.tsx'
 
 function option(challenge: CodeBreakerChallenge, correct: boolean) {
   return challenge.options.find(
@@ -19,10 +24,11 @@ function answer(challenge: CodeBreakerChallenge, correct: boolean) {
 }
 
 function renderGame() {
-  const onEarnXp = vi.fn()
   const onExit = vi.fn()
-  render(<CodeBreakerScreen xp={0} onEarnXp={onEarnXp} onExit={onExit} />)
-  return { onEarnXp, onExit }
+  renderWithProgress(
+    <CodeBreakerScreen onPlayAgain={vi.fn()} onExit={onExit} />,
+  )
+  return { onExit }
 }
 
 describe('CodeBreakerScreen', () => {
@@ -51,8 +57,8 @@ describe('CodeBreakerScreen', () => {
   })
 
   it('slots the selected condition into the lock code', () => {
-    const { container } = render(
-      <CodeBreakerScreen xp={0} onEarnXp={() => {}} onExit={() => {}} />,
+    const { container } = renderWithProgress(
+      <CodeBreakerScreen onPlayAgain={() => {}} onExit={() => {}} />,
     )
     const slot = () => container.querySelector('.code-block__slot')
     expect(slot()).toHaveTextContent('____')
@@ -63,7 +69,7 @@ describe('CodeBreakerScreen', () => {
   })
 
   it('rewards a correct answer with 100 XP, unlocks, and explains the logic', () => {
-    const { onEarnXp } = renderGame()
+    renderGame()
     answer(first, true)
 
     expect(
@@ -73,11 +79,11 @@ describe('CodeBreakerScreen', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Unlocked')
     expect(screen.getByText('How it evaluates')).toBeInTheDocument()
     expect(screen.getByText('Takeaway')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(100)
+    expectTotalXp(100)
   })
 
   it('gives 25 XP for a wrong answer, explains why it fails, and shows the correct logic', () => {
-    const { onEarnXp } = renderGame()
+    renderGame()
     answer(first, false)
 
     expect(
@@ -90,11 +96,11 @@ describe('CodeBreakerScreen', () => {
       screen.getByText((_, el) => el?.textContent === whyNot),
     ).toBeInTheDocument()
     expect(screen.getByText('Correct logic')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(25)
+    expectTotalXp(25)
   })
 
   it('cannot be submitted again for extra XP', () => {
-    const { onEarnXp } = renderGame()
+    renderGame()
     answer(first, false)
 
     expect(
@@ -106,7 +112,7 @@ describe('CodeBreakerScreen', () => {
     fireEvent.click(
       screen.getByRole('radio', { name: option(first, true).code }),
     )
-    expect(onEarnXp).toHaveBeenCalledTimes(1)
+    expectTotalXp(25)
   })
 
   it('continues to the next lock', () => {
@@ -125,7 +131,7 @@ describe('CodeBreakerScreen', () => {
   })
 
   it('shows a completion summary after the final lock', () => {
-    const { onEarnXp, onExit } = renderGame()
+    const { onExit } = renderGame()
 
     codeBreakerChallenges.forEach((challenge, i) => {
       // Miss the third and fifth locks, solve the rest.
@@ -142,9 +148,10 @@ describe('CodeBreakerScreen', () => {
       screen.getByRole('heading', { name: 'All locks broken' }),
     ).toBeInTheDocument()
     expect(screen.getByText('+350')).toBeInTheDocument()
-    expect(screen.getByText('5')).toBeInTheDocument()
-    expect(screen.getByText('3/5')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledTimes(5)
+    expectStat('Correct this run', '3/5')
+    expectStat('Modules complete', '3/5')
+    expectStat('Mastered', '3/5')
+    expectTotalXp(350)
 
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
     expect(onExit).toHaveBeenCalled()

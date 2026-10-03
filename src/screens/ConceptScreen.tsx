@@ -18,7 +18,6 @@ import { XP_CONCEPT } from '../game/xp.ts'
 import './ConceptScreen.css'
 
 interface ConceptScreenProps {
-  xp: number
   concept: Concept
   /** 0-based position in the foundations. */
   index: number
@@ -41,7 +40,6 @@ interface Result {
  * feedback → practise in a game or move on. Remount (via `key`) per concept.
  */
 function ConceptScreen({
-  xp,
   concept,
   index,
   total,
@@ -92,7 +90,7 @@ function ConceptScreen({
 
   return (
     <div className="screen" data-theme="foundations">
-      <TopBar xp={xp} backLabel="Foundations" onBack={onBack} />
+      <TopBar backLabel="Foundations" onBack={onBack} />
       <main className="game">
         <GameHud
           art="foundations"

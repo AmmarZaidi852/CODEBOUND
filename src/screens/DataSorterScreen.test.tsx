@@ -1,9 +1,14 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { DataSorterChallenge } from '../challenges/dataSorter.ts'
 import { dataSorterChallenges } from '../content/dataSorterChallenges.ts'
 import DataSorterScreen from './DataSorterScreen.tsx'
 import { expectStep } from '../test/progress.ts'
+import {
+  expectStat,
+  expectTotalXp,
+  renderWithProgress,
+} from '../test/render.tsx'
 
 const byId = (id: string) => dataSorterChallenges.find((c) => c.id === id)!
 
@@ -37,17 +42,15 @@ function answer(challenge: DataSorterChallenge, correct: boolean) {
 }
 
 function renderGame(challenges?: DataSorterChallenge[]) {
-  const onEarnXp = vi.fn()
   const onExit = vi.fn()
-  render(
+  renderWithProgress(
     <DataSorterScreen
-      xp={0}
-      onEarnXp={onEarnXp}
+      onPlayAgain={vi.fn()}
       onExit={onExit}
       challenges={challenges}
     />,
   )
-  return { onEarnXp, onExit }
+  return { onExit }
 }
 
 describe('DataSorterScreen', () => {
@@ -67,7 +70,7 @@ describe('DataSorterScreen', () => {
 
   it('shows zero-based index labels and validates an indexing pick', () => {
     const indexing = byId('indexing')
-    const { onEarnXp } = renderGame([indexing])
+    renderGame([indexing])
 
     expect(
       screen.getByRole('button', { name: 'Index 0: 12' }),
@@ -81,12 +84,12 @@ describe('DataSorterScreen', () => {
       screen.getByRole('heading', { name: 'Data sorted!' }),
     ).toBeInTheDocument()
     expect(screen.getByText('+100 XP')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(100)
+    expectTotalXp(100)
   })
 
   it('treats a count-from-1 pick as wrong, awards 25 XP, and explains index 0', () => {
     const indexing = byId('indexing')
-    const { onEarnXp } = renderGame([indexing])
+    renderGame([indexing])
 
     fireEvent.click(screen.getByRole('button', { name: 'Index 1: 18' }))
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
@@ -99,7 +102,7 @@ describe('DataSorterScreen', () => {
       screen.getByText(/Python starts at index 0/, { selector: 'p' }),
     ).toBeInTheDocument()
     expect(screen.getByText('What happened')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(25)
+    expectTotalXp(25)
   })
 
   it('requires an answer before submitting', () => {
@@ -111,7 +114,7 @@ describe('DataSorterScreen', () => {
 
   it('builds a list from tiles: append() result goes on the end', () => {
     const append = byId('append')
-    const { onEarnXp } = renderGame([append])
+    renderGame([append])
     const target = () => screen.getByRole('group', { name: 'scores' })
 
     expect(screen.getByRole('button', { name: 'Submit' })).toBeDisabled()
@@ -129,12 +132,12 @@ describe('DataSorterScreen', () => {
 
     answer(append, true)
     expect(screen.getByText('+100 XP')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(100)
+    expectTotalXp(100)
   })
 
   it('rejects a built list in the wrong order and shows the correct result', () => {
     const append = byId('append')
-    const { onEarnXp } = renderGame([append])
+    renderGame([append])
     ;[25, 12, 20, 7].forEach(addTile)
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
 
@@ -146,7 +149,7 @@ describe('DataSorterScreen', () => {
         .getAllByText(/\d+/)
         .map((el) => Number(el.textContent)),
     ).toEqual([12, 20, 7, 25])
-    expect(onEarnXp).toHaveBeenCalledWith(25)
+    expectTotalXp(25)
   })
 
   it('validates pop(): the item at the index is the one removed', () => {
@@ -162,7 +165,7 @@ describe('DataSorterScreen', () => {
   })
 
   it('locks the answer after submitting so XP is awarded only once', () => {
-    const { onEarnXp } = renderGame([byId('append'), byId('pop')])
+    renderGame([byId('append'), byId('pop')])
     addTile(12)
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
 
@@ -172,7 +175,7 @@ describe('DataSorterScreen', () => {
     expect(screen.getByRole('button', { name: 'Add 20' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Reset' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Remove 12' })).toBeDisabled()
-    expect(onEarnXp).toHaveBeenCalledTimes(1)
+    expectTotalXp(25)
   })
 
   it('moves to the next challenge with a fresh answer', () => {
@@ -189,7 +192,7 @@ describe('DataSorterScreen', () => {
   })
 
   it('shows a completion summary after the final challenge', () => {
-    const { onEarnXp, onExit } = renderGame()
+    const { onExit } = renderGame()
 
     dataSorterChallenges.forEach((challenge, i) => {
       // Miss the indexing and combined challenges, solve the rest.
@@ -209,9 +212,10 @@ describe('DataSorterScreen', () => {
       screen.getByRole('heading', { name: 'All data sorted' }),
     ).toBeInTheDocument()
     expect(screen.getByText('+550')).toBeInTheDocument()
-    expect(screen.getByText('7')).toBeInTheDocument()
-    expect(screen.getByText('5/7')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledTimes(7)
+    expectStat('Correct this run', '5/7')
+    expectStat('Modules complete', '5/7')
+    expectStat('Mastered', '5/7')
+    expectTotalXp(550)
 
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
     expect(onExit).toHaveBeenCalled()

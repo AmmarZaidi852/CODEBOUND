@@ -2,12 +2,15 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import App from './App.tsx'
 import RunSummary from './components/RunSummary.tsx'
+import type { RunStats } from './game/useChallengeRun.ts'
+import { applyAnswer, newProgress } from './progression/progress.ts'
 import XpBadge from './components/XpBadge.tsx'
 import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
 import { dataSorterChallenges } from './content/dataSorterChallenges.ts'
 import { games } from './content/games.ts'
 import BugHuntScreen from './screens/BugHuntScreen.tsx'
 import DataSorterScreen from './screens/DataSorterScreen.tsx'
+import { expectStat, renderWithProgress } from './test/render.tsx'
 
 /** Retro UI layer: cartridges, HUD status, action bar, feedback, rewards. */
 
@@ -57,7 +60,7 @@ describe('home title screen', () => {
 
 describe('challenge HUD and action bar', () => {
   function renderBugHunt() {
-    render(<BugHuntScreen xp={0} onEarnXp={vi.fn()} onExit={vi.fn()} />)
+    renderWithProgress(<BugHuntScreen onExit={vi.fn()} onPlayAgain={vi.fn()} />)
   }
 
   it('keeps the primary action disabled with a hint until an answer is picked', () => {
@@ -99,7 +102,9 @@ describe('challenge HUD and action bar', () => {
   })
 
   it('reports Data Sorter status from online to sorted', () => {
-    render(<DataSorterScreen xp={0} onEarnXp={vi.fn()} onExit={vi.fn()} />)
+    renderWithProgress(
+      <DataSorterScreen onExit={vi.fn()} onPlayAgain={vi.fn()} />,
+    )
     expect(screen.getByRole('status')).toHaveTextContent('Data core: Online')
 
     const task = dataSorterChallenges[0].task
@@ -131,23 +136,79 @@ describe('XP rewards', () => {
     expect(gain(container)).toHaveAttribute('aria-hidden', 'true')
   })
 
-  it('shows the run reward, a mission stamp and progress to the next level', () => {
-    render(
+  /** Bug Hunt with the given results per challenge, in order. */
+  function bugHuntAfter(results: ('right' | 'wrong' | 'fixed')[]) {
+    let p = newProgress()
+    bugHuntChallenges.forEach(({ id }, i) => {
+      const r = results[i]
+      if (!r) return
+      p = applyAnswer(p, 'bug-hunt', id, r === 'right').progress
+      if (r === 'fixed') p = applyAnswer(p, 'bug-hunt', id, true).progress
+    })
+    return p
+  }
+
+  function renderSummary(
+    progress: ReturnType<typeof newProgress>,
+    stats: Partial<RunStats> = {},
+  ) {
+    renderWithProgress(
       <RunSummary
-        art="bug-hunt"
+        game="bug-hunt"
         gameName="Bug Hunt"
         title="All bugs squashed"
         message="Nice hunting."
-        xp={350}
-        runXp={350}
-        total={5}
-        solved={3}
+        challengeIds={bugHuntChallenges.map((c) => c.id)}
+        stats={{ played: 5, correct: 3, runXp: 350, replay: false, ...stats }}
         onExit={vi.fn()}
+        onPlayAgain={vi.fn()}
       />,
+      progress,
     )
-    expect(screen.getByText('Bug Hunt · Mission complete')).toBeInTheDocument()
+  }
+
+  it('shows the run reward, saved progress and what is left', () => {
+    renderSummary(bugHuntAfter(['right', 'wrong', 'right', 'wrong', 'right']))
+    expect(screen.getByText('Bug Hunt · Run complete')).toBeInTheDocument()
     expect(screen.getByText('+350')).toBeInTheDocument()
+    expectStat('Modules complete', '3/5')
+    expectStat('Mastered', '3/5')
+    expect(screen.getByText('Game status: In progress')).toBeInTheDocument()
+    expect(screen.getByText('2 modules left to complete.')).toBeInTheDocument()
     expect(screen.getByText('Level 2')).toBeInTheDocument()
     expect(screen.getByText('250 XP to level 3')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Retry unfinished' }),
+    ).toBeInTheDocument()
+  })
+
+  it('stamps a completed game and offers a replay', () => {
+    renderSummary(bugHuntAfter(['right', 'fixed', 'right', 'right', 'right']))
+    expect(screen.getByText('Bug Hunt · Mission complete')).toBeInTheDocument()
+    expect(screen.getByText('Game status: Complete')).toBeInTheDocument()
+    expectStat('Mastered', '4/5')
+    expect(
+      screen.getByRole('button', { name: 'Replay Bug Hunt' }),
+    ).toBeInTheDocument()
+  })
+
+  it('stamps a mastered game', () => {
+    renderSummary(bugHuntAfter(['right', 'right', 'right', 'right', 'right']))
+    expect(screen.getByText('Bug Hunt · Game mastered')).toBeInTheDocument()
+    expect(
+      screen.getByText('Every module mastered on the first try.'),
+    ).toBeInTheDocument()
+  })
+
+  it('says a replay earned no new XP', () => {
+    renderSummary(bugHuntAfter(['right', 'right', 'right', 'right', 'right']), {
+      replay: true,
+      runXp: 0,
+    })
+    expect(screen.getByText('Bug Hunt · Replay')).toBeInTheDocument()
+    expect(screen.getByText('+0')).toBeInTheDocument()
+    expect(
+      screen.getByText(/XP for these modules was already earned/),
+    ).toBeInTheDocument()
   })
 })

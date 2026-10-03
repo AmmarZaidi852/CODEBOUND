@@ -1,9 +1,14 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { FunctionForgeChallenge } from '../challenges/functionForge.ts'
 import { functionForgeChallenges } from '../content/functionForgeChallenges.ts'
 import FunctionForgeScreen from './FunctionForgeScreen.tsx'
 import { expectStep } from '../test/progress.ts'
+import {
+  expectStat,
+  expectTotalXp,
+  renderWithProgress,
+} from '../test/render.tsx'
 
 const byId = (id: string) => functionForgeChallenges.find((c) => c.id === id)!
 
@@ -39,17 +44,15 @@ function answer(challenge: FunctionForgeChallenge, correct: boolean) {
 }
 
 function renderGame(challenges?: FunctionForgeChallenge[]) {
-  const onEarnXp = vi.fn()
   const onExit = vi.fn()
-  render(
+  renderWithProgress(
     <FunctionForgeScreen
-      xp={0}
-      onEarnXp={onEarnXp}
+      onPlayAgain={vi.fn()}
       onExit={onExit}
       challenges={challenges}
     />,
   )
-  return { onEarnXp, onExit }
+  return { onExit }
 }
 
 describe('FunctionForgeScreen', () => {
@@ -64,7 +67,7 @@ describe('FunctionForgeScreen', () => {
   })
 
   it('assembles a function header from tokens, with live code and undo', () => {
-    const { onEarnXp } = renderGame([byId('define')])
+    renderGame([byId('define')])
     const built = () => screen.getByRole('group', { name: 'Your code' })
 
     addToken('def')
@@ -88,11 +91,11 @@ describe('FunctionForgeScreen', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent('Online')
     expect(screen.getByText('+100 XP')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(100)
+    expectTotalXp(100)
   })
 
   it('fails a wrongly ordered build with 25 XP and shows the correct code', () => {
-    const { onEarnXp } = renderGame([byId('define')])
+    renderGame([byId('define')])
     answer(byId('define'), false)
 
     expect(
@@ -104,12 +107,12 @@ describe('FunctionForgeScreen', () => {
       screen.getByText('def greet():', { selector: '.feedback__fix-code' }),
     ).toBeInTheDocument()
     expect(screen.getByText(/A header is always/)).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(25)
+    expectTotalXp(25)
   })
 
   it('passes arguments into slots in order and shows what the call returned', () => {
     const multi = byId('multiple-parameters')
-    const { onEarnXp } = renderGame([multi])
+    renderGame([multi])
     const call = () => screen.getByRole('group', { name: 'Call' })
 
     fireEvent.click(screen.getByRole('button', { name: 'Pass 3' }))
@@ -141,7 +144,7 @@ describe('FunctionForgeScreen', () => {
     expect(
       screen.getByText('subtract(10, 3)', { selector: '.feedback__fix-code' }),
     ).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(25)
+    expectTotalXp(25)
   })
 
   it('accepts the right argument and outputs the target', () => {
@@ -181,7 +184,7 @@ describe('FunctionForgeScreen', () => {
   })
 
   it('locks the module after running so XP is awarded only once', () => {
-    const { onEarnXp } = renderGame([byId('build'), byId('define')])
+    renderGame([byId('build'), byId('define')])
     addToken('def')
     fireEvent.click(screen.getByRole('button', { name: 'Run module' }))
 
@@ -191,11 +194,11 @@ describe('FunctionForgeScreen', () => {
     expect(screen.getByRole('button', { name: 'Add area' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Remove def' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Reset' })).toBeDisabled()
-    expect(onEarnXp).toHaveBeenCalledTimes(1)
+    expectTotalXp(25)
   })
 
   it('moves through modules in order and finishes with a summary', () => {
-    const { onEarnXp, onExit } = renderGame()
+    const { onExit } = renderGame()
 
     functionForgeChallenges.forEach((challenge, i) => {
       expectStep('Function Forge', i + 1, 7)
@@ -216,9 +219,10 @@ describe('FunctionForgeScreen', () => {
       screen.getByRole('heading', { name: 'All modules online' }),
     ).toBeInTheDocument()
     expect(screen.getByText('+550')).toBeInTheDocument()
-    expect(screen.getByText('7')).toBeInTheDocument()
-    expect(screen.getByText('5/7')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledTimes(7)
+    expectStat('Correct this run', '5/7')
+    expectStat('Modules complete', '5/7')
+    expectStat('Mastered', '5/7')
+    expectTotalXp(550)
 
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
     expect(onExit).toHaveBeenCalled()

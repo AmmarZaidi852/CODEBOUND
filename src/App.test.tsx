@@ -129,9 +129,10 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /Games/ }))
     expect(screen.getByText('125 XP')).toBeInTheDocument()
 
-    // Re-entering Bug Hunt starts a fresh run but keeps the session XP.
-    fireEvent.click(screen.getByRole('button', { name: 'Play Bug Hunt' }))
-    expectStep('Bug Hunt', 1, 5)
+    // Re-entering Bug Hunt continues at the first unfinished module and
+    // keeps the XP total.
+    fireEvent.click(screen.getByRole('button', { name: 'Continue Bug Hunt' }))
+    expectStep('Bug Hunt', 2, 5)
     expect(screen.getByText('125 XP')).toBeInTheDocument()
   })
 

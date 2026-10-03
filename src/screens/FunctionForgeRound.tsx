@@ -17,11 +17,14 @@ import FunctionPipeline from '../components/FunctionPipeline.tsx'
 import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
 import type { RunResult } from '../game/useChallengeRun.ts'
+import type { ChallengeState } from '../progression/progress.ts'
 
 interface FunctionForgeRoundProps {
   challenge: FunctionForgeChallenge
   index: number
   total: number
+  /** Saved state of every challenge in the game. */
+  states: readonly ChallengeState[]
   result: RunResult | null
   isLast: boolean
   onSubmit: (correct: boolean) => void
@@ -42,6 +45,7 @@ function FunctionForgeRound({
   challenge,
   index,
   total,
+  states,
   result,
   isLast,
   onSubmit,
@@ -126,6 +130,7 @@ function FunctionForgeRound({
         name="Function Forge"
         index={index}
         total={total}
+        states={states}
         status={{
           label: 'Forge',
           value: statusLabels[status],
@@ -295,6 +300,8 @@ function FunctionForgeRound({
         <FeedbackPanel
           correct={result.correct}
           xpEarned={result.xpEarned}
+          mastered={result.mastered}
+          replay={result.replay}
           title={result.correct ? 'Module online!' : 'Module fault'}
           whyNot={whyNot}
           isLast={isLast}

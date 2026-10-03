@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { Concept, ConceptId } from '../challenges/foundations.ts'
 import { foundations } from '../content/foundations.ts'
+import { renderWithProgress } from '../test/render.tsx'
 import ConceptScreen from './ConceptScreen.tsx'
 
 const byId = (id: ConceptId) => foundations.find((c) => c.id === id)!
@@ -16,9 +17,8 @@ function renderConcept(
     onPractise: vi.fn(),
     onNext: vi.fn(),
   }
-  render(
+  renderWithProgress(
     <ConceptScreen
-      xp={0}
       concept={concept}
       index={foundations.indexOf(concept)}
       total={foundations.length}

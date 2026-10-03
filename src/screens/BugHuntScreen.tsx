@@ -13,12 +13,13 @@ import InlineCode from '../components/InlineCode.tsx'
 import RunSummary from '../components/RunSummary.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { bugHuntChallenges } from '../content/bugHuntChallenges.ts'
-import { useChallengeRun } from '../game/useChallengeRun.ts'
+import { useChallengeRun, type RunStart } from '../game/useChallengeRun.ts'
 import './BugHuntScreen.css'
 
 interface BugHuntScreenProps {
-  xp: number
-  onEarnXp: (amount: number) => void
+  /** Continue at the first unfinished module, or replay from 01. */
+  startAt?: RunStart
+  onPlayAgain: (startAt: RunStart) => void
   onExit: () => void
   /** Where leaving the game goes, e.g. "Games" or "Foundations". */
   exitLabel?: string
@@ -26,8 +27,8 @@ interface BugHuntScreenProps {
 }
 
 function BugHuntScreen({
-  xp,
-  onEarnXp,
+  startAt = 'continue',
+  onPlayAgain,
   onExit,
   exitLabel = 'Games',
   challenges = bugHuntChallenges,
@@ -37,31 +38,30 @@ function BugHuntScreen({
     isLast,
     selectedId,
     result,
-    runXp,
-    solved,
+    states,
+    stats,
     finished,
     titleRef,
     feedbackRef,
     select,
     submit,
     next,
-  } = useChallengeRun(challenges.length, onEarnXp)
+  } = useChallengeRun('bug-hunt', challenges, startAt)
 
   if (finished) {
     return (
       <div className="screen" data-theme="bug-hunt">
-        <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
+        <TopBar backLabel={exitLabel} onBack={onExit} />
         <RunSummary
-          art="bug-hunt"
+          game="bug-hunt"
           gameName="Bug Hunt"
           title="All bugs squashed"
           message="You worked through every broken script. Nice hunting."
-          xp={xp}
-          runXp={runXp}
-          total={challenges.length}
-          solved={solved}
+          challengeIds={challenges.map((c) => c.id)}
+          stats={stats}
           onExit={onExit}
           exitLabel={`Back to ${exitLabel.toLowerCase()}`}
+          onPlayAgain={onPlayAgain}
         />
       </div>
     )
@@ -73,13 +73,14 @@ function BugHuntScreen({
 
   return (
     <div className="screen" data-theme="bug-hunt">
-      <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
+      <TopBar backLabel={exitLabel} onBack={onExit} />
       <main className="game">
         <GameHud
           art="bug-hunt"
           name="Bug Hunt"
           index={index}
           total={challenges.length}
+          states={states}
           status={{
             label: 'System',
             value: !result
@@ -143,6 +144,8 @@ function BugHuntScreen({
           <FeedbackPanel
             correct={result.correct}
             xpEarned={result.xpEarned}
+            mastered={result.mastered}
+            replay={result.replay}
             title={result.correct ? 'Bug squashed!' : 'Not quite'}
             whyNot={selectedFix?.whyNot}
             isLast={isLast}

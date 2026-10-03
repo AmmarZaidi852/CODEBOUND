@@ -1,10 +1,10 @@
 import PixelProgress from '../components/PixelProgress.tsx'
 import PixelSprite from '../components/PixelSprite.tsx'
 import XpBadge from '../components/XpBadge.tsx'
+import { useProgress } from '../progression/ProgressContext.ts'
 import './HomeScreen.css'
 
 interface HomeScreenProps {
-  xp: number
   /** Python Foundations concepts completed / total. */
   learned: { done: number; total: number }
   onLearn: () => void
@@ -12,13 +12,14 @@ interface HomeScreenProps {
 }
 
 /** Title screen: logo, hero terminal, the two ways in, and player stats. */
-function HomeScreen({ xp, learned, onLearn, onPlay }: HomeScreenProps) {
+function HomeScreen({ learned, onLearn, onPlay }: HomeScreenProps) {
+  const { xp } = useProgress().progress
   const learnLabel =
     learned.done === 0
       ? 'START LEARNING'
       : learned.done < learned.total
         ? 'CONTINUE LEARNING'
-        : 'REVIEW FOUNDATIONS'
+        : 'REVIEW LEARNING'
 
   return (
     <div className="screen" data-theme="foundations">

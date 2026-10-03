@@ -12,11 +12,14 @@ import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
 import ListCells, { type CellState } from '../components/ListCells.tsx'
 import type { RunResult } from '../game/useChallengeRun.ts'
+import type { ChallengeState } from '../progression/progress.ts'
 
 interface DataSorterRoundProps {
   challenge: DataSorterChallenge
   index: number
   total: number
+  /** Saved state of every challenge in the game. */
+  states: readonly ChallengeState[]
   result: RunResult | null
   isLast: boolean
   onSubmit: (correct: boolean) => void
@@ -34,6 +37,7 @@ function DataSorterRound({
   challenge,
   index,
   total,
+  states,
   result,
   isLast,
   onSubmit,
@@ -80,6 +84,7 @@ function DataSorterRound({
         name="Data Sorter"
         index={index}
         total={total}
+        states={states}
         status={{
           label: 'Data core',
           value: !locked ? 'Online' : result.correct ? 'Sorted' : 'Mismatch',
@@ -179,6 +184,8 @@ function DataSorterRound({
         <FeedbackPanel
           correct={result.correct}
           xpEarned={result.xpEarned}
+          mastered={result.mastered}
+          replay={result.replay}
           title={result.correct ? 'Data sorted!' : 'Not quite'}
           whyNot={challenge.explanation.mistake}
           isLast={isLast}

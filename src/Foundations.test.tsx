@@ -151,7 +151,7 @@ describe('Python Foundations flow', () => {
     expect(screen.getByText('200 XP')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /Home/ }))
     expect(
-      screen.getByRole('button', { name: 'REVIEW FOUNDATIONS' }),
+      screen.getByRole('button', { name: 'REVIEW LEARNING' }),
     ).toBeInTheDocument()
   })
 

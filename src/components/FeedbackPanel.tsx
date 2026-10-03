@@ -5,6 +5,10 @@ import './FeedbackPanel.css'
 interface FeedbackPanelProps {
   correct: boolean
   xpEarned: number
+  /** First-try success: the challenge is now mastered. */
+  mastered?: boolean
+  /** Attempted before; XP is only paid once. */
+  replay?: boolean
   title: string
   /** Why the player's pick failed (wrong answers only). */
   whyNot?: string
@@ -24,6 +28,8 @@ interface FeedbackPanelProps {
 function FeedbackPanel({
   correct,
   xpEarned,
+  mastered = false,
+  replay = false,
   title,
   whyNot,
   isLast,
@@ -42,7 +48,13 @@ function FeedbackPanel({
           <span className="feedback__icon" aria-hidden="true" />
           {correct ? 'System online' : 'System error'}
         </span>
-        {xpEarned > 0 && <span className="feedback__xp">+{xpEarned} XP</span>}
+        <span className="feedback__chips">
+          {mastered && <span className="feedback__mastered">Mastered</span>}
+          {xpEarned > 0 && <span className="feedback__xp">+{xpEarned} XP</span>}
+          {replay && xpEarned === 0 && (
+            <span className="feedback__replay">Replay · no XP</span>
+          )}
+        </span>
       </div>
       <div className="feedback__body">
         <h2 ref={headingRef} tabIndex={-1}>

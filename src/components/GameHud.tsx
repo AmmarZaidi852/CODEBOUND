@@ -1,4 +1,5 @@
 import type { SpriteId } from '../art/sprites.ts'
+import type { ChallengeState } from '../progression/progress.ts'
 import PixelProgress from './PixelProgress.tsx'
 import PixelSprite from './PixelSprite.tsx'
 import StatusBadge, { type StatusState } from './StatusBadge.tsx'
@@ -12,6 +13,13 @@ interface GameHudProps {
   /** Word for one step: "Module", "Lesson". */
   unit?: string
   status?: { label: string; value: string; state: StatusState }
+  /** Saved state of every step: fills segments and marks a replay. */
+  states?: readonly ChallengeState[]
+}
+
+const marks: Partial<Record<ChallengeState, string>> = {
+  completed: 'Complete',
+  mastered: 'Mastered',
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -24,7 +32,9 @@ function GameHud({
   total,
   unit = 'Module',
   status,
+  states,
 }: GameHudProps) {
+  const mark = states && marks[states[index]]
   return (
     <section className="game-hud panel" aria-label={`${name} status`}>
       <div className="game-hud__art">
@@ -39,11 +49,19 @@ function GameHud({
           <PixelProgress
             className="game-hud__bar"
             value={index}
+            segments={states}
             current={index}
             total={total}
             label={`${name} progress`}
             valueText={`${unit} ${index + 1} of ${total}`}
           />
+          {mark && (
+            <span
+              className={`game-hud__mark game-hud__mark--${states?.[index]}`}
+            >
+              {mark}
+            </span>
+          )}
         </div>
       </div>
       {status && <StatusBadge {...status} />}

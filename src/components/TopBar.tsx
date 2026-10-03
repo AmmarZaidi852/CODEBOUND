@@ -1,13 +1,14 @@
+import { useProgress } from '../progression/ProgressContext.ts'
 import XpBadge from './XpBadge.tsx'
 import './TopBar.css'
 
 interface TopBarProps {
-  xp: number
   backLabel?: string
   onBack?: () => void
 }
 
-function TopBar({ xp, backLabel, onBack }: TopBarProps) {
+function TopBar({ backLabel, onBack }: TopBarProps) {
+  const { xp } = useProgress().progress
   return (
     <header className="top-bar">
       {onBack ? (

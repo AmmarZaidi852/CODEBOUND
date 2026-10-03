@@ -1,9 +1,14 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { BugHuntChallenge } from '../challenges/bugHunt.ts'
 import { bugHuntChallenges } from '../content/bugHuntChallenges.ts'
 import BugHuntScreen from './BugHuntScreen.tsx'
 import { expectStep } from '../test/progress.ts'
+import {
+  expectStat,
+  expectTotalXp,
+  renderWithProgress,
+} from '../test/render.tsx'
 
 function fixLabel(challenge: BugHuntChallenge, correct: boolean) {
   const fix = challenge.fixes.find(
@@ -20,10 +25,9 @@ function answer(challenge: BugHuntChallenge, correct: boolean) {
 }
 
 function renderGame() {
-  const onEarnXp = vi.fn()
   const onExit = vi.fn()
-  render(<BugHuntScreen xp={0} onEarnXp={onEarnXp} onExit={onExit} />)
-  return { onEarnXp, onExit }
+  renderWithProgress(<BugHuntScreen onPlayAgain={vi.fn()} onExit={onExit} />)
+  return { onExit }
 }
 
 describe('BugHuntScreen', () => {
@@ -48,7 +52,7 @@ describe('BugHuntScreen', () => {
   })
 
   it('rewards a correct patch with 100 XP and an explanation', () => {
-    const { onEarnXp } = renderGame()
+    renderGame()
     answer(first, true)
 
     expect(
@@ -56,11 +60,11 @@ describe('BugHuntScreen', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('+100 XP')).toBeInTheDocument()
     expect(screen.getByText('What was wrong')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(100)
+    expectTotalXp(100)
   })
 
   it('gives 25 XP for a wrong patch and explains why it fails', () => {
-    const { onEarnXp } = renderGame()
+    renderGame()
     answer(first, false)
 
     expect(
@@ -74,11 +78,11 @@ describe('BugHuntScreen', () => {
       ),
     ).toBeInTheDocument()
     expect(screen.getByText('What was wrong')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledWith(25)
+    expectTotalXp(25)
   })
 
   it('locks the answer after submitting', () => {
-    const { onEarnXp } = renderGame()
+    renderGame()
     answer(first, false)
 
     for (const radio of screen.getAllByRole('radio')) {
@@ -87,7 +91,7 @@ describe('BugHuntScreen', () => {
     expect(
       screen.queryByRole('button', { name: 'Apply patch' }),
     ).not.toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledTimes(1)
+    expectTotalXp(25)
   })
 
   it('moves to the next challenge', () => {
@@ -103,7 +107,7 @@ describe('BugHuntScreen', () => {
   })
 
   it('shows a completion summary after the final challenge', () => {
-    const { onEarnXp, onExit } = renderGame()
+    const { onExit } = renderGame()
 
     bugHuntChallenges.forEach((challenge, i) => {
       // Miss the second challenge, solve the rest.
@@ -120,9 +124,10 @@ describe('BugHuntScreen', () => {
       screen.getByRole('heading', { name: 'All bugs squashed' }),
     ).toBeInTheDocument()
     expect(screen.getByText('+425')).toBeInTheDocument()
-    expect(screen.getByText('5')).toBeInTheDocument()
-    expect(screen.getByText('4/5')).toBeInTheDocument()
-    expect(onEarnXp).toHaveBeenCalledTimes(5)
+    expectStat('Correct this run', '4/5')
+    expectStat('Modules complete', '4/5')
+    expectStat('Mastered', '4/5')
+    expectTotalXp(425)
 
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
     expect(onExit).toHaveBeenCalled()

@@ -16,12 +16,13 @@ import RunSummary from '../components/RunSummary.tsx'
 import type { StatusState } from '../components/StatusBadge.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { codeBreakerChallenges } from '../content/codeBreakerChallenges.ts'
-import { useChallengeRun } from '../game/useChallengeRun.ts'
+import { useChallengeRun, type RunStart } from '../game/useChallengeRun.ts'
 import './CodeBreakerScreen.css'
 
 interface CodeBreakerScreenProps {
-  xp: number
-  onEarnXp: (amount: number) => void
+  /** Continue at the first unfinished module, or replay from 01. */
+  startAt?: RunStart
+  onPlayAgain: (startAt: RunStart) => void
   onExit: () => void
   /** Where leaving the game goes, e.g. "Games" or "Foundations". */
   exitLabel?: string
@@ -43,8 +44,8 @@ const lockStates: Record<LockState, StatusState> = {
 }
 
 function CodeBreakerScreen({
-  xp,
-  onEarnXp,
+  startAt = 'continue',
+  onPlayAgain,
   onExit,
   exitLabel = 'Games',
   challenges = codeBreakerChallenges,
@@ -54,31 +55,30 @@ function CodeBreakerScreen({
     isLast,
     selectedId,
     result,
-    runXp,
-    solved,
+    states,
+    stats,
     finished,
     titleRef,
     feedbackRef,
     select,
     submit,
     next,
-  } = useChallengeRun(challenges.length, onEarnXp)
+  } = useChallengeRun('code-breaker', challenges, startAt)
 
   if (finished) {
     return (
       <div className="screen" data-theme="code-breaker">
-        <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
+        <TopBar backLabel={exitLabel} onBack={onExit} />
         <RunSummary
-          art="code-breaker"
+          game="code-breaker"
           gameName="Code Breaker"
           title="All locks broken"
           message="Every security node is open. Your logic held up."
-          xp={xp}
-          runXp={runXp}
-          total={challenges.length}
-          solved={solved}
+          challengeIds={challenges.map((c) => c.id)}
+          stats={stats}
           onExit={onExit}
           exitLabel={`Back to ${exitLabel.toLowerCase()}`}
+          onPlayAgain={onPlayAgain}
         />
       </div>
     )
@@ -97,13 +97,14 @@ function CodeBreakerScreen({
 
   return (
     <div className="screen" data-theme="code-breaker">
-      <TopBar xp={xp} backLabel={exitLabel} onBack={onExit} />
+      <TopBar backLabel={exitLabel} onBack={onExit} />
       <main className="game">
         <GameHud
           art="code-breaker"
           name="Code Breaker"
           index={index}
           total={challenges.length}
+          states={states}
           status={{
             label: 'Security',
             value: lockLabels[lockState],
@@ -169,6 +170,8 @@ function CodeBreakerScreen({
           <FeedbackPanel
             correct={result.correct}
             xpEarned={result.xpEarned}
+            mastered={result.mastered}
+            replay={result.replay}
             title={result.correct ? 'Lock broken!' : 'Access denied'}
             whyNot={selectedOption?.whyNot}
             isLast={isLast}

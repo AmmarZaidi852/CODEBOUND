@@ -1,68 +1,138 @@
+import PixelProgress from '../components/PixelProgress.tsx'
 import PixelSprite from '../components/PixelSprite.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { foundations } from '../content/foundations.ts'
+import { gameChallengeIds } from '../content/gameChallenges.ts'
 import { games, type GameId } from '../content/games.ts'
+import type { RunStart } from '../game/useChallengeRun.ts'
+import {
+  gameStates,
+  gameStatus,
+  statusLabels,
+} from '../progression/progress.ts'
+import { useProgress } from '../progression/ProgressContext.ts'
 import './GameSelectScreen.css'
 
 interface GameSelectScreenProps {
-  xp: number
   onBack: () => void
-  onSelect: (id: GameId) => void
+  onSelect: (id: GameId, startAt: RunStart) => void
 }
 
-/** Cartridge shelf: one card per game, each in its own area colour. */
-function GameSelectScreen({ xp, onBack, onSelect }: GameSelectScreenProps) {
+const pad = (n: number) => String(n).padStart(2, '0')
+
+/** Cartridge shelf: one card per game, each showing its saved progress. */
+function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
+  const { progress } = useProgress()
+
   return (
     <div className="screen">
-      <TopBar xp={xp} backLabel="Home" onBack={onBack} />
+      <TopBar backLabel="Home" onBack={onBack} />
       <main className="game-select">
         <p className="eyebrow">Select cartridge</p>
         <h1 className="game-select__title">Choose your game</h1>
         <ul className="game-select__grid">
-          {games.map((game, i) => (
-            <li
-              key={game.id}
-              data-theme={game.id}
-              className={`game-card${game.playable ? '' : ' game-card--locked'}`}
-            >
-              <div className="game-card__screen">
-                <span className="game-card__slot">
-                  Cart {String(i + 1).padStart(2, '0')}
-                </span>
-                <PixelSprite id={game.id} className="game-card__art" />
-                <span className="game-card__status">
-                  <span aria-hidden="true" />
-                  {game.status}
-                </span>
-              </div>
-              <div className="game-card__label">
-                <h2 className="game-card__name">{game.name}</h2>
-                <p className="game-card__description">{game.description}</p>
-                <p className="game-card__learn-row">
-                  <span className="game-card__learn-tag">Learn</span>
-                  <span className="game-card__learn">
-                    {foundations
-                      .filter((c) => c.game === game.id)
-                      .map((c) => c.title)
-                      .join(' · ')}
+          {games.map((game, i) => {
+            const states = gameStates(
+              progress,
+              game.id,
+              gameChallengeIds[game.id],
+            )
+            const status = gameStatus(states)
+            const done = states.filter((s) => s !== 'unplayed').length
+            return (
+              <li
+                key={game.id}
+                data-theme={game.id}
+                className={`game-card game-card--${status}${game.playable ? '' : ' game-card--locked'}`}
+              >
+                <div className="game-card__screen">
+                  <span className="game-card__slot">Cart {pad(i + 1)}</span>
+                  <PixelSprite id={game.id} className="game-card__art" />
+                  <span className="game-card__status">
+                    <span aria-hidden="true" />
+                    {game.status}
                   </span>
-                </p>
-                <button
-                  type="button"
-                  className={`btn btn--go ${game.playable ? 'btn--primary' : ''}`}
-                  disabled={!game.playable}
-                  aria-label={
-                    game.playable
-                      ? `Play ${game.name}`
-                      : `${game.name} is locked`
-                  }
-                  onClick={() => onSelect(game.id)}
-                >
-                  {game.playable ? 'Play' : 'Locked'}
-                </button>
-              </div>
-            </li>
-          ))}
+                </div>
+                <div className="game-card__label">
+                  <h2 className="game-card__name">{game.name}</h2>
+                  <p className="game-card__description">{game.description}</p>
+                  <p className="game-card__learn-row">
+                    <span className="game-card__learn-tag">Learn</span>
+                    <span className="game-card__learn">
+                      {foundations
+                        .filter((c) => c.game === game.id)
+                        .map((c) => c.title)
+                        .join(' · ')}
+                    </span>
+                  </p>
+                  <div className="game-card__progress">
+                    <span className="game-card__state">
+                      <span aria-hidden="true" />
+                      {statusLabels[status]}
+                    </span>
+                    <span className="game-card__count">
+                      Modules {pad(done)} / {pad(states.length)}
+                    </span>
+                    <PixelProgress
+                      className="game-card__bar"
+                      value={done}
+                      total={states.length}
+                      segments={states}
+                      label={`${game.name} modules complete`}
+                      valueText={`${done} of ${states.length} modules complete`}
+                    />
+                  </div>
+                  <div className="game-card__actions">
+                    {status === 'new' && (
+                      <button
+                        type="button"
+                        className="btn btn--primary btn--go"
+                        disabled={!game.playable}
+                        aria-label={
+                          game.playable
+                            ? `Play ${game.name}`
+                            : `${game.name} is locked`
+                        }
+                        onClick={() => onSelect(game.id, 'start')}
+                      >
+                        {game.playable ? 'Play' : 'Locked'}
+                      </button>
+                    )}
+                    {status === 'in-progress' && (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn--primary btn--go"
+                          aria-label={`Continue ${game.name}`}
+                          onClick={() => onSelect(game.id, 'continue')}
+                        >
+                          Continue
+                        </button>
+                        <button
+                          type="button"
+                          className="btn game-card__replay"
+                          aria-label={`Replay ${game.name} from the start`}
+                          onClick={() => onSelect(game.id, 'start')}
+                        >
+                          Replay
+                        </button>
+                      </>
+                    )}
+                    {(status === 'complete' || status === 'mastered') && (
+                      <button
+                        type="button"
+                        className="btn btn--primary btn--go"
+                        aria-label={`Replay ${game.name}`}
+                        onClick={() => onSelect(game.id, 'start')}
+                      >
+                        Replay
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </main>
     </div>

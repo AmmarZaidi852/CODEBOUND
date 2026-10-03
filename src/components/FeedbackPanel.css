@@ -67,6 +67,23 @@
   );
 }
 
+.feedback__chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.feedback__mastered,
+.feedback__replay {
+  padding: 0 0.45rem;
+  border: 2px solid var(--color-on-tone);
+}
+
+.feedback__mastered {
+  animation: xp-pop 0.5s 0.3s ease-out backwards;
+}
+
 .feedback__xp {
   padding: 0 0.45rem;
   background: var(--color-on-tone);

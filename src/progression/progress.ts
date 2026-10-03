@@ -39,6 +39,13 @@ export interface Progress {
 export type ChallengeState = 'unplayed' | 'completed' | 'mastered'
 export type GameStatus = 'new' | 'in-progress' | 'complete' | 'mastered'
 
+export const statusLabels: Record<GameStatus, string> = {
+  new: 'New',
+  'in-progress': 'In progress',
+  complete: 'Complete',
+  mastered: 'Mastered',
+}
+
 export interface AnswerOutcome {
   xpEarned: number
   /** This answer earned mastery (first attempt, correct). */

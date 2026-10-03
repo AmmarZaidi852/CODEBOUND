@@ -154,6 +154,86 @@
   color: var(--color-text);
 }
 
-.game-card .btn {
-  align-self: stretch;
+/* Saved progress: [● IN PROGRESS]  MODULES 03 / 05  [■■■□□] */
+.game-card__progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.75rem;
+  padding: 0.55rem 0.65rem;
+  border: 2px solid var(--color-border);
+  background: var(--color-inset);
+}
+
+.game-card__state {
+  --state-color: var(--color-text-muted);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--state-color);
+}
+
+.game-card__state span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 2px solid var(--state-color);
+}
+
+.game-card--in-progress .game-card__state {
+  --state-color: var(--tone);
+}
+
+.game-card--complete .game-card__state,
+.game-card--mastered .game-card__state {
+  --state-color: var(--color-success);
+}
+
+.game-card--in-progress .game-card__state span,
+.game-card--complete .game-card__state span {
+  background: var(--state-color);
+}
+
+/* Mastered: a solid badge, the strongest state on the shelf. */
+.game-card--mastered .game-card__state {
+  padding: 0 0.4rem;
+  background: var(--color-success);
+  color: var(--color-on-tone);
+}
+
+.game-card--mastered .game-card__state span {
+  border-color: var(--color-on-tone);
+  background: var(--color-on-tone);
+}
+
+.game-card__count {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-strong);
+}
+
+.game-card__bar {
+  flex: 1;
+  min-width: 5rem;
+  height: 0.6rem;
+}
+
+.game-card__actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.game-card__actions .btn--primary {
+  flex: 1;
+}
+
+/* Mastered cartridges get a tone frame, like a finished save file. */
+.game-card--mastered {
+  border-color: var(--color-success);
 }

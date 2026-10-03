@@ -12,7 +12,6 @@ import {
 import './FoundationsScreen.css'
 
 interface FoundationsScreenProps {
-  xp: number
   completed: readonly ConceptId[]
   onBack: () => void
   onOpen: (id: ConceptId) => void
@@ -26,7 +25,6 @@ const stateLabels = {
 
 /** The training campaign: eight concepts, done → current → locked. */
 function FoundationsScreen({
-  xp,
   completed,
   onBack,
   onOpen,
@@ -36,7 +34,7 @@ function FoundationsScreen({
 
   return (
     <div className="screen" data-theme="foundations">
-      <TopBar xp={xp} backLabel="Home" onBack={onBack} />
+      <TopBar backLabel="Home" onBack={onBack} />
       <main className="foundations">
         <header className="foundations__header panel">
           <div className="foundations__art">

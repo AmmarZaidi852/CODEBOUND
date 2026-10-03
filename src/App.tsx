@@ -3,7 +3,9 @@ import type { ConceptId } from './challenges/foundations.ts'
 import { foundations } from './content/foundations.ts'
 import type { GameId } from './content/games.ts'
 import { foundationsProgress, nextConcept } from './game/foundationsProgress.ts'
-import { XP_CONCEPT } from './game/xp.ts'
+import type { RunStart } from './game/useChallengeRun.ts'
+import { useProgress } from './progression/ProgressContext.ts'
+import ProgressProvider from './progression/ProgressProvider.tsx'
 import BugHuntScreen from './screens/BugHuntScreen.tsx'
 import CodeBreakerScreen from './screens/CodeBreakerScreen.tsx'
 import ConceptScreen from './screens/ConceptScreen.tsx'
@@ -13,63 +15,67 @@ import FunctionForgeScreen from './screens/FunctionForgeScreen.tsx'
 import GameSelectScreen from './screens/GameSelectScreen.tsx'
 import HomeScreen from './screens/HomeScreen.tsx'
 
-type Screen = 'home' | 'select' | 'foundations' | 'concept' | GameId
+type Screen = 'home' | 'select' | 'foundations' | 'concept' | 'game'
 
-function App() {
+/** The game being played, how it was entered, and where it starts. */
+interface Run {
+  game: GameId
+  /** Games opened from a lesson return to the learning path. */
+  from: 'select' | 'foundations'
+  startAt: RunStart
+  /** Bumped to remount the game for another run. */
+  attempt: number
+}
+
+const gameScreens = {
+  'bug-hunt': BugHuntScreen,
+  'code-breaker': CodeBreakerScreen,
+  'data-sorter': DataSorterScreen,
+  'function-forge': FunctionForgeScreen,
+}
+
+/** Switches screens. All saved state lives in ProgressProvider. */
+function Screens() {
+  const { progress, completeConcept } = useProgress()
+  const completed = progress.concepts
+
   const [screen, setScreen] = useState<Screen>('home')
-  const [xp, setXp] = useState(0)
-
-  // Python Foundations progression (session only).
-  const [completed, setCompleted] = useState<ConceptId[]>([])
   const [conceptId, setConceptId] = useState<ConceptId>(foundations[0].id)
-  // Games opened from a lesson return to the learning path.
-  const [gameExit, setGameExit] = useState<'select' | 'foundations'>('select')
+  const [run, setRun] = useState<Run | null>(null)
 
   // Every screen starts at the top, not at the previous screen's scroll.
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [screen, conceptId])
-
-  // Shared by every game so XP carries across the whole session.
-  const earnXp = (amount: number) => setXp((total) => total + amount)
+  }, [screen, conceptId, run])
 
   function openConcept(id: ConceptId) {
     setConceptId(id)
     setScreen('concept')
   }
 
-  /** Marks a concept done. The XP reward is given only the first time. */
-  function completeConcept(id: ConceptId) {
-    if (completed.includes(id)) return
-    setCompleted([...completed, id])
-    earnXp(XP_CONCEPT)
+  function openGame(game: GameId, from: Run['from'], startAt: RunStart) {
+    setRun({ game, from, startAt, attempt: (run?.attempt ?? 0) + 1 })
+    setScreen('game')
   }
 
-  function openGame(id: GameId, from: 'select' | 'foundations') {
-    setGameExit(from)
-    setScreen(id)
-  }
-
-  const gameProps = {
-    xp,
-    onEarnXp: earnXp,
-    onExit: () => setScreen(gameExit),
-    exitLabel: gameExit === 'foundations' ? 'Foundations' : 'Games',
-  }
-
-  if (screen === 'bug-hunt') return <BugHuntScreen {...gameProps} />
-  if (screen === 'code-breaker') return <CodeBreakerScreen {...gameProps} />
-  if (screen === 'data-sorter') return <DataSorterScreen {...gameProps} />
-  if (screen === 'function-forge') {
-    return <FunctionForgeScreen {...gameProps} />
+  if (screen === 'game' && run) {
+    const Game = gameScreens[run.game]
+    return (
+      <Game
+        key={run.attempt}
+        startAt={run.startAt}
+        onExit={() => setScreen(run.from)}
+        exitLabel={run.from === 'foundations' ? 'Foundations' : 'Games'}
+        onPlayAgain={(startAt) => openGame(run.game, run.from, startAt)}
+      />
+    )
   }
 
   if (screen === 'select') {
     return (
       <GameSelectScreen
-        xp={xp}
         onBack={() => setScreen('home')}
-        onSelect={(id) => openGame(id, 'select')}
+        onSelect={(id, startAt) => openGame(id, 'select', startAt)}
       />
     )
   }
@@ -77,7 +83,6 @@ function App() {
   if (screen === 'foundations') {
     return (
       <FoundationsScreen
-        xp={xp}
         completed={completed}
         onBack={() => setScreen('home')}
         onOpen={openConcept}
@@ -92,7 +97,6 @@ function App() {
     return (
       <ConceptScreen
         key={concept.id}
-        xp={xp}
         concept={concept}
         index={index}
         total={foundations.length}
@@ -100,7 +104,9 @@ function App() {
         nextTitle={next?.title ?? null}
         onComplete={() => completeConcept(concept.id)}
         onBack={() => setScreen('foundations')}
-        onPractise={() => concept.game && openGame(concept.game, 'foundations')}
+        onPractise={() =>
+          concept.game && openGame(concept.game, 'foundations', 'continue')
+        }
         onNext={() => (next ? openConcept(next.id) : setScreen('foundations'))}
       />
     )
@@ -108,11 +114,18 @@ function App() {
 
   return (
     <HomeScreen
-      xp={xp}
       learned={foundationsProgress(foundations, completed)}
       onLearn={() => setScreen('foundations')}
       onPlay={() => setScreen('select')}
     />
+  )
+}
+
+function App() {
+  return (
+    <ProgressProvider>
+      <Screens />
+    </ProgressProvider>
   )
 }
 
