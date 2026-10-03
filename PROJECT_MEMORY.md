@@ -1,13 +1,13 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 5 — Function Forge (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 6.
+- **Current phase:** Phase 6 — Retro game identity & UX overhaul (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 7.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
 
-React 19 · TypeScript 6 · Vite 8 · Vitest 5 (+ Testing Library, jsdom) · ESLint 10 (typescript-eslint, react-hooks, react-refresh) · Prettier 3. Frontend only, no backend.
+React 19 · TypeScript 6 · Vite 8 · `@fontsource/jersey-10` (self-hosted display font, the only runtime dependency besides React) · Vitest 5 (+ Testing Library, jsdom) · ESLint 10 (typescript-eslint, react-hooks, react-refresh) · Prettier 3. Frontend only, no backend.
 
 ## Learning path → games
 
@@ -42,6 +42,20 @@ Games (all playable): Bug Hunt (5 challenges), Code Breaker (5), Data Sorter (7)
   - Tests (137 total): token formatting, validation (structure, order, call, output), content consistency, gameplay (assemble with undo/reset, args order and real output, choose slotting, predict, locked after run / XP once, sequential progress, completion and first-try count), four games in selection, Functions → Function Forge → back to Foundations with progress kept. All earlier tests still pass.
   - Browser-verified in Chrome: full Function Forge run (+550, 5/7 first try), wrong-argument NameError display, Foundations → Functions → Practise in Function Forge → ← Foundations (8/8 kept), all four games open directly, shared XP consistent, no console errors, no horizontal overflow at 375px.
 
+- **Phase 6 — Retro game identity & UX overhaul:**
+  - **Visual system** (`src/styles/global.css`, documented in `DESIGN.md` → Visual language): navy surfaces; green brand plus one tone per area via `data-theme` (Foundations green, Bug Hunt amber, Code Breaker magenta, Data Sorter cyan, Function Forge violet); Jersey 10 display font for headings/labels/buttons, system font for teaching text, monospace for code; square 2px-bordered panels with tone corner brackets; chunky pressable buttons (primary / default / ghost, `btn--go` arrow).
+  - **Original pixel art** (`src/art/`): grid → SVG renderer (one path per colour) and 6 hand-composed sprites: Home terminal + cartridge (with blinking cursor), Foundations training cartridge + manual, Bug Hunt corrupted terminal + bug, Code Breaker padlock + key, Data Sorter crates on an indexed shelf, Function Forge input → machine → output. No external or copyrighted assets.
+  - **Home** is a title screen (hero art, extruded pixel logo, primary Start/Continue/Review Learning, PLAY, segmented Foundations progress, large XP badge; two-column on desktop).
+  - **Game selection** is a cartridge shelf (art window with CART number and status LED, name in tone, description, concepts taught, one Play button; hover/focus lift).
+  - **Gameplay hierarchy** for every game and lesson: `GameHud` (sprite, name, `MODULE 02 / 05` segmented progressbar, per-game status) → mission (number, title, objective) → Intel concept card → interaction → sticky `ActionBar` (hint + one primary action, disabled until answered).
+  - **Feedback**: SYSTEM ONLINE / SYSTEM ERROR strip with tick/cross and XP chip above the unchanged teaching text; ✓/✕ markers and A/B/C keys on choices; one-shot shake on wrong answers.
+  - **XP**: rules unchanged. Segmented level bar, floating "+100" / "+100 · LEVEL UP" on the top-bar badge (decorative, `aria-hidden`), completion screen with mission stamp, burst, stats and "N XP to level X" meter.
+  - **Foundations** is a training campaign (Complete / Current / Locked rows with pixel icons; locked rows dashed and quiet); lessons are training terminals ("Training module 03", `>` prompt, "Code terminal · Try it").
+  - New shared components: `GameHud`, `StatusBadge`, `PixelProgress`, `ActionBar`, `PixelSprite`. `RunProgress` removed (replaced by `GameHud`).
+  - Fixes found in the browser: screens now open at the top (scroll was carried over); reload no longer restores a mid-page scroll; `--tone-wash` is recomputed per theme (it was stuck on green); Pixelify Sans replaced by Jersey 10 because C read as O and 5 as S; removed `background-attachment: fixed` and `backdrop-filter` (paint cost).
+  - Tests (153 total): progress assertions now check the HUD progressbar and `MODULE 0n / 0m` label (`src/test/progress.ts`); Forge's first status reads Ready; new `RetroUi.test.tsx` (cartridges, primary actions, action-bar hints, status changes, SYSTEM ONLINE/ERROR, XP popup and level up, completion stamp and level meter) and `sprites.test.ts` (sprite grids valid). No existing assertions weakened.
+  - Browser-verified in Chrome (desktop width and a 375px same-origin frame): Home, game selection (all 4 cartridges), Bug Hunt correct + wrong, Code Breaker wrong + correct and full run to completion, Data Sorter correct, Function Forge assemble correct, Foundations → Variables lesson → micro-challenge → Practise in Bug Hunt → ← Foundations (1/8 kept, XP kept), completion → Back to games. No horizontal overflow at 375px, no console errors, keyboard focus visible, ~60 fps.
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
 ## Not implemented (by design)
@@ -49,6 +63,11 @@ See `ARCHITECTURE.md` and `DESIGN.md` for details.
 Python execution, typed-code answers, persistence (XP and progress reset on reload), accounts, databases, backend, routing, maps/NPCs/dialogue, AI mentor, skill trees, leaderboards.
 
 ## Known limitations
+
+- The Chrome window could not go below ~630px, so 375px was checked in a same-origin iframe (layout and overflow measured, not on a physical phone).
+- Jersey 10 ships the latin subset only (all content is English).
+- On phones the HUD status badge wraps under the game name, and the completion screen's exit button sits below the fold on short screens.
+- Sprites are fixed images (only the Home cursor animates); there is no per-challenge art.
 
 - Replaying a game awards XP again (acceptable while XP is session-only).
 - Leaving a game mid-run discards that run's progress; XP already earned is kept.
@@ -60,4 +79,4 @@ Python execution, typed-code answers, persistence (XP and progress reset on relo
 ## Git
 
 - Branch: `main`
-- Last code commit of Phase 5: `8f19a5a` (docs are committed right after it)
+- Last code commit of Phase 6: `e4a72f2` (tests); docs follow it. Phase 5 ended at `2fedf90`.
