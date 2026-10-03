@@ -4,14 +4,18 @@ import TopBar from '../components/TopBar.tsx'
 import { foundations } from '../content/foundations.ts'
 import {
   gameChallengeIds,
+  gameModuleTiers,
   writeModuleCounts,
 } from '../content/gameChallenges.ts'
 import { games, type GameId } from '../content/games.ts'
 import type { RunStart } from '../game/useChallengeRun.ts'
 import {
+  bossState,
   gameStates,
   gameStatus,
   statusLabels,
+  tierCounts,
+  type BossState,
 } from '../progression/progress.ts'
 import { useProgress } from '../progression/ProgressContext.ts'
 import './GameSelectScreen.css'
@@ -22,6 +26,13 @@ interface GameSelectScreenProps {
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
+
+const bossLabels: Record<BossState, string> = {
+  locked: 'Locked',
+  ready: 'Ready',
+  cleared: 'Cleared',
+  mastered: 'Mastered',
+}
 
 /** Cartridge shelf: one card per game, each showing its saved progress. */
 function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
@@ -42,6 +53,10 @@ function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
             )
             const status = gameStatus(states)
             const done = states.filter((s) => s !== 'unplayed').length
+            const tiers = gameModuleTiers[game.id]
+            const core = tierCounts(states, tiers, 'core')
+            const advanced = tierCounts(states, tiers, 'advanced')
+            const boss = bossState(states, tiers)
             const cleared = status === 'complete' || status === 'mastered'
             return (
               <li
@@ -94,6 +109,33 @@ function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
                       label={`${game.name} modules complete`}
                       valueText={`${done} of ${states.length} modules complete`}
                     />
+                    {boss && (
+                      <p className="game-card__tiers">
+                        <span
+                          className={
+                            core.done === core.total
+                              ? 'game-card__tier--done'
+                              : ''
+                          }
+                        >
+                          Core {pad(core.done)}/{pad(core.total)}
+                        </span>
+                        <span
+                          className={
+                            advanced.done === advanced.total
+                              ? 'game-card__tier--done'
+                              : ''
+                          }
+                        >
+                          Advanced {pad(advanced.done)}/{pad(advanced.total)}
+                        </span>
+                        <span
+                          className={`game-card__boss game-card__boss--${boss}`}
+                        >
+                          Boss {bossLabels[boss]}
+                        </span>
+                      </p>
+                    )}
                   </div>
                   <div className="game-card__actions">
                     {status === 'new' && (

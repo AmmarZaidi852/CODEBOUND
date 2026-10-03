@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import App from '../App.tsx'
+import { tierOf } from '../challenges/meta.ts'
 import { adder, doubler, ticketTotal } from '../content/codeChallenges.ts'
 import { bugHuntModules } from '../content/gameChallenges.ts'
 import {
@@ -267,7 +268,7 @@ describe('write modules and progression', () => {
     render(<App />)
     click('PLAY')
     click('Continue Bug Hunt')
-    expectStep('Bug Hunt', 3, 7)
+    expectStep('Bug Hunt', 3, 10)
     expect(
       screen.getByRole('heading', { level: 1, name: 'Ticket Counter' }),
     ).toBeInTheDocument()
@@ -287,7 +288,7 @@ describe('write modules and progression', () => {
     render(<App />)
     expectTotalXp(300)
     click('PLAY')
-    expect(screen.getByText('Modules 03 / 07')).toBeInTheDocument()
+    expect(screen.getByText('Modules 03 / 10')).toBeInTheDocument()
     click('Replay Bug Hunt from the start')
     answerBugHunt(bugHuntModules[0], true)
     nextModule(false)
@@ -305,7 +306,7 @@ describe('write modules and progression', () => {
     // Every Bug Hunt patch solved, but neither write module.
     let p = newProgress()
     bugHuntModules
-      .filter((m) => !('kind' in m))
+      .filter((m) => !('kind' in m) && tierOf(m) === 'core')
       .forEach(({ id }) => {
         p = applyAnswer(p, 'bug-hunt', id, true).progress
       })
@@ -316,7 +317,7 @@ describe('write modules and progression', () => {
       .getByRole('heading', { name: 'Bug Hunt' })
       .closest('li')!
     expect(within(card).getByText('In progress')).toBeInTheDocument()
-    expect(within(card).getByText('Modules 05 / 07')).toBeInTheDocument()
+    expect(within(card).getByText('Modules 05 / 10')).toBeInTheDocument()
   })
 })
 
@@ -339,10 +340,10 @@ describe('pointing players to write modules', () => {
     render(<App />)
     click('PLAY')
     for (const [name, count] of [
-      ['Bug Hunt', 2],
-      ['Code Breaker', 2],
-      ['Data Sorter', 2],
-      ['Function Forge', 3],
+      ['Bug Hunt', 4],
+      ['Code Breaker', 4],
+      ['Data Sorter', 4],
+      ['Function Forge', 5],
     ] as const) {
       const card = screen.getByRole('heading', { name }).closest('li')!
       expect(

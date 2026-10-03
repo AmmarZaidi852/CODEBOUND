@@ -1,3 +1,5 @@
+import { missionTier } from '../challenges/meta.ts'
+import TierTag, { BossStrip } from '../components/TierTag.tsx'
 import { useState, type RefObject } from 'react'
 import {
   isCorrectAnswer,
@@ -92,8 +94,12 @@ function DataSorterRound({
         }}
       />
 
-      <section className="mission panel">
-        <p className="mission__id">Data Terminal {terminalNumber} · Process</p>
+      <section className={`mission panel${missionTier(challenge.tier)}`}>
+        <BossStrip tier={challenge.tier} />
+        <p className="mission__id">
+          Data Terminal {terminalNumber} · Process
+          <TierTag tier={challenge.tier} />
+        </p>
         <h1 className="game__title" ref={titleRef} tabIndex={-1}>
           {challenge.name}
         </h1>

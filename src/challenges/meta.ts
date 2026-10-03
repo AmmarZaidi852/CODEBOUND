@@ -28,3 +28,7 @@ export const tierLabels: Record<Tier, string> = {
   advanced: 'Advanced',
   boss: 'Boss',
 }
+
+/** Extra mission-panel class for a tier: the boss gets its own frame. */
+export const missionTier = (tier?: Tier) =>
+  tier === 'boss' ? ' mission--boss' : ''

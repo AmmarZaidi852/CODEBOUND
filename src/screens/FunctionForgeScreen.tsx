@@ -65,7 +65,7 @@ function FunctionForgeScreen({
           gameName="Function Forge"
           title="All modules online"
           message="You defined, called, and built Python functions. The forge is running."
-          challengeIds={challenges.map((c) => c.id)}
+          modules={challenges}
           stats={stats}
           onExit={onExit}
           exitLabel={`Back to ${exitLabel.toLowerCase()}`}

@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
+import { tierOf, type Tier } from '../challenges/meta.ts'
 import type { GameId } from '../content/games.ts'
 import {
+  bossState,
   continueIndex,
   gameStates,
   gameStatus,
+  sectionOf,
   type AnswerOutcome,
+  type ChallengeState,
 } from '../progression/progress.ts'
 import { useProgress } from '../progression/ProgressContext.ts'
 
@@ -12,8 +16,11 @@ export interface RunResult extends AnswerOutcome {
   correct: boolean
 }
 
-/** Where a run begins: the first unfinished challenge, or module 01. */
-export type RunStart = 'continue' | 'start'
+/**
+ * Where a run begins: the first unfinished module (continue), module 01
+ * (start), or the first module of a tier ('advanced', 'boss').
+ */
+export type RunStart = 'continue' | 'start' | 'advanced' | 'boss'
 
 /** What one play-through achieved, for the completion screen. */
 export interface RunStats {
@@ -24,6 +31,26 @@ export interface RunStats {
   runXp: number
   /** The game was already complete before this run began. */
   replay: boolean
+  /** The tier this run played. A run covers one tier section. */
+  section: Tier
+}
+
+function startIndex(
+  startAt: RunStart,
+  states: readonly ChallengeState[],
+  tiers: readonly Tier[],
+): number {
+  if (startAt === 'start') return 0
+  if (startAt === 'continue') return continueIndex(states)
+  const at = tiers.indexOf(startAt)
+  // A missing tier, or a boss that is still locked, falls back to Continue.
+  if (
+    at === -1 ||
+    (startAt === 'boss' && bossState(states, tiers) === 'locked')
+  ) {
+    return continueIndex(states)
+  }
+  return at
 }
 
 /**
@@ -34,17 +61,18 @@ export interface RunStats {
  */
 export function useChallengeRun(
   game: GameId,
-  challenges: readonly { id: string }[],
+  challenges: readonly { id: string; tier?: Tier }[],
   startAt: RunStart = 'continue',
 ) {
   const { progress, answer, finishRun } = useProgress()
   const ids = challenges.map((c) => c.id)
+  const tiers = challenges.map(tierOf)
   const states = gameStates(progress, game, ids)
 
   // Fixed when the run begins; later answers must not move them.
-  const [start] = useState(() =>
-    startAt === 'start' ? 0 : continueIndex(states),
-  )
+  const [start] = useState(() => startIndex(startAt, states, tiers))
+  // A run plays one tier section: CORE, ADVANCED or the BOSS.
+  const { tier: section, end } = sectionOf(tiers, start)
   const [replay] = useState(() => {
     const status = gameStatus(states)
     return status === 'complete' || status === 'mastered'
@@ -68,7 +96,7 @@ export function useChallengeRun(
     if (result) feedbackRef.current?.focus()
   }, [result])
 
-  const isLast = index === challenges.length - 1
+  const isLast = index === end
 
   function select(id: string) {
     if (!result) setSelectedId(id)
@@ -111,6 +139,7 @@ export function useChallengeRun(
     correct,
     runXp,
     replay,
+    section,
   }
 
   return {

@@ -4,6 +4,7 @@ import App from './App.tsx'
 import { bugHuntChallenges } from './content/bugHuntChallenges.ts'
 import { codeBreakerChallenges } from './content/codeBreakerChallenges.ts'
 import { dataSorterChallenges } from './content/dataSorterChallenges.ts'
+import { tierOf } from './challenges/meta.ts'
 import { bugHuntModules } from './content/gameChallenges.ts'
 import { answerBugHunt, nextModule } from './test/play.ts'
 import { expectStep } from './test/progress.ts'
@@ -47,7 +48,7 @@ describe('App', () => {
         name: dataSorterChallenges[0].name,
       }),
     ).toBeInTheDocument()
-    expectStep('Data Sorter', 1, 9)
+    expectStep('Data Sorter', 1, 12)
   })
 
   it('opens Code Breaker from game selection', () => {
@@ -61,7 +62,7 @@ describe('App', () => {
         name: codeBreakerChallenges[0].system,
       }),
     ).toBeInTheDocument()
-    expectStep('Code Breaker', 1, 7)
+    expectStep('Code Breaker', 1, 10)
   })
 
   it('returns home from game selection', () => {
@@ -76,11 +77,12 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'PLAY' }))
     fireEvent.click(screen.getByRole('button', { name: 'Play Bug Hunt' }))
 
-    // Patches and write modules alike, all solved first try.
-    bugHuntModules.forEach((module, i) => {
+    // The Core run: patches and write modules alike, all first try.
+    const core = bugHuntModules.filter((m) => tierOf(m) === 'core')
+    core.forEach((module, i) => {
       answerBugHunt(module, true)
       expect(screen.getByText(`${(i + 1) * 100} XP`)).toBeInTheDocument()
-      nextModule(i === bugHuntModules.length - 1)
+      nextModule(i === core.length - 1)
     })
 
     expect(
@@ -126,7 +128,7 @@ describe('App', () => {
     // Re-entering Bug Hunt continues at the first unfinished module and
     // keeps the XP total.
     fireEvent.click(screen.getByRole('button', { name: 'Continue Bug Hunt' }))
-    expectStep('Bug Hunt', 2, 7)
+    expectStep('Bug Hunt', 2, 10)
     expect(screen.getByText('125 XP')).toBeInTheDocument()
   })
 

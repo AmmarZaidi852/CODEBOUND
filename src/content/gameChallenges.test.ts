@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CodeChallenge } from '../challenges/code.ts'
+import { tierOf } from '../challenges/meta.ts'
 import {
   bugHuntModules,
   codeBreakerModules,
@@ -21,10 +22,11 @@ describe('game module lists', () => {
     }
     const writes = (list: object[]) =>
       list.filter((m) => (m as CodeChallenge).kind === 'code').length
-    expect(writes(bugHuntModules)).toBe(2)
-    expect(writes(codeBreakerModules)).toBe(2)
-    expect(writes(dataSorterModules)).toBe(2)
-    expect(writes(functionForgeModules)).toBe(3)
+    // CORE write modules (Phase 8) plus ADVANCED / BOSS ones (Phase 9).
+    expect(writes(bugHuntModules)).toBe(4)
+    expect(writes(codeBreakerModules)).toBe(4)
+    expect(writes(dataSorterModules)).toBe(4)
+    expect(writes(functionForgeModules)).toBe(5)
   })
 
   it('keeps every existing challenge, in its original order', async () => {
@@ -44,7 +46,7 @@ describe('game module lists', () => {
     ]
     lists.forEach((original, i) => {
       const kept = modules[i].filter(
-        (m) => (m as CodeChallenge).kind !== 'code',
+        (m) => (m as CodeChallenge).kind !== 'code' && tierOf(m) === 'core',
       )
       expect(kept).toEqual(original)
     })
@@ -54,6 +56,6 @@ describe('game module lists', () => {
     expect(gameChallengeIds['bug-hunt']).toEqual(
       bugHuntModules.map((m) => m.id),
     )
-    expect(gameChallengeIds['function-forge']).toHaveLength(10)
+    expect(gameChallengeIds['function-forge']).toHaveLength(13)
   })
 })

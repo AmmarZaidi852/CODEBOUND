@@ -116,6 +116,11 @@ function ConceptScreen({
           <p className="concept__summary">
             <InlineCode text={concept.summary} />
           </p>
+          {concept.later && (
+            <p className="concept__later">
+              <span className="mission__label">Later</span> {concept.later}
+            </p>
+          )}
         </header>
 
         <div className="concept__example">

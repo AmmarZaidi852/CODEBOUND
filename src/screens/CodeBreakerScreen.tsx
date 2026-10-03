@@ -1,3 +1,5 @@
+import { missionTier } from '../challenges/meta.ts'
+import TierTag, { BossStrip } from '../components/TierTag.tsx'
 import { isCodeChallenge, type CodeChallenge } from '../challenges/code.ts'
 import {
   CODE_SLOT,
@@ -94,7 +96,7 @@ function CodeBreakerScreen({
           gameName="Code Breaker"
           title="All locks broken"
           message="Every security node is open. Your logic held up."
-          challengeIds={challenges.map((c) => c.id)}
+          modules={challenges}
           stats={stats}
           onExit={onExit}
           exitLabel={`Back to ${exitLabel.toLowerCase()}`}
@@ -157,9 +159,13 @@ function CodeBreakerScreen({
           }}
         />
 
-        <section className={`mission panel access-panel--${lockState}`}>
+        <section
+          className={`mission panel access-panel--${lockState}${missionTier(challenge.tier)}`}
+        >
+          <BossStrip tier={challenge.tier} />
           <p className="mission__id">
             Security Node {pad(index + 1)} · Break the lock
+            <TierTag tier={challenge.tier} />
           </p>
           <h1 className="game__title" ref={titleRef} tabIndex={-1}>
             {challenge.system}

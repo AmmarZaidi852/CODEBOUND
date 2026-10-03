@@ -1,3 +1,5 @@
+import { missionTier } from '../challenges/meta.ts'
+import TierTag, { BossStrip } from '../components/TierTag.tsx'
 import { useMemo, useRef, useState, type RefObject } from 'react'
 import {
   checkCode,
@@ -126,10 +128,12 @@ function CodeRound({
         }}
       />
 
-      <section className="mission panel">
+      <section className={`mission panel${missionTier(challenge.tier)}`}>
+        <BossStrip tier={challenge.tier} />
         <p className="mission__id">
           {theme.label}
           <span className="code-round__mode">Write</span>
+          <TierTag tier={challenge.tier} />
         </p>
         <h1 className="game__title" ref={titleRef} tabIndex={-1}>
           {challenge.title}

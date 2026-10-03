@@ -110,6 +110,8 @@ export const foundations: Concept[] = [
     title: 'Conditions',
     summary:
       '`if` runs a block of code only when its condition is `True`, and `else` runs when it is not.',
+    later:
+      "You'll use conditions alone first, then combine them with lists, loops and functions in Advanced and Boss modules.",
     example: [
       'energy = 30',
       '',
@@ -148,6 +150,8 @@ export const foundations: Concept[] = [
     title: 'Lists',
     summary:
       'A list holds several values in order inside square brackets, and `len()` tells you how many there are.',
+    later:
+      'Lists come back in Advanced and Boss modules, combined with loops and conditions to filter and count data.',
     example: ['colors = ["red", "green", "blue"]', 'print(len(colors))'],
     exampleNote:
       'The list has three items separated by commas, so `len(colors)` prints 3.',
@@ -202,6 +206,8 @@ export const foundations: Concept[] = [
     title: 'Loops',
     summary:
       'A `for` loop runs the same block of code once for each item in a list.',
+    later:
+      'In Advanced and Boss modules, loops team up with conditions and lists: counting matches, filtering data, adding totals.',
     example: ['for n in [1, 2, 3]:', '    print(n * 10)'],
     exampleNote:
       '`n` takes each value in turn, so this prints 10, then 20, then 30.',
@@ -234,6 +240,8 @@ export const foundations: Concept[] = [
     title: 'Functions',
     summary:
       'A function is a named block of code you define once with `def` and run whenever you call it.',
+    later:
+      'Advanced and Boss modules put conditions, loops and lists inside functions.',
     example: [
       'def greet():',
       '    print("Hello")',

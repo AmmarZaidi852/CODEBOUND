@@ -1,0 +1,43 @@
+/* Difficulty is information, not a grade: small, quiet tags. */
+.tier-tag {
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 0 0.35rem;
+  border: 2px solid var(--tone);
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+.tier-tag--boss {
+  background: var(--tone);
+  color: var(--color-on-tone);
+}
+
+/* Boss mission: a heavier frame in the game's colour, same layout. */
+.mission--boss {
+  border-color: var(--tone);
+  box-shadow: 0 0 0 4px var(--tone-wash);
+}
+
+.mission__boss-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -1rem -1.15rem 0.3rem;
+  padding: 0.35rem 1.15rem;
+  background: var(--tone);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-on-tone);
+}
+
+.mission__boss-strip span {
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--color-on-tone);
+  animation: cursor-blink 1.4s steps(1) infinite;
+}

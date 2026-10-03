@@ -65,7 +65,7 @@ function DataSorterScreen({
           gameName="Data Sorter"
           title="All data sorted"
           message="Every terminal is processed. You can read and reshape lists."
-          challengeIds={challenges.map((c) => c.id)}
+          modules={challenges}
           stats={stats}
           onExit={onExit}
           exitLabel={`Back to ${exitLabel.toLowerCase()}`}

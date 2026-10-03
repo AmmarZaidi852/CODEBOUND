@@ -16,6 +16,11 @@
   color: var(--tone);
 }
 
+.concept .concept__later {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
 .concept__example {
   display: flex;
   flex-direction: column;

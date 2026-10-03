@@ -1,4 +1,5 @@
 import type { ConceptId } from '../challenges/foundations.ts'
+import type { Tier } from '../challenges/meta.ts'
 import type { GameId } from '../content/games.ts'
 import { XP_CONCEPT, xpForResult } from '../game/xp.ts'
 
@@ -166,8 +167,55 @@ export function gameStatus(states: readonly ChallengeState[]): GameStatus {
   return states.every((s) => s === 'mastered') ? 'mastered' : 'complete'
 }
 
-/** Where Continue starts: the first unfinished challenge, or 0 if all are done. */
+/**
+ * Where Continue starts: the first unfinished challenge, or 0 if all are
+ * done. Modules are ordered CORE → ADVANCED → BOSS, so this recommends
+ * unfinished core first, then advanced, then the boss.
+ */
 export function continueIndex(states: readonly ChallengeState[]): number {
   const index = states.indexOf('unplayed')
   return index === -1 ? 0 : index
+}
+
+// ── Difficulty tiers ─────────────────────────────────────────────────────
+
+export type BossState = 'locked' | 'ready' | 'cleared' | 'mastered'
+
+/** Completed / total modules of one tier. */
+export function tierCounts(
+  states: readonly ChallengeState[],
+  tiers: readonly Tier[],
+  tier: Tier,
+) {
+  const inTier = states.filter((_, i) => tiers[i] === tier)
+  return {
+    done: inTier.filter((s) => s !== 'unplayed').length,
+    total: inTier.length,
+  }
+}
+
+/**
+ * The boss unlocks once every CORE and ADVANCED module is complete.
+ * null when the game has no boss.
+ */
+export function bossState(
+  states: readonly ChallengeState[],
+  tiers: readonly Tier[],
+): BossState | null {
+  const at = tiers.indexOf('boss')
+  if (at === -1) return null
+  if (states[at] === 'mastered') return 'mastered'
+  if (states[at] === 'completed') return 'cleared'
+  const ready = states.every((s, i) => tiers[i] === 'boss' || s !== 'unplayed')
+  return ready ? 'ready' : 'locked'
+}
+
+/** The run of consecutive modules sharing `index`'s tier. */
+export function sectionOf(tiers: readonly Tier[], index: number) {
+  const tier = tiers[index]
+  let start = index
+  let end = index
+  while (start > 0 && tiers[start - 1] === tier) start--
+  while (end < tiers.length - 1 && tiers[end + 1] === tier) end++
+  return { tier, start, end }
 }

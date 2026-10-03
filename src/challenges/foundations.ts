@@ -47,6 +47,8 @@ export interface Concept {
   title: string
   /** One-sentence explanation. Backticks mark inline code. */
   summary: string
+  /** Where this idea gets combined with others later (Advanced / Boss). */
+  later?: string
   example: string[]
   /** What the example does, in a sentence or two. */
   exampleNote: string

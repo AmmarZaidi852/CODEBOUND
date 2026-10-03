@@ -1,3 +1,5 @@
+import { missionTier } from '../challenges/meta.ts'
+import TierTag, { BossStrip } from '../components/TierTag.tsx'
 import { useState, type RefObject } from 'react'
 import {
   correctForgeCode,
@@ -138,9 +140,13 @@ function FunctionForgeRound({
         }}
       />
 
-      <section className={`mission panel forge-module--${status}`}>
+      <section
+        className={`mission panel forge-module--${status}${missionTier(challenge.tier)}`}
+      >
+        <BossStrip tier={challenge.tier} />
         <p className="mission__id">
           Function Module {String(index + 1).padStart(2, '0')} · Build
+          <TierTag tier={challenge.tier} />
         </p>
         <h1 className="game__title" ref={titleRef} tabIndex={-1}>
           {challenge.title}

@@ -158,8 +158,15 @@ describe('XP rewards', () => {
         gameName="Bug Hunt"
         title="All bugs squashed"
         message="Nice hunting."
-        challengeIds={bugHuntChallenges.map((c) => c.id)}
-        stats={{ played: 5, correct: 3, runXp: 350, replay: false, ...stats }}
+        modules={bugHuntChallenges}
+        stats={{
+          played: 5,
+          correct: 3,
+          runXp: 350,
+          replay: false,
+          section: 'core',
+          ...stats,
+        }}
         onExit={vi.fn()}
         onPlayAgain={vi.fn()}
       />,

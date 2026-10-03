@@ -1,3 +1,5 @@
+import { missionTier } from '../challenges/meta.ts'
+import TierTag, { BossStrip } from '../components/TierTag.tsx'
 import { isCodeChallenge, type CodeChallenge } from '../challenges/code.ts'
 import {
   getCorrectFix,
@@ -77,7 +79,7 @@ function BugHuntScreen({
           gameName="Bug Hunt"
           title="All bugs squashed"
           message="You worked through every broken script. Nice hunting."
-          challengeIds={challenges.map((c) => c.id)}
+          modules={challenges}
           stats={stats}
           onExit={onExit}
           exitLabel={`Back to ${exitLabel.toLowerCase()}`}
@@ -137,9 +139,11 @@ function BugHuntScreen({
           }}
         />
 
-        <header className="mission panel">
+        <header className={`mission panel${missionTier(challenge.tier)}`}>
+          <BossStrip tier={challenge.tier} />
           <p className="mission__id">
             Bug {String(index + 1).padStart(2, '0')} · Find and patch
+            <TierTag tier={challenge.tier} />
           </p>
           <h1 className="game__title" ref={titleRef} tabIndex={-1}>
             {challenge.title}
