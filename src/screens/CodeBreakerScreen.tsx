@@ -165,8 +165,7 @@ function CodeBreakerScreen({
             {challenge.system}
           </h1>
           <p className="mission__objective">
-            <span className="mission__label">Rule</span>
-            {challenge.rule}
+            <span className="mission__label">Rule</span> {challenge.rule}
           </p>
           <dl className="access-panel__state" aria-label="System state">
             {challenge.state.map((item) => (

@@ -146,7 +146,7 @@ function BugHuntScreen({
           </h1>
           <p className="mission__objective">{challenge.mission}</p>
           <p className="bug-hunt__expected">
-            <span className="mission__label">Expected output</span>
+            <span className="mission__label">Expected output</span>{' '}
             <code>{challenge.expectedOutput}</code>
           </p>
         </header>

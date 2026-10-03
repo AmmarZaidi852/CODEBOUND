@@ -137,12 +137,12 @@ function CodeRound({
           <InlineCode text={challenge.mission} />
         </p>
         <p className="code-round__goal" id={`${editorId}-goal`}>
-          <span className="mission__label">Goal</span>
+          <span className="mission__label">Goal</span>{' '}
           <InlineCode text={challenge.goal} />
         </p>
         {challenge.constraint && (
           <p className="code-round__goal">
-            <span className="mission__label">Rule</span>
+            <span className="mission__label">Rule</span>{' '}
             <InlineCode text={challenge.constraint} />
           </p>
         )}
