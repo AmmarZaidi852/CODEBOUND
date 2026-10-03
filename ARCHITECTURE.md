@@ -12,13 +12,15 @@ src/
   App.tsx                   Holds session state (screen, XP, completed concepts) and switches screens
   screens/                  Full-page screens: Home, GameSelect, Foundations, Concept, BugHunt, CodeBreaker, DataSorter, FunctionForge (+ per-challenge Round components)
   components/               Reusable UI (see below)
+  art/                      Pixel-art toolkit (pixel.ts: grid → SVG paths) and the original sprites (sprites.ts)
   content/                  Static data: game list, each game's challenges, Python Foundations concepts
   challenges/               Challenge types, deterministic validation, listOps (tiny list model)
   game/xp.ts                XP rewards and level maths
   game/useChallengeRun.ts   Shared state for playing through a challenge sequence
   game/foundationsProgress.ts  Unlock / current / progress rules for Python Foundations
-  styles/global.css         Design tokens (CSS variables), buttons, shared game layout
-  test/setup.ts             Vitest setup (jest-dom matchers, cleanup)
+  styles/global.css         Design tokens, area themes (data-theme), display font, buttons, panels, mission layout
+  test/setup.ts             Vitest setup (jest-dom matchers, cleanup, scrollTo stub)
+  test/progress.ts          expectStep(): asserts the HUD shows MODULE n / total
 ```
 
 Tests sit next to the code they cover (`*.test.ts[x]`).
@@ -39,7 +41,9 @@ Tests sit next to the code they cover (`*.test.ts[x]`).
   - A game opened from a concept gets `exitLabel="Foundations"` and returns to the path; opened from game selection it returns there.
   - Game cards list the concepts they practise, derived from each concept's `game`.
 - **Validation** is deterministic and client-side: a chosen id, tapped index, or built list is compared with the challenge data. No Python is executed.
-- **Styling** is plain CSS: shared tokens, buttons, and the `.game` column layout in `global.css`; each screen/component keeps its own CSS file next to it.
+- **Styling** is plain CSS: shared tokens, buttons, `.panel`, `.mission` and the `.game` column layout in `global.css`; each screen/component keeps its own CSS file next to it. A screen sets `data-theme="<game id>"` (or `foundations`) on its root, and every component inside picks up that area's `--tone`. See `DESIGN.md` → Visual language.
+- **Art** is data: each sprite is a list of equal-length strings, one character per pixel, composed from small parts with `compose()`. `gridToPaths()` merges runs into one SVG path per colour. Tests check every sprite is rectangular and uses known colours.
+- **Navigation:** `App.tsx` scrolls to the top whenever the screen (or lesson) changes; browser scroll restoration is off because a reload resets the session.
 
 ## Shared game building blocks
 
@@ -48,18 +52,24 @@ A game screen owns its layout and content, and composes these:
 | Piece              | Role                                                                                                                                                                                |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `useChallengeRun`  | Current index, optional single-choice selection, single submit (awards XP once), next, run XP, first-try count, finished, focus. Games enable submit only once they have an answer. |
-| `RunProgress`      | "Game · 2/5" label and progress pips.                                                                                                                                               |
-| `ConceptCard`      | Short concept primer.                                                                                                                                                               |
+| `GameHud`          | Top strip: area sprite, game name, `MODULE 02 / 05` + segmented progressbar, optional `StatusBadge`.                                                                                |
+| `StatusBadge`      | LED + "Label: Value" readout with idle / ok / fail states (`role="status"`).                                                                                                        |
+| `PixelProgress`    | Segmented bar `[■■□□]`; exposes a `progressbar` when given a label, decorative otherwise.                                                                                           |
+| `ActionBar`        | Sticky bottom bar: hint + the one primary action (Apply patch, Submit, Run module, Check answer).                                                                                   |
+| `ConceptCard`      | Short "Intel" concept primer.                                                                                                                                                       |
 | `CodeBlock`        | Editor-style code with optional highlighted line and fillable slot.                                                                                                                 |
-| `ChoiceList`       | Radio choices that lock and mark correct/wrong after submit.                                                                                                                        |
+| `ChoiceList`       | Lettered radio choices that lock and mark correct (✓) / wrong (✕) after submit.                                                                                                     |
 | `FunctionPipeline` | A call drawn as INPUT → `name()` → OUTPUT, with the output hidden until the function runs.                                                                                          |
 | `ListCells`        | A Python list drawn as `[ cells ]` with optional zero-based index labels and clickable cells.                                                                                       |
-| `FeedbackPanel`    | Success/fail header, XP earned (hidden when 0), why a wrong pick fails, explanation, and Next/Finish or custom `actions`.                                                           |
-| `RunSummary`       | Completion screen: XP earned, challenges completed, solved first try, back to games.                                                                                                |
+| `FeedbackPanel`    | SYSTEM ONLINE / SYSTEM ERROR strip with XP earned (hidden when 0), why a wrong pick fails, explanation, and Next/Finish or custom `actions`.                                        |
+| `RunSummary`       | Completion screen: sprite, mission stamp, XP earned, challenges completed, solved first try, level meter, back button.                                                              |
+| `XpBadge`          | Level chip, 10-segment XP bar, total; floats "+100" (or "· LEVEL UP") when XP rises. `large` variant on Home.                                                                       |
+| `PixelSprite`      | Renders a sprite from `src/art/sprites.ts` as crisp SVG.                                                                                                                            |
+| `TopBar`           | ← back button + `XpBadge`.                                                                                                                                                          |
 
 Games whose answer is more than one choice keep it in a per-challenge component remounted with `key` (see `DataSorterRound`, `FunctionForgeRound`).
 
-To add a game: define its challenge type + validator in `src/challenges/`, its data in `src/content/`, a screen in `src/screens/` built from the pieces above, then mark it playable in `src/content/games.ts` and route to it in `App.tsx`.
+To add a game: define its challenge type + validator in `src/challenges/`, its data in `src/content/`, a screen in `src/screens/` built from the pieces above, then add it to `src/content/games.ts` (with a cartridge `status`), give it a sprite in `src/art/sprites.ts` and a tone in `global.css` (`[data-theme='<id>']`), and route to it in `App.tsx`.
 
 ## Not built yet
 
