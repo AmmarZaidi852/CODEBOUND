@@ -3,6 +3,7 @@ import type { DataSorterChallenge } from '../challenges/dataSorter.ts'
 export const dataSorterChallenges: DataSorterChallenge[] = [
   {
     id: 'lists',
+    concepts: ['lists'],
     name: 'Score Feed',
     concept: 'Lists',
     lesson:
@@ -25,6 +26,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'indexing',
+    concepts: ['lists', 'indexing'],
     name: 'Index Probe',
     concept: 'Indexing',
     lesson:
@@ -47,6 +49,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'set-item',
+    concepts: ['lists', 'indexing'],
     name: 'Patch Record',
     concept: 'Changing an item',
     lesson:
@@ -74,6 +77,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'append',
+    concepts: ['lists'],
     name: 'Intake Queue',
     concept: 'append()',
     lesson:
@@ -101,6 +105,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'pop',
+    concepts: ['lists', 'indexing'],
     name: 'Purge Slot',
     concept: 'pop()',
     lesson:
@@ -124,6 +129,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'combined',
+    concepts: ['lists', 'indexing'],
     name: 'Batch Process',
     concept: 'Combining operations',
     lesson:
@@ -160,6 +166,7 @@ export const dataSorterChallenges: DataSorterChallenge[] = [
   },
   {
     id: 'for-loop',
+    concepts: ['lists', 'loops'],
     name: 'Signal Doubler',
     concept: 'for loops & len()',
     lesson:

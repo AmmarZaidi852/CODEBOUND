@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type RefObject } from 'react'
 import {
   checkCode,
+  resultName,
   starterSource,
   type CodeChallenge,
   type CodeVerdict,
@@ -298,25 +299,25 @@ function CodeRound({
                 </dd>
               </>
             )}
-            {(verdict.output.length > 0 || !verdict.error) &&
-              !challenge.listVariable && (
-                <>
-                  <dt>Your output</dt>
-                  <dd>
-                    <pre className="code-round__output">
-                      {verdict.output.length
-                        ? verdict.output.join('\n')
-                        : '(nothing printed)'}
-                    </pre>
-                  </dd>
-                </>
-              )}
-            {verdict.list && challenge.listVariable && (
+            {(verdict.output.length > 0 ||
+              (!verdict.error && !challenge.listVariable)) && (
+              <>
+                <dt>Your output</dt>
+                <dd>
+                  <pre className="code-round__output">
+                    {verdict.output.length
+                      ? verdict.output.join('\n')
+                      : '(nothing printed)'}
+                  </pre>
+                </dd>
+              </>
+            )}
+            {verdict.list && resultName(challenge) && (
               <>
                 <dt>Your result</dt>
                 <dd>
                   <ListCells
-                    label={`${challenge.listVariable} =`}
+                    label={`${resultName(challenge)} =`}
                     values={verdict.list}
                     showIndexes
                   />

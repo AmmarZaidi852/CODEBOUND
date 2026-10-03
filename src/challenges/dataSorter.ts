@@ -1,3 +1,4 @@
+import type { ChallengeMeta } from './meta.ts'
 import type { ListOp } from './listOps.ts'
 
 /** Tap one cell of the input list. */
@@ -22,7 +23,7 @@ export type DataTask = PickTask | BuildTask
 export type DataAnswer =
   { kind: 'pick'; index: number } | { kind: 'build'; values: number[] }
 
-export interface DataSorterChallenge {
+export interface DataSorterChallenge extends ChallengeMeta {
   id: string
   name: string
   concept: string

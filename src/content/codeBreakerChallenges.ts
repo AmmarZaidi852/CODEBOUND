@@ -3,6 +3,7 @@ import type { CodeBreakerChallenge } from '../challenges/codeBreaker.ts'
 export const codeBreakerChallenges: CodeBreakerChallenge[] = [
   {
     id: 'basic-if',
+    concepts: ['conditions'],
     system: 'Keypad Lock',
     concept: 'if',
     lesson:
@@ -36,6 +37,7 @@ export const codeBreakerChallenges: CodeBreakerChallenge[] = [
   },
   {
     id: 'comparisons',
+    concepts: ['operators', 'conditions'],
     system: 'Clearance Scanner',
     concept: 'Comparison operators',
     lesson:
@@ -75,6 +77,7 @@ export const codeBreakerChallenges: CodeBreakerChallenge[] = [
   },
   {
     id: 'if-elif-else',
+    concepts: ['conditions'],
     system: 'Reactor Monitor',
     concept: 'if / elif / else',
     lesson:
@@ -122,6 +125,7 @@ export const codeBreakerChallenges: CodeBreakerChallenge[] = [
   },
   {
     id: 'and-or',
+    concepts: ['operators', 'conditions'],
     system: 'Two-Factor Gate',
     concept: 'and / or',
     lesson:
@@ -166,6 +170,7 @@ export const codeBreakerChallenges: CodeBreakerChallenge[] = [
   },
   {
     id: 'combined',
+    concepts: ['operators', 'conditions'],
     system: 'Core Mainframe',
     concept: 'Combined logic',
     lesson:

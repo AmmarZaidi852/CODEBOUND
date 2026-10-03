@@ -1,3 +1,4 @@
+import type { ChallengeMeta } from './meta.ts'
 import { getChoice, type Choice } from './choice.ts'
 
 /** Marks the gap in a module's code that the player's answer fills. */
@@ -49,7 +50,7 @@ export type ForgeAnswer =
   | { kind: 'choose'; optionId: string }
   | { kind: 'args'; args: string[] }
 
-export interface FunctionForgeChallenge {
+export interface FunctionForgeChallenge extends ChallengeMeta {
   id: string
   title: string
   concept: string

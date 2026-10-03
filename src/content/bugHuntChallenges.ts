@@ -3,6 +3,7 @@ import type { BugHuntChallenge } from '../challenges/bugHunt.ts'
 export const bugHuntChallenges: BugHuntChallenge[] = [
   {
     id: 'variables',
+    concepts: ['variables'],
     concept: 'Variables',
     title: 'The Missing Score',
     lesson:
@@ -36,6 +37,7 @@ export const bugHuntChallenges: BugHuntChallenge[] = [
   },
   {
     id: 'arithmetic',
+    concepts: ['variables', 'operators'],
     concept: 'Arithmetic',
     title: 'Average Disaster',
     lesson:
@@ -69,6 +71,7 @@ export const bugHuntChallenges: BugHuntChallenge[] = [
   },
   {
     id: 'strings',
+    concepts: ['variables', 'data-types'],
     concept: 'Strings & print',
     title: 'Glitched Nameplate',
     lesson:
@@ -102,6 +105,7 @@ export const bugHuntChallenges: BugHuntChallenge[] = [
   },
   {
     id: 'booleans',
+    concepts: ['data-types'],
     concept: 'Booleans',
     title: 'Gate Malfunction',
     lesson:
@@ -141,6 +145,7 @@ export const bugHuntChallenges: BugHuntChallenge[] = [
   },
   {
     id: 'if-else',
+    concepts: ['conditions'],
     concept: 'if / else',
     title: 'Broken Lock',
     lesson:

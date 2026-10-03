@@ -8,6 +8,7 @@ function unquote(literal: string): string | null {
 export const functionForgeChallenges: FunctionForgeChallenge[] = [
   {
     id: 'define',
+    concepts: ['functions'],
     title: 'Define It',
     concept: 'def',
     lesson:
@@ -32,6 +33,7 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'call',
+    concepts: ['functions'],
     title: 'Call It',
     concept: 'Calling a function',
     lesson:
@@ -75,6 +77,7 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'one-parameter',
+    concepts: ['functions'],
     title: 'One Parameter',
     concept: 'Parameters & arguments',
     lesson:
@@ -106,6 +109,7 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'return',
+    concepts: ['functions', 'operators'],
     title: 'Return',
     concept: 'return',
     lesson:
@@ -143,6 +147,7 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'multiple-parameters',
+    concepts: ['functions', 'operators'],
     title: 'Two Inputs',
     concept: 'Multiple parameters',
     lesson:
@@ -174,6 +179,7 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'predict',
+    concepts: ['functions', 'operators'],
     title: 'Trace It',
     concept: 'Tracing a function',
     lesson:
@@ -211,6 +217,7 @@ export const functionForgeChallenges: FunctionForgeChallenge[] = [
   },
   {
     id: 'build',
+    concepts: ['functions', 'operators'],
     title: 'Forge It',
     concept: 'Building a function',
     lesson:

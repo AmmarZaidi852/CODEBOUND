@@ -1,3 +1,4 @@
+import type { ChallengeMeta } from './meta.ts'
 import {
   equal,
   literal,
@@ -48,7 +49,7 @@ export interface CodeFailure {
   callMessage?: string
 }
 
-export interface CodeChallenge {
+export interface CodeChallenge extends ChallengeMeta {
   kind: 'code'
   id: string
   title: string
@@ -66,6 +67,8 @@ export interface CodeChallenge {
   showGiven?: boolean
   /** List variable drawn as cells before and after (Data Sorter). */
   listVariable?: string
+  /** A different list drawn after the run, e.g. a filtered copy. Defaults to `listVariable`. */
+  resultVariable?: string
   tests: CodeTest[]
   requirements?: CodeRequirement[]
   /** Specific diagnoses, checked in order before the generic message. */
@@ -262,8 +265,8 @@ export function checkCode(
           ? `${failure.error.line ? `Line ${failure.error.line} · ` : ''}${failure.error.kind}: ${failure.error.message}`
           : null,
         list: listValues(
-          challenge.listVariable
-            ? failure.globals.get(challenge.listVariable)
+          resultName(challenge)
+            ? failure.globals.get(resultName(challenge)!)
             : undefined,
         ),
       }
@@ -276,8 +279,8 @@ export function checkCode(
       : containsTokens(tokens, r.avoids),
   )
   const list = listValues(
-    challenge.listVariable
-      ? shown?.globals.get(challenge.listVariable)
+    resultName(challenge)
+      ? shown?.globals.get(resultName(challenge)!)
       : undefined,
   )
   if (missing) {
@@ -297,6 +300,10 @@ export function checkCode(
     list,
   }
 }
+
+/** The list shown as the result of a run, if the challenge draws one. */
+export const resultName = (challenge: CodeChallenge) =>
+  challenge.resultVariable ?? challenge.listVariable
 
 /** A variable's value after a failed run, as Python would show it. */
 export function valueOf(f: CodeFailure, name: string): string | null {

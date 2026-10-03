@@ -11,6 +11,7 @@ import { valueOf, type CodeChallenge } from '../challenges/code.ts'
 export const ticketTotal: CodeChallenge = {
   kind: 'code',
   id: 'ticket-total',
+  concepts: ['variables', 'operators'],
   title: 'Ticket Counter',
   concept: 'Arithmetic',
   lesson:
@@ -55,6 +56,7 @@ export const ticketTotal: CodeChallenge = {
 export const brokenBadge: CodeChallenge = {
   kind: 'code',
   id: 'broken-badge',
+  concepts: ['variables', 'data-types'],
   title: 'Broken Badge',
   concept: 'Text and numbers',
   lesson:
@@ -105,6 +107,7 @@ export const brokenBadge: CodeChallenge = {
 export const vaultThreshold: CodeChallenge = {
   kind: 'code',
   id: 'vault-threshold',
+  concepts: ['operators', 'conditions'],
   title: 'Vault Threshold',
   concept: 'Comparison operators',
   lesson: '`>` means strictly greater. `>=` also includes the number itself.',
@@ -159,6 +162,7 @@ export const vaultThreshold: CodeChallenge = {
 export const accessRule: CodeChallenge = {
   kind: 'code',
   id: 'access-rule',
+  concepts: ['operators', 'conditions'],
   title: 'Access Rule',
   concept: 'and',
   lesson: '`and` is `True` only when both sides are `True`.',
@@ -223,6 +227,7 @@ export const accessRule: CodeChallenge = {
 export const fixReading: CodeChallenge = {
   kind: 'code',
   id: 'fix-reading',
+  concepts: ['lists', 'indexing'],
   title: 'Fix the Reading',
   concept: 'Changing an item',
   lesson:
@@ -273,6 +278,7 @@ export const fixReading: CodeChallenge = {
 export const queueIntake: CodeChallenge = {
   kind: 'code',
   id: 'queue-intake',
+  concepts: ['lists'],
   title: 'Queue Intake',
   concept: 'append()',
   lesson: '`queue.append(25)` adds 25 to the end of `queue`.',
@@ -318,6 +324,7 @@ export const queueIntake: CodeChallenge = {
 export const doubler: CodeChallenge = {
   kind: 'code',
   id: 'write-double',
+  concepts: ['functions', 'operators'],
   title: 'Doubler',
   concept: 'return',
   lesson: '`return` sends a value back to the code that called the function.',
@@ -358,6 +365,7 @@ export const doubler: CodeChallenge = {
 export const adder: CodeChallenge = {
   kind: 'code',
   id: 'write-add',
+  concepts: ['functions', 'operators'],
   title: 'Adder',
   concept: 'Multiple parameters',
   lesson:
@@ -398,6 +406,7 @@ export const adder: CodeChallenge = {
 export const useIt: CodeChallenge = {
   kind: 'code',
   id: 'write-call',
+  concepts: ['functions'],
   title: 'Use It',
   concept: 'Calling a function',
   lesson:

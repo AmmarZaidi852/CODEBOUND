@@ -1,3 +1,4 @@
+import type { ChallengeMeta } from './meta.ts'
 import { getChoice, type Choice } from './choice.ts'
 
 /** One candidate patch: replace a single line of the snippet with new code. */
@@ -6,7 +7,7 @@ export interface BugFix extends Choice {
   code: string
 }
 
-export interface BugHuntChallenge {
+export interface BugHuntChallenge extends ChallengeMeta {
   id: string
   concept: string
   title: string

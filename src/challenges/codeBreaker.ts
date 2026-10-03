@@ -1,3 +1,4 @@
+import type { ChallengeMeta } from './meta.ts'
 import { getChoice, type Choice } from './choice.ts'
 
 /** Marks the gap in a lock's code that the chosen option fills. */
@@ -8,7 +9,7 @@ export interface LockOption extends Choice {
   code: string
 }
 
-export interface CodeBreakerChallenge {
+export interface CodeBreakerChallenge extends ChallengeMeta {
   id: string
   /** Name of the security system being broken. */
   system: string
