@@ -7,4 +7,6 @@ window.scrollTo = () => {}
 
 afterEach(() => {
   cleanup()
+  // Progress is saved to localStorage; every test starts as a new player.
+  localStorage.clear()
 })
