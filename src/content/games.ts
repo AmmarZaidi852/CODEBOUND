@@ -7,6 +7,8 @@ export interface GameInfo {
   description: string
   /** Area status readout shown on the cartridge, e.g. "Corrupted". */
   status: string
+  /** The same readout once every module is complete, e.g. "Patched". */
+  clearedStatus: string
   playable: boolean
 }
 
@@ -16,6 +18,7 @@ export const games: GameInfo[] = [
     name: 'Bug Hunt',
     description: 'Fix broken Python code.',
     status: 'Corrupted',
+    clearedStatus: 'Patched',
     playable: true,
   },
   {
@@ -23,6 +26,7 @@ export const games: GameInfo[] = [
     name: 'Code Breaker',
     description: 'Use Python logic to unlock security systems.',
     status: 'Locked',
+    clearedStatus: 'Unlocked',
     playable: true,
   },
   {
@@ -30,6 +34,7 @@ export const games: GameInfo[] = [
     name: 'Data Sorter',
     description: 'Manipulate Python lists and data.',
     status: 'Online',
+    clearedStatus: 'Sorted',
     playable: true,
   },
   {
@@ -37,6 +42,7 @@ export const games: GameInfo[] = [
     name: 'Function Forge',
     description: 'Build and use Python functions.',
     status: 'Ready',
+    clearedStatus: 'Online',
     playable: true,
   },
 ]

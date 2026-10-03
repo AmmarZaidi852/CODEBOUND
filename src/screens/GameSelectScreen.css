@@ -102,11 +102,15 @@
   color: var(--tone);
 }
 
+.game-card__status--cleared {
+  color: var(--color-success);
+}
+
 .game-card__status span {
   width: 0.45rem;
   height: 0.45rem;
-  background: var(--tone);
-  box-shadow: 0 0 6px var(--tone);
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
 }
 
 .game-card__label {

@@ -125,6 +125,9 @@ describe('persistent progress', () => {
     reload(unmount)
     click('PLAY')
     expect(within(card('Bug Hunt')).getByText('Mastered')).toBeInTheDocument()
+    // The art readout switches to the game's success state.
+    expect(within(card('Bug Hunt')).getByText('Patched')).toBeInTheDocument()
+    expect(within(card('Code Breaker')).getByText('Locked')).toBeInTheDocument()
     expect(
       within(card('Bug Hunt')).getByText('Modules 05 / 05'),
     ).toBeInTheDocument()

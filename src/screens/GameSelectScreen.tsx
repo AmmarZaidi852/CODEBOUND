@@ -39,6 +39,7 @@ function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
             )
             const status = gameStatus(states)
             const done = states.filter((s) => s !== 'unplayed').length
+            const cleared = status === 'complete' || status === 'mastered'
             return (
               <li
                 key={game.id}
@@ -48,9 +49,11 @@ function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
                 <div className="game-card__screen">
                   <span className="game-card__slot">Cart {pad(i + 1)}</span>
                   <PixelSprite id={game.id} className="game-card__art" />
-                  <span className="game-card__status">
+                  <span
+                    className={`game-card__status${cleared ? ' game-card__status--cleared' : ''}`}
+                  >
                     <span aria-hidden="true" />
-                    {game.status}
+                    {cleared ? game.clearedStatus : game.status}
                   </span>
                 </div>
                 <div className="game-card__label">
