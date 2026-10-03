@@ -1,8 +1,8 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 7 — Progression, mastery & replayability (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 8.
+- **Current phase:** Phase 8 — Real coding challenges & challenge depth (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 9.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -22,7 +22,7 @@ React 19 · TypeScript 6 · Vite 8 · `@fontsource/jersey-10` (self-hosted displ
 | 7   | Loops      | How many times does the loop body run?     | Data Sorter    |
 | 8   | Functions  | What does `add(2, 3)` return? (def/params) | Function Forge |
 
-Games (all playable): Bug Hunt (5 challenges), Code Breaker (5), Data Sorter (7), Function Forge (7).
+Games (all playable), modules including write modules: Bug Hunt 7 (2 write), Code Breaker 7 (2), Data Sorter 9 (2), Function Forge 10 (3).
 
 ## Implemented
 
@@ -67,11 +67,23 @@ Games (all playable): Bug Hunt (5 challenges), Code Breaker (5), Data Sorter (7)
   - Tests (188 total): pure rules (`progress.test.ts`), storage safety (`storage.test.ts`), app-level progression with simulated reloads (`Progression.test.tsx`: persistence, no fake level-up on restore, cartridge states, continue, replay without XP, completed-not-mastered, reset with confirmation). Screen tests render inside the provider (`src/test/render.tsx`) and check the XP total instead of a callback mock; re-entering a started game now continues (module 02), and Home's finished label is REVIEW LEARNING. No assertions weakened.
   - Browser-verified in Chrome (fresh player): Foundations 2 concepts, Bug Hunt (mastered + miss), Code Breaker, Data Sorter and Function Forge first-try wins; reload kept XP, Foundations (current = Operators), challenge and cartridge states, no XP popup on load; Continue opened module 02; replay of module 01 paid 0 XP; finishing Bug Hunt gave +375 (75 + 3×100), 5/5 complete, 4/5 mastered, Complete; Code Breaker reached Game mastered; reload kept both; keyboard-only reset (Cancel focused → Erase) cleared the key and stayed fresh after reload. 375px frame: no overflow, no buttons under 40px on Home, reset confirmation, cartridges, gameplay and completion. No console errors.
 
+- **Phase 8 — Real coding challenges & challenge depth:**
+  - **New interaction type: Write.** The player edits real Python in a CODEBOUND code terminal (`CodeTerminal`) and presses Check code. 9 write modules, placed right after the related challenge: Bug Hunt 2 (Ticket Counter, Broken Badge), Code Breaker 2 (Vault Threshold, Access Rule), Data Sorter 2 (Fix the Reading, Queue Intake), Function Forge 3 (Doubler, Adder, Use It). Games now have 7 / 7 / 9 / 10 modules and mix Choose, Build, Predict and Write. All earlier interactions are unchanged.
+  - **Validation:** a controlled simulator of the taught Python subset (`src/python/`: lexer, parser, interpreter). **CODEBOUND does not execute user Python** (no real runtime, no `eval`, no backend). `checkCode` runs the code against each module's test cases (given system values; expected output, final variables or function return values), then token-level requirements (must use `append()`, must not type the answer…). Equivalent solutions pass; hard-coded answers and rebuilt lists are refused with an explanation. Errors use Python's names (`NameError`, `TypeError`, `IndexError`…); unsupported code (`while`, `import`, f-strings…) is refused clearly; step / range / depth limits stop runaway code.
+  - **Feedback:** SYSTEM ONLINE / SYSTEM ERROR with what the checker found ("When power = 50, your code printed LOCKED…", "`double(4)` printed 8 but returned None…", off-by-one index), the player's output or resulting list as cells, Try again / Show solution (solution only on request), then the explanation once solved.
+  - **Hints:** 3 per module, progressive (idea → syntax → shape), never the finished line, no XP cost. **A module solved after opening a hint is completed, not mastered.**
+  - **Attempts / mastery / XP (values unchanged):** opening, editing, Reset and hints aren't attempts; each Check is. First Check correct (no hint) → mastered +100; first Check wrong → +25, retry allowed, first correct after that +75 (completed); further checks 0; replays 0 and never remove mastery. Implemented with `applyAnswer(..., hinted)` and `useChallengeRun.retry()` in the existing progression layer.
+  - **Editor:** textarea over a highlighted copy (no editor library), line numbers, Enter auto-indent (+4 after `:`), Backspace removes an indent level, Tab not captured, 16px, internal horizontal scroll, focus ring, forced-colors fallback, Reset (44px).
+  - **Foundations:** each lesson's Try it notes the linked game's Write modules; cartridges show "N modules where you type the code". Lessons unchanged.
+  - Mission labels are numbered by position (Security Node 03…); hard-coded node / terminal / module fields removed. Screen readers now get a space between labels and values (Goal, Rule, Expected output).
+  - Tests (284 total): simulator (printing, precedence, blocks, functions, lists, Python error messages, syntax-mistake messages, unsupported code, no page access, runaway limits), every write module (solution passes, starter fails, equivalent solutions, common mistakes, typed answers, malformed code, hints never contain the answer), module placement, hint mastery rule, CodeRound UI (label/description, Check enable, Reset, auto-indent, attempts, retry XP, second wrong check 0, Show solution, malformed/unsupported, hints), and write modules with Continue / persistence / replay / completion. Screen tests run against each game's own challenges as before; app-level tests play the real module lists through `src/test/play.ts`.
+  - Browser-verified in Chrome: Bug Hunt patches then Ticket Counter typed with real keys (wrong `-` → "printed 5, should print 24", +25; hint; fix → +75, not mastered); Code Breaker Vault Threshold (failing case named, fix accepted); Data Sorter via Continue to Fix the Reading (off-by-one diagnosed, result list drawn) and Queue Intake (hinted first try +100, not mastered); Function Forge Doubler (print vs return diagnosed, fixed), Adder first try mastered, Use It typed with real Enter/Backspace (auto-indent/dedent) → mastered, completion 10/10 complete, 9/10 mastered; reload kept XP and every write-module record; replaying Ticket Counter showed COMPLETE and "Replay · no XP" with XP unchanged. 375px frame: no page overflow (long lines scroll inside the editor), no small buttons after the Reset fix. No console errors.
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
 ## Not implemented (by design)
 
-Python execution, typed-code answers, cloud sync / cross-device progress, accounts, databases, backend, routing, maps/NPCs/dialogue, AI mentor, skill trees, leaderboards, achievements, streaks.
+Real Python execution (write modules use the controlled subset simulator), free-form programs beyond the taught subset, cloud sync / cross-device progress, accounts, databases, backend, routing, maps/NPCs/dialogue, AI mentor, skill trees, leaderboards, achievements, streaks.
 
 ## Known limitations
 
@@ -87,10 +99,15 @@ Python execution, typed-code answers, cloud sync / cross-device progress, accoun
 - "Practise in <game>" continues that game (first unfinished module), not the challenge matching the concept.
 - Only one schema version exists; an unknown version starts a fresh player rather than migrating.
 - A concept completes on answering its micro-challenge, right or wrong (after the explanation), not after playing the game.
-- Function Forge assemble tasks accept only the exact expected token order (e.g. `h * w` is not offered as an alternative).
+- Function Forge assemble tasks accept only the exact expected token order (e.g. `h * w` is not offered as an alternative). Write modules accept equivalent code.
+- The simulator covers only the taught subset; valid Python outside it (`while`, f-strings, `in`, slicing, dicts, string methods…) is refused as "not part of this terminal yet" rather than run.
+- Write modules check behaviour on their test cases plus a few token requirements; unusual but valid solutions that avoid a required form (e.g. Vault Threshold written as `power > 49`) are asked to use the taught form, with an explanation.
+- A hint opened, then the module left without checking, isn't remembered; mastery is still possible on a later first check.
+- Output is compared exactly, so a stray trailing space in printed text counts as different (the message shows what was printed).
+- Code isn't saved between visits; Reset and re-entering a module start from the starter code.
 - Data Sorter shows one shared "typical mistake" note per challenge; values are integers only.
 
 ## Git
 
 - Branch: `main`
-- Phase 7 work starts after `5d9424d` (end of Phase 6); its last code commit is `9b83119`, followed by docs. Phase 6 ended at `5d9424d`, Phase 5 at `2fedf90`.
+- Phase 8 work starts after `4fec17b` (end of Phase 7); its last code commit is `cb11746`, followed by docs. Phase 7 ended at `4fec17b`, Phase 6 at `5d9424d`, Phase 5 at `2fedf90`.

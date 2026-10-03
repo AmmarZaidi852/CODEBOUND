@@ -132,6 +132,33 @@ So every challenge is worth at most 100 XP in total, and repeating content canno
 
 **Reset.** A small "Reset local progress" text link sits in Home's footer. It opens an inline confirmation (Cancel focused first, Escape cancels); **Erase progress** removes only CODEBOUND's saved key and starts a fresh player.
 
+## Write modules (real code)
+
+Every game mixes four kinds of play: **Choose** (pick a patch, condition or line), **Build** (assemble tokens, tap list tiles or arguments), **Predict** (what does this print / return?) and **Write** (type real Python). Write modules sit right after the challenge that introduces the same idea, so the player meets it by choosing or building first, then writes it.
+
+| Game           | Write modules                                                                                 |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| Bug Hunt       | Ticket Counter (fix `+` to `*`), Broken Badge (join text and a number with `str()`)           |
+| Code Breaker   | Vault Threshold (repair `>` to `>=`), Access Rule (write `pin == 1234 and level >= 3`)        |
+| Data Sorter    | Fix the Reading (`readings[1] = 30`), Queue Intake (`queue.append(25)`)                       |
+| Function Forge | Doubler (`return x * 2`), Adder (define `add(a, b)`), Use It (call `area(4, 6)` and print it) |
+
+**Screen:** HUD → mission with a WRITE tag, the Goal (and a system readout or the starting list when needed) → Intel → the **code terminal** → hints → sticky **Check code**.
+
+**The code terminal** is CODEBOUND's own editor, not an IDE: the same dark terminal frame as code blocks, line numbers, light keyword / string / number colouring (meaning never depends on colour), a tone-coloured caret and focus ring, and Reset. Enter keeps the indent and adds one level after `:`; Backspace in leading spaces removes one level; Tab is not captured, so keyboard users can always leave. Text is 16px so phones don't zoom; long lines scroll inside the editor.
+
+**Checking.** Check is enabled once the code differs from the starter (and from the last checked version). The code runs in a small, controlled simulator of the Python subset the lessons teach (see `ARCHITECTURE.md`). **CODEBOUND never executes user code as real Python or as JavaScript.** Each module defines test cases (system values given, then expected output, final variables or function return values) and a few requirements (e.g. "use `append()`", "don't type the 24 yourself"). Equivalent solutions pass (`x * 2` or `2 * x`, `print("a", b)` or `"a " + str(b)`).
+
+**Feedback says what the checker found, not just "wrong":** "When power = 50, your code printed LOCKED. It should print OPEN." · "You changed index 2, which is the third item…" · "`double(4)` printed 8 but returned None. Use `return`…" · "Line 3 · TypeError: can only concatenate str…". The player's output (or resulting list, as cells) is shown. The solution is never shown unless the player presses **Show solution**; otherwise the next step is **Try again**.
+
+**Hints.** Three per module, revealed one at a time: an idea → the syntax → the shape (e.g. `total = price ___ count`). They never contain the finished line. Hints cost no XP. Rule: **a module solved after opening a hint is completed, not mastered** (the editor says so before and after the first hint).
+
+**Attempts and mastery** (same rules as every module):
+
+- Opening, editing, Reset and hints are not attempts. Pressing Check is.
+- First Check correct (no hint) → **Mastered**, +100. First Check wrong → +25, then the player may retry; the first correct Check after that pays +75 (100 total) and is **Completed**. Further checks pay 0.
+- Replays pay nothing ("Replay · no XP") and never remove mastery.
+
 ## Python Foundations
 
 Eight short lessons in order: Variables → Data types → Operators → Conditions → Lists → Indexing → Loops → Functions. Each is one screen: a one-sentence idea, a tiny example, one quick micro-challenge, and feedback. Then the player either practises in the linked game or moves to the next concept.
@@ -143,13 +170,13 @@ Eight short lessons in order: Variables → Data types → Operators → Conditi
 | Lists, Indexing, Loops                           | Data Sorter    |
 | Functions (`def`, parameters, `return`, calling) | Function Forge |
 
-Variables starts open. Answering a concept's micro-challenge completes it and unlocks the next. Completed concepts stay open for review.
+Variables starts open. Answering a concept's micro-challenge completes it and unlocks the next. Completed concepts stay open for review. Each lesson's Try it notes that its linked game has **Write** modules where you type the code yourself.
 
 ## Games
 
-- **Bug Hunt** (playable): find the broken line in a short script and choose the patch that fixes it. 5 beginner challenges: variables, arithmetic, strings, booleans, if/else.
-- **Code Breaker** (playable): break 5 security locks with logic instead of fixing bugs. Each lock shows a rule and the system's current values. The player picks the condition or operator that enforces the rule (it fills a slot in the lock's code), or predicts what the code prints. Lessons cover `if`, comparison operators, `if / elif / else`, `and` / `or` / `not`, and combined conditions. The HUD's security status shows Locked → Unlocked / Still locked.
-- **Function Forge** (playable): configure 7 function "modules" (define → call → one parameter → `return` → two parameters → trace → build). The player assembles code from tokens, taps arguments into a call's parameter slots, or picks a line / predicts a return value. The code updates live, and an INPUT → `function()` → OUTPUT pipeline shows the call; after running, a wrong call shows what it really returned (e.g. `-7` or a `NameError`). Forge status goes Ready → Online / Fault.
-- **Data Sorter** (playable): organise data in 7 terminals by working with the list itself instead of picking from text answers. The player taps a cell ("what is at index 2?", "what does `pop(2)` remove?") or builds the resulting list from value tiles (assignment, `append()`, combined operations, `for`-loop output with `len()`). Lists are drawn as cells with zero-based index labels. Feedback shows the resulting list, what happened step by step, and the rule to remember.
+- **Bug Hunt** (playable, 7 modules): find the broken line in a short script and choose the patch that fixes it (variables, arithmetic, strings, booleans, if/else), plus 2 write modules where the player fixes the code by typing.
+- **Code Breaker** (playable, 7 modules: 5 locks + 2 write modules where the player repairs or writes the condition and it is tested against several system states): break security locks with logic instead of fixing bugs. Each lock shows a rule and the system's current values. The player picks the condition or operator that enforces the rule (it fills a slot in the lock's code), or predicts what the code prints. Lessons cover `if`, comparison operators, `if / elif / else`, `and` / `or` / `not`, and combined conditions. The HUD's security status shows Locked → Unlocked / Still locked.
+- **Function Forge** (playable, 10 modules): configure function "modules" (define → call → one parameter → `return` → write a `return` → two parameters → write a two-parameter function → trace → build → write a call). The player assembles code from tokens, taps arguments into a call's parameter slots, or picks a line / predicts a return value. The code updates live, and an INPUT → `function()` → OUTPUT pipeline shows the call; after running, a wrong call shows what it really returned (e.g. `-7` or a `NameError`). Forge status goes Ready → Online / Fault.
+- **Data Sorter** (playable, 9 modules: 7 terminals + 2 write modules where the player types the list operation and sees the resulting list as cells): organise data by working with the list itself instead of picking from text answers. The player taps a cell ("what is at index 2?", "what does `pop(2)` remove?") or builds the resulting list from value tiles (assignment, `append()`, combined operations, `for`-loop output with `len()`). Lists are drawn as cells with zero-based index labels. Feedback shows the resulting list, what happened step by step, and the rule to remember.
 
 _More detailed game design will be added only as phases are authorized._
