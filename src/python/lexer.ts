@@ -92,7 +92,8 @@ const OPERATORS = [
   '.',
 ]
 
-export function tokenize(source: string): Token[] {
+/** `partial` allows unclosed brackets, for matching code fragments. */
+export function tokenize(source: string, partial = false): Token[] {
   const tokens: Token[] = []
   const indents = [0]
   let depth = 0 // open brackets: newlines inside them are ignored
@@ -194,7 +195,7 @@ export function tokenize(source: string): Token[] {
     })
 
   const last = tokens.at(-1)?.line ?? 1
-  if (depth > 0) {
+  if (depth > 0 && !partial) {
     throw new PyError('SyntaxError', 'A bracket is never closed.', last)
   }
   while (indents.length > 1) {
