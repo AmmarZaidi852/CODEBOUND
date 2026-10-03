@@ -75,7 +75,9 @@ export function challengeState(
 }
 
 /**
- * Records one answer. A challenge pays out the XP of its best result once:
+ * Records one answer. `hinted`: the player opened a hint before this
+ * answer, so even a correct first attempt is not mastered (XP is unchanged).
+ * A challenge pays out the XP of its best result once:
  * first attempt +100 / +25 as before; solving a missed challenge later tops
  * it up to 100 (+75); anything else pays nothing, so replays cannot farm XP.
  */
@@ -84,6 +86,7 @@ export function applyAnswer(
   game: GameId,
   challengeId: string,
   correct: boolean,
+  hinted = false,
 ): { progress: Progress; outcome: AnswerOutcome } {
   const key = challengeKey(game, challengeId)
   const prev = progress.challenges[key]
@@ -91,7 +94,7 @@ export function applyAnswer(
   const xpEarned = Math.max(0, xpForResult(correct) - paid)
   const record: ChallengeRecord = {
     solved: (prev?.solved ?? false) || correct,
-    mastered: prev ? prev.mastered : correct,
+    mastered: prev ? prev.mastered : correct && !hinted,
     xp: paid + xpEarned,
   }
   return {
@@ -102,7 +105,7 @@ export function applyAnswer(
     },
     outcome: {
       xpEarned,
-      mastered: !prev && correct,
+      mastered: !prev && correct && !hinted,
       replay: prev !== undefined,
     },
   }

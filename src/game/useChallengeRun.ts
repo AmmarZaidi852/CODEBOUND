@@ -78,12 +78,20 @@ export function useChallengeRun(
    * Records the answer once; later calls for the same challenge are ignored.
    * Screens only enable submitting once the player has an answer.
    */
-  function submit(isCorrect: boolean) {
+  function submit(isCorrect: boolean, hinted = false) {
     if (result) return
-    const outcome = answer(game, ids[index], isCorrect)
+    const outcome = answer(game, ids[index], isCorrect, hinted)
     setResult({ correct: isCorrect, ...outcome })
     setRunXp((sum) => sum + outcome.xpEarned)
     if (isCorrect) setCorrect((n) => n + 1)
+  }
+
+  /**
+   * After a wrong answer, lets the player try the same challenge again
+   * ("write" modules). The wrong attempt stays recorded.
+   */
+  function retry() {
+    if (result && !result.correct) setResult(null)
   }
 
   function next() {
@@ -118,6 +126,7 @@ export function useChallengeRun(
     feedbackRef,
     select,
     submit,
+    retry,
     next,
   }
 }

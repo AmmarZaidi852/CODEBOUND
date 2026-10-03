@@ -5,7 +5,13 @@ import type { AnswerOutcome, Progress } from './progress.ts'
 
 export interface ProgressApi {
   progress: Progress
-  answer: (game: GameId, challengeId: string, correct: boolean) => AnswerOutcome
+  /** `hinted`: a hint was used, so a correct first try is not mastered. */
+  answer: (
+    game: GameId,
+    challengeId: string,
+    correct: boolean,
+    hinted?: boolean,
+  ) => AnswerOutcome
   completeConcept: (id: ConceptId) => void
   finishRun: (game: GameId, run: { fullRun: boolean; correct: number }) => void
   /** Erases saved progress and starts a fresh player. */

@@ -30,8 +30,14 @@ function ProgressProvider({ children, initial }: ProgressProviderProps) {
 
   const api: ProgressApi = {
     progress,
-    answer(game, challengeId, correct) {
-      const result = applyAnswer(latest.current, game, challengeId, correct)
+    answer(game, challengeId, correct, hinted = false) {
+      const result = applyAnswer(
+        latest.current,
+        game,
+        challengeId,
+        correct,
+        hinted,
+      )
       commit(result.progress)
       return result.outcome
     },

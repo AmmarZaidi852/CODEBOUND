@@ -78,6 +78,29 @@ describe('progression rules', () => {
     })
   })
 
+  it('a hint keeps the XP but prevents mastery on that attempt', () => {
+    const hinted = applyAnswer(newProgress(), 'bug-hunt', 'a', true, true)
+    expect(hinted.outcome).toEqual({
+      xpEarned: 100,
+      mastered: false,
+      replay: false,
+    })
+    expect(gameStates(hinted.progress, 'bug-hunt', ['a'])).toEqual([
+      'completed',
+    ])
+    // Replaying later without a hint cannot master it retroactively.
+    const again = applyAnswer(hinted.progress, 'bug-hunt', 'a', true)
+    expect(gameStates(again.progress, 'bug-hunt', ['a'])).toEqual(['completed'])
+  })
+
+  it('a hint opened before a wrong first attempt changes nothing else', () => {
+    const p = applyAnswer(newProgress(), 'bug-hunt', 'a', false, true)
+    expect(p.outcome.xpEarned).toBe(25)
+    const fixed = applyAnswer(p.progress, 'bug-hunt', 'a', true)
+    expect(fixed.outcome.xpEarned).toBe(75)
+    expect(fixed.progress.xp).toBe(100)
+  })
+
   it('pays a concept once', () => {
     const once = applyConcept(newProgress(), 'variables')
     expect(once.xpEarned).toBe(25)
