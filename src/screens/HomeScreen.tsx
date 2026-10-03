@@ -1,5 +1,6 @@
 import PixelProgress from '../components/PixelProgress.tsx'
 import PixelSprite from '../components/PixelSprite.tsx'
+import ResetProgress from '../components/ResetProgress.tsx'
 import XpBadge from '../components/XpBadge.tsx'
 import { useProgress } from '../progression/ProgressContext.ts'
 import './HomeScreen.css'
@@ -71,6 +72,11 @@ function HomeScreen({ learned, onLearn, onPlay }: HomeScreenProps) {
           <span className="home__player-label">Player</span>
           <XpBadge xp={xp} large />
         </div>
+
+        <footer className="home__footer">
+          <p>Progress is saved in this browser.</p>
+          <ResetProgress />
+        </footer>
       </main>
     </div>
   )

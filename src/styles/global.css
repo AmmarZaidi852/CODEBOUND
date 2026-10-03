@@ -269,6 +269,19 @@ code {
   --btn-fg: color-mix(in srgb, var(--tone) 55%, var(--color-text-muted));
 }
 
+/* Destructive confirmation only (e.g. erasing saved progress). */
+.btn--danger {
+  --tone: var(--red);
+  --btn-bg: var(--red);
+  --btn-edge: var(--red);
+  --btn-fg: var(--color-on-tone);
+  --btn-base: #7a1d27;
+}
+
+.btn--danger:hover:not(:disabled) {
+  --btn-edge: var(--color-text-strong);
+}
+
 .btn--ghost {
   --btn-bg: transparent;
   --btn-edge: transparent;
