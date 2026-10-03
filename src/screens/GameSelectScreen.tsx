@@ -2,7 +2,10 @@ import PixelProgress from '../components/PixelProgress.tsx'
 import PixelSprite from '../components/PixelSprite.tsx'
 import TopBar from '../components/TopBar.tsx'
 import { foundations } from '../content/foundations.ts'
-import { gameChallengeIds } from '../content/gameChallenges.ts'
+import {
+  gameChallengeIds,
+  writeModuleCounts,
+} from '../content/gameChallenges.ts'
 import { games, type GameId } from '../content/games.ts'
 import type { RunStart } from '../game/useChallengeRun.ts'
 import {
@@ -68,6 +71,13 @@ function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
                         .join(' · ')}
                     </span>
                   </p>
+                  {writeModuleCounts[game.id] > 0 && (
+                    <p className="game-card__write">
+                      <span className="game-card__write-tag">Write</span>
+                      {writeModuleCounts[game.id]} modules where you type the
+                      code
+                    </p>
+                  )}
                   <div className="game-card__progress">
                     <span className="game-card__state">
                       <span aria-hidden="true" />

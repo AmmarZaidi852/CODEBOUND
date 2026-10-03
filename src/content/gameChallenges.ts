@@ -75,6 +75,14 @@ export const functionForgeModules: (FunctionForgeChallenge | CodeChallenge)[] =
     useIt,
   ]
 
+/** How many "write" modules each game has, for the cartridge label. */
+export const writeModuleCounts: Record<GameId, number> = {
+  'bug-hunt': bugHuntModules.filter((m) => 'kind' in m).length,
+  'code-breaker': codeBreakerModules.filter((m) => 'kind' in m).length,
+  'data-sorter': dataSorterModules.filter((m) => 'kind' in m).length,
+  'function-forge': functionForgeModules.filter((m) => 'kind' in m).length,
+}
+
 /** Every game's module ids, in play order. Used to read saved progress. */
 export const gameChallengeIds: Record<GameId, readonly string[]> = {
   'bug-hunt': bugHuntModules.map((c) => c.id),

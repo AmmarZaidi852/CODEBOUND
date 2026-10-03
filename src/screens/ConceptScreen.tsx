@@ -127,6 +127,12 @@ function ConceptScreen({
 
         <section className="concept__try panel" aria-label="Try it">
           <p className="eyebrow">Code terminal · Try it</p>
+          {game && (
+            <p className="concept__write-note">
+              Here you pick the answer. In {game.name}, <strong>Write</strong>{' '}
+              modules have you type the code yourself.
+            </p>
+          )}
           {micro.kind === 'choice' ? (
             <>
               {micro.code && <CodeBlock fileName="try.py" lines={micro.code} />}

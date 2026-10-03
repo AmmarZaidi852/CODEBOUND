@@ -37,6 +37,22 @@
   background: var(--color-inset);
 }
 
+.concept__write-note {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.concept__write-note strong {
+  padding: 0 0.3rem;
+  background: var(--tone);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-tone);
+}
+
 .concept__prompt {
   margin: 0;
   font-weight: 600;

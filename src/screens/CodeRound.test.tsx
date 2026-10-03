@@ -319,3 +319,35 @@ describe('write modules and progression', () => {
     expect(within(card).getByText('Modules 05 / 07')).toBeInTheDocument()
   })
 })
+
+describe('pointing players to write modules', () => {
+  it('lessons say the linked game has modules where you type the code', () => {
+    render(<App />)
+    click('START LEARNING')
+    click('Start Variables')
+    expect(
+      screen.getByText((_, el) =>
+        el?.classList.contains('concept__write-note')
+          ? el.textContent ===
+            'Here you pick the answer. In Bug Hunt, Write modules have you type the code yourself.'
+          : false,
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('cartridges say how many write modules each game has', () => {
+    render(<App />)
+    click('PLAY')
+    for (const [name, count] of [
+      ['Bug Hunt', 2],
+      ['Code Breaker', 2],
+      ['Data Sorter', 2],
+      ['Function Forge', 3],
+    ] as const) {
+      const card = screen.getByRole('heading', { name }).closest('li')!
+      expect(
+        within(card).getByText(`${count} modules where you type the code`),
+      ).toBeInTheDocument()
+    }
+  })
+})
