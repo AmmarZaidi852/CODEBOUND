@@ -1,8 +1,8 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 6 — Retro game identity & UX overhaul (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 7.
+- **Current phase:** Phase 7 — Progression, mastery & replayability (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 8.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -56,11 +56,22 @@ Games (all playable): Bug Hunt (5 challenges), Code Breaker (5), Data Sorter (7)
   - Tests (153 total): progress assertions now check the HUD progressbar and `MODULE 0n / 0m` label (`src/test/progress.ts`); Forge's first status reads Ready; new `RetroUi.test.tsx` (cartridges, primary actions, action-bar hints, status changes, SYSTEM ONLINE/ERROR, XP popup and level up, completion stamp and level meter) and `sprites.test.ts` (sprite grids valid). No existing assertions weakened.
   - Browser-verified in Chrome (desktop width and a 375px same-origin frame): Home, game selection (all 4 cartridges), Bug Hunt correct + wrong, Code Breaker wrong + correct and full run to completion, Data Sorter correct, Function Forge assemble correct, Foundations → Variables lesson → micro-challenge → Practise in Bug Hunt → ← Foundations (1/8 kept, XP kept), completion → Back to games. No horizontal overflow at 375px, no console errors, keyboard focus visible, ~60 fps.
 
+- **Phase 7 — Progression, mastery & replayability:**
+  - **Persistence** (`src/progression/`): one `localStorage` key `codebound.progress`, schema `version: 1`: `xp`, `concepts`, `challenges` (`"game:challengeId"` → `{ solved, mastered, xp }`), `games` (`{ runs, bestRun }`; best run counts full runs from module 01 only). Level is derived from XP, never stored. `storage.ts` validates every load; missing / corrupt JSON / unknown version / blocked storage → fresh player, invalid fields dropped, writes never throw. `ProgressProvider` restores before first render and saves on every change through one `commit()`; screens use `useProgress()`.
+  - **XP rules** (values unchanged: +100 correct, +25 wrong, +25 concept once): a challenge pays the XP of its best result once. First attempt +100 / +25; first correct answer after a miss +75 (tops up to 100); any other replay 0. Max 100 XP per challenge, so no XP farming.
+  - **Challenge states:** unplayed (never solved) · completed (solved, first attempt wrong) · mastered (first attempt correct; can't be earned later, and a wrong replay doesn't remove it).
+  - **Game states:** New · In progress · Complete · Mastered, derived from challenge states.
+  - **Continue / replay:** a game in progress continues at its first unfinished module and plays to the end; Replay starts at 01. One runner (`useChallengeRun(game, challenges, startAt)`); `App` remounts the game with a new key for another run.
+  - **UI (Phase 6 components reused):** cartridges show a status light (NEW / IN PROGRESS / COMPLETE / MASTERED, mastered as a solid badge with a green frame), `MODULES 03 / 05`, saved segments (mastered segments have a bright top edge), and Play, Continue + Replay, or Replay; the art readout turns to the success word when complete (Patched / Unlocked / Sorted / Online). The HUD fills saved segments and marks replayed modules COMPLETE / MASTERED. Feedback adds a MASTERED chip on first-try wins and "Replay · no XP" on repeats. The completion screen shows XP this run, correct this run, saved modules complete and mastered, game status, what is left, and Retry unfinished / Replay. Home shows saved XP / level / Foundations; its button reads START / CONTINUE / REVIEW LEARNING.
+  - **Reset:** a quiet "Reset local progress" text link in Home's footer, inline confirmation (Cancel focused, Escape cancels, focus returns), red "Erase progress" removes only CODEBOUND's key.
+  - Tests (188 total): pure rules (`progress.test.ts`), storage safety (`storage.test.ts`), app-level progression with simulated reloads (`Progression.test.tsx`: persistence, no fake level-up on restore, cartridge states, continue, replay without XP, completed-not-mastered, reset with confirmation). Screen tests render inside the provider (`src/test/render.tsx`) and check the XP total instead of a callback mock; re-entering a started game now continues (module 02), and Home's finished label is REVIEW LEARNING. No assertions weakened.
+  - Browser-verified in Chrome (fresh player): Foundations 2 concepts, Bug Hunt (mastered + miss), Code Breaker, Data Sorter and Function Forge first-try wins; reload kept XP, Foundations (current = Operators), challenge and cartridge states, no XP popup on load; Continue opened module 02; replay of module 01 paid 0 XP; finishing Bug Hunt gave +375 (75 + 3×100), 5/5 complete, 4/5 mastered, Complete; Code Breaker reached Game mastered; reload kept both; keyboard-only reset (Cancel focused → Erase) cleared the key and stayed fresh after reload. 375px frame: no overflow, no buttons under 40px on Home, reset confirmation, cartridges, gameplay and completion. No console errors.
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
 ## Not implemented (by design)
 
-Python execution, typed-code answers, persistence (XP and progress reset on reload), accounts, databases, backend, routing, maps/NPCs/dialogue, AI mentor, skill trees, leaderboards.
+Python execution, typed-code answers, cloud sync / cross-device progress, accounts, databases, backend, routing, maps/NPCs/dialogue, AI mentor, skill trees, leaderboards, achievements, streaks.
 
 ## Known limitations
 
@@ -69,9 +80,12 @@ Python execution, typed-code answers, persistence (XP and progress reset on relo
 - On phones the HUD status badge wraps under the game name, and the completion screen's exit button sits below the fold on short screens.
 - Sprites are fixed images (only the Home cursor animates); there is no per-challenge art.
 
-- Replaying a game awards XP again (acceptable while XP is session-only).
-- Leaving a game mid-run discards that run's progress; XP already earned is kept.
-- "Practise in <game>" starts that game from its first challenge, not the challenge matching the concept.
+- Progress lives in one browser's `localStorage`: clearing site data or switching browser/device starts fresh. Two open tabs don't sync; the last one to save wins.
+- Mastery is only possible on a challenge's first attempt; a missed module can be completed later but never mastered (by design).
+- Leaving a game mid-run keeps every answer already given; the run's completion screen and "best run" are only recorded when a run reaches the end.
+- Continue plays from the first unfinished module to the end of the game, including any already-finished modules after it (they pay no XP).
+- "Practise in <game>" continues that game (first unfinished module), not the challenge matching the concept.
+- Only one schema version exists; an unknown version starts a fresh player rather than migrating.
 - A concept completes on answering its micro-challenge, right or wrong (after the explanation), not after playing the game.
 - Function Forge assemble tasks accept only the exact expected token order (e.g. `h * w` is not offered as an alternative).
 - Data Sorter shows one shared "typical mistake" note per challenge; values are integers only.
@@ -79,4 +93,4 @@ Python execution, typed-code answers, persistence (XP and progress reset on relo
 ## Git
 
 - Branch: `main`
-- Last code commit of Phase 6: `e4a72f2` (tests); docs follow it. Phase 5 ended at `2fedf90`.
+- Phase 7 work starts after `5d9424d` (end of Phase 6); its last code commit is `9b83119`, followed by docs. Phase 6 ended at `5d9424d`, Phase 5 at `2fedf90`.

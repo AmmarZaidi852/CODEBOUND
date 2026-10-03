@@ -9,14 +9,15 @@ index.html                  HTML entry
 public/                     Static files served as-is (favicon)
 src/
   main.tsx                  Mounts <App /> and loads global styles
-  App.tsx                   Holds session state (screen, XP, completed concepts) and switches screens
+  App.tsx                   Wraps everything in ProgressProvider; switches screens and tracks the game being played
   screens/                  Full-page screens: Home, GameSelect, Foundations, Concept, BugHunt, CodeBreaker, DataSorter, FunctionForge (+ per-challenge Round components)
   components/               Reusable UI (see below)
   art/                      Pixel-art toolkit (pixel.ts: grid → SVG paths) and the original sprites (sprites.ts)
   content/                  Static data: game list, each game's challenges, Python Foundations concepts
   challenges/               Challenge types, deterministic validation, listOps (tiny list model)
   game/xp.ts                XP rewards and level maths
-  game/useChallengeRun.ts   Shared state for playing through a challenge sequence
+  game/useChallengeRun.ts   Shared state for one run through a game; asks progression for XP and mastery
+  progression/              Saved player progress: model + rules (progress.ts), localStorage (storage.ts), React context (ProgressProvider, useProgress)
   game/foundationsProgress.ts  Unlock / current / progress rules for Python Foundations
   styles/global.css         Design tokens, area themes (data-theme), display font, buttons, panels, mission layout
   test/setup.ts             Vitest setup (jest-dom matchers, cleanup, scrollTo stub)
@@ -28,7 +29,12 @@ Tests sit next to the code they cover (`*.test.ts[x]`).
 ## How it fits together
 
 - **Screens** are chosen by a plain `useState` in `App.tsx`. No router.
-- **XP** is session-only React state in `App.tsx`. Every game gets the same `onEarnXp(amount)` callback, so XP is shared across games. Nothing is persisted.
+- **Progress** has one source of truth: `ProgressProvider` (`src/progression/`). Screens read it with `useProgress()` and change it only through its actions: `answer(game, challengeId, correct)` (returns XP earned / mastered / replay), `completeConcept(id)`, `finishRun(game, run)`, `reset()`.
+  - `progress.ts` is pure: the `Progress` model (`version`, `xp`, `concepts`, `challenges` keyed `game:challengeId` → `{ solved, mastered, xp }`, `games` → `{ runs, bestRun }`) and the rules (`applyAnswer`, `applyConcept`, `applyRunEnd`, `challengeState`, `gameStatus`, `continueIndex`). Level is never stored; `levelForXp` derives it.
+  - `storage.ts` is the only code that touches `localStorage` (key `codebound.progress`). Loading validates everything (`sanitize`): missing data, invalid JSON, an unknown version, or blocked storage give a fresh player; bad fields are dropped. Saves and clears never throw.
+  - The provider loads before the first render (so a reload shows no XP or level-up animation) and saves inside the same `commit()` that updates state.
+  - `useChallengeRun(game, challenges, startAt)` picks the first module (`continue` → first unfinished, `start` → 01), reports each answer to `answer()`, and calls `finishRun()` at the end. Screens get `startAt` and `onPlayAgain(startAt)`; `App` remounts the game with a new `key` for another run.
+  - `content/gameChallenges.ts` lists each game's challenge ids so the selection screen and summaries can read saved state.
 - **Content is data.** Each game has its own typed challenge shape in `src/challenges/` and a list of challenges in `src/content/`. Adding a challenge means adding an object to that list.
   - `BugHuntChallenge`: buggy code + candidate one-line patches.
   - `CodeBreakerChallenge`: a security rule, a system-state readout, lock code with an optional `____` slot, and options that either fill the slot or predict the output.
@@ -43,29 +49,29 @@ Tests sit next to the code they cover (`*.test.ts[x]`).
 - **Validation** is deterministic and client-side: a chosen id, tapped index, or built list is compared with the challenge data. No Python is executed.
 - **Styling** is plain CSS: shared tokens, buttons, `.panel`, `.mission` and the `.game` column layout in `global.css`; each screen/component keeps its own CSS file next to it. A screen sets `data-theme="<game id>"` (or `foundations`) on its root, and every component inside picks up that area's `--tone`. See `DESIGN.md` → Visual language.
 - **Art** is data: each sprite is a list of equal-length strings, one character per pixel, composed from small parts with `compose()`. `gridToPaths()` merges runs into one SVG path per colour. Tests check every sprite is rectangular and uses known colours.
-- **Navigation:** `App.tsx` scrolls to the top whenever the screen (or lesson) changes; browser scroll restoration is off because a reload resets the session.
+- **Navigation:** `App.tsx` scrolls to the top whenever the screen (or lesson) changes; browser scroll restoration is off because a reload always opens Home (saved progress is restored, the current screen is not).
 
 ## Shared game building blocks
 
 A game screen owns its layout and content, and composes these:
 
-| Piece              | Role                                                                                                                                                                                |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `useChallengeRun`  | Current index, optional single-choice selection, single submit (awards XP once), next, run XP, first-try count, finished, focus. Games enable submit only once they have an answer. |
-| `GameHud`          | Top strip: area sprite, game name, `MODULE 02 / 05` + segmented progressbar, optional `StatusBadge`.                                                                                |
-| `StatusBadge`      | LED + "Label: Value" readout with idle / ok / fail states (`role="status"`).                                                                                                        |
-| `PixelProgress`    | Segmented bar `[■■□□]`; exposes a `progressbar` when given a label, decorative otherwise.                                                                                           |
-| `ActionBar`        | Sticky bottom bar: hint + the one primary action (Apply patch, Submit, Run module, Check answer).                                                                                   |
-| `ConceptCard`      | Short "Intel" concept primer.                                                                                                                                                       |
-| `CodeBlock`        | Editor-style code with optional highlighted line and fillable slot.                                                                                                                 |
-| `ChoiceList`       | Lettered radio choices that lock and mark correct (✓) / wrong (✕) after submit.                                                                                                     |
-| `FunctionPipeline` | A call drawn as INPUT → `name()` → OUTPUT, with the output hidden until the function runs.                                                                                          |
-| `ListCells`        | A Python list drawn as `[ cells ]` with optional zero-based index labels and clickable cells.                                                                                       |
-| `FeedbackPanel`    | SYSTEM ONLINE / SYSTEM ERROR strip with XP earned (hidden when 0), why a wrong pick fails, explanation, and Next/Finish or custom `actions`.                                        |
-| `RunSummary`       | Completion screen: sprite, mission stamp, XP earned, challenges completed, solved first try, level meter, back button.                                                              |
-| `XpBadge`          | Level chip, 10-segment XP bar, total; floats "+100" (or "· LEVEL UP") when XP rises. `large` variant on Home.                                                                       |
-| `PixelSprite`      | Renders a sprite from `src/art/sprites.ts` as crisp SVG.                                                                                                                            |
-| `TopBar`           | ← back button + `XpBadge`.                                                                                                                                                          |
+| Piece              | Role                                                                                                                                                                                                                                            |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useChallengeRun`  | Start module (continue / start), current index, optional single-choice selection, single submit (XP and mastery from progression), next, run stats, saved challenge states, finished, focus. Games enable submit only once they have an answer. |
+| `GameHud`          | Top strip: area sprite, game name, `MODULE 02 / 05` + segmented progressbar, optional `StatusBadge`.                                                                                                                                            |
+| `StatusBadge`      | LED + "Label: Value" readout with idle / ok / fail states (`role="status"`).                                                                                                                                                                    |
+| `PixelProgress`    | Segmented bar `[■■□□]`; exposes a `progressbar` when given a label, decorative otherwise.                                                                                                                                                       |
+| `ActionBar`        | Sticky bottom bar: hint + the one primary action (Apply patch, Submit, Run module, Check answer).                                                                                                                                               |
+| `ConceptCard`      | Short "Intel" concept primer.                                                                                                                                                                                                                   |
+| `CodeBlock`        | Editor-style code with optional highlighted line and fillable slot.                                                                                                                                                                             |
+| `ChoiceList`       | Lettered radio choices that lock and mark correct (✓) / wrong (✕) after submit.                                                                                                                                                                 |
+| `FunctionPipeline` | A call drawn as INPUT → `name()` → OUTPUT, with the output hidden until the function runs.                                                                                                                                                      |
+| `ListCells`        | A Python list drawn as `[ cells ]` with optional zero-based index labels and clickable cells.                                                                                                                                                   |
+| `FeedbackPanel`    | SYSTEM ONLINE / SYSTEM ERROR strip with XP earned (hidden when 0), why a wrong pick fails, explanation, and Next/Finish or custom `actions`.                                                                                                    |
+| `RunSummary`       | Completion screen from saved progress: stamp, XP this run, correct this run, modules complete, mastered, game status, what is left, level meter, back + Retry unfinished / Replay.                                                              |
+| `XpBadge`          | Level chip, 10-segment XP bar, total; floats "+100" (or "· LEVEL UP") when XP rises. `large` variant on Home.                                                                                                                                   |
+| `PixelSprite`      | Renders a sprite from `src/art/sprites.ts` as crisp SVG.                                                                                                                                                                                        |
+| `TopBar`           | ← back button + `XpBadge`.                                                                                                                                                                                                                      |
 
 Games whose answer is more than one choice keep it in a per-challenge component remounted with `key` (see `DataSorterRound`, `FunctionForgeRound`).
 
@@ -75,5 +81,4 @@ To add a game: define its challenge type + validator in `src/challenges/`, its d
 
 | Concern                   | Likely location | Notes                                                                                 |
 | ------------------------- | --------------- | ------------------------------------------------------------------------------------- |
-| Shared/persistent state   | `src/state/`    | Only if prop passing gets painful or progress must survive a reload.                  |
 | Python execution (future) | `src/python/`   | Likely in-browser (e.g. Pyodide in a Web Worker) to avoid a backend. Not decided yet. |

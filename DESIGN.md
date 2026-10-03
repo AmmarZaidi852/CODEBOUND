@@ -78,7 +78,7 @@ All artwork is original, drawn as character grids in `src/art/sprites.ts` and re
   4. **Interaction**: code + the controls. This is the largest part of the screen.
   5. **Action bar**: sticky at the bottom with a hint ("Pick a patch" → "Patch loaded") and the one primary action.
 - **Feedback:** a SYSTEM ONLINE / SYSTEM ERROR strip with the XP earned, then the same plain-language teaching underneath (why your pick failed, the answer, why). The game framing never replaces the explanation.
-- **Completion:** sprite with a one-shot pixel burst, "GAME · MISSION COMPLETE" stamp, XP earned, challenges, first-try count, and a level meter ("150 XP to level 3").
+- **Completion:** sprite with a one-shot pixel burst and a stamp ("BUG HUNT · RUN COMPLETE / MISSION COMPLETE / GAME MASTERED", or "· REPLAY"), then four tiles: XP earned this run, correct this run, modules complete (saved), mastered (saved). Below: game status with saved segments, what is left ("2 modules left to complete." / "Every module complete · 4 of 5 mastered"), the level meter, and actions: back (primary) plus **Retry unfinished** or **Replay**.
 - **Foundations = training campaign:** numbered rows marked Complete (tick), Current (highlighted, primary Start) or Locked (dashed, dimmed).
 - **Lessons = training terminals:** "Training module 03", a `>` prompt before the one-line idea, the example, then the "Code terminal · Try it" challenge.
 
@@ -92,13 +92,45 @@ Body text stays in the system font. Muted text clears 4.5:1. Focus rings are ton
 
 ## Core loop
 
-**Learn a concept → Try a tiny example → Play a challenge → Get feedback → Progress**
+**Learn a concept → Try a tiny example → Play a challenge → Get feedback → Progress**, and across visits: **PLAY → PROGRESS → MASTER → REPLAY**.
 
-Home offers two ways in: **Start / Continue Learning** (the Python Foundations path) and **Play** (straight to game selection). The path guides; it never traps the player in a course.
+Home offers two ways in: **Start / Continue / Review Learning** (the Python Foundations path) and **Play** (straight to game selection). The path guides; it never traps the player in a course.
 
 - Correct answer: +100 XP. Wrong answer: +25 XP, because a miss still teaches something. A wrong answer always explains why that choice fails.
 - Level up every 300 XP.
 - Finishing a Foundations concept for the first time gives a small +25 XP.
+- Each challenge pays out only once (see Progression below), so replaying is for practice, not for XP.
+
+## Progression and mastery
+
+Progress is saved in the browser (`localStorage`) and restored on every visit: XP (level is always computed from it), completed Foundations concepts, every challenge's result, and finished runs per game. No accounts, no backend.
+
+**Challenge states**
+
+| State     | Meaning                                                                                  |
+| --------- | ---------------------------------------------------------------------------------------- |
+| Unplayed  | Never answered correctly (it may have been attempted and missed).                        |
+| Completed | Answered correctly, but the first attempt was wrong.                                     |
+| Mastered  | The very first attempt was correct. Mastery can only be earned then, never by replaying. |
+
+**Game states**: **New** (nothing completed) · **In progress** (some completed) · **Complete** (all completed) · **Mastered** (all mastered).
+
+**XP once per challenge.** A challenge pays the XP of its best result, once:
+
+| Situation                                | XP                      |
+| ---------------------------------------- | ----------------------- |
+| First attempt, correct                   | +100 (and Mastered)     |
+| First attempt, wrong                     | +25                     |
+| Later, first correct answer after a miss | +75 (tops it up to 100) |
+| Any other replay answer                  | 0 ("Replay · no XP")    |
+
+So every challenge is worth at most 100 XP in total, and repeating content cannot farm XP. Concepts pay +25 once.
+
+**Continue and replay.** Entering a game in progress **continues** at the first unfinished module and plays on to the end. **Replay** always starts at module 01. A replay uses the same challenges and explanations; the HUD marks modules already done as COMPLETE / MASTERED, and the saved result is only ever improved (missed → completed), never lowered.
+
+**Where it shows:** cartridge status light + `MODULES 03 / 05` + saved segments (mastered segments have a bright top edge) and Play / Continue + Replay / Replay buttons; the in-game HUD; a MASTERED chip on a first-try win; the completion screen; Home's XP badge and Foundations bar.
+
+**Reset.** A small "Reset local progress" text link sits in Home's footer. It opens an inline confirmation (Cancel focused first, Escape cancels); **Erase progress** removes only CODEBOUND's saved key and starts a fresh player.
 
 ## Python Foundations
 
