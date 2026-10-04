@@ -37,7 +37,10 @@ export function answerBugHunt(
     (f) => (f.id === module.correctFixId) === correct,
   )!
   fireEvent.click(
-    screen.getByRole('radio', { name: `Line ${fix.line} ${fix.code}` }),
+    // Accessible names collapse whitespace, e.g. an indented patch line.
+    screen.getByRole('radio', {
+      name: `Line ${fix.line} ${fix.code}`.replace(/\s+/g, ' ').trim(),
+    }),
   )
   click('Apply patch')
 }
