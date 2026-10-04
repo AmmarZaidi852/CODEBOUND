@@ -40,7 +40,9 @@ function PixelProgress({
     if (i === current) return 'current'
     if (!segments) return i < value ? 'on' : undefined
     if (segments[i] === 'mastered') return 'on mastered'
-    return segments[i] === 'completed' ? 'on' : undefined
+    return segments[i] === 'completed' || segments[i] === 'recovered'
+      ? 'on'
+      : undefined
   }
 
   return (

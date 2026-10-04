@@ -190,13 +190,23 @@ describe('Mastery Lab practice uses the canonical challenge', () => {
     ).toBeInTheDocument()
   })
 
-  it('practising an already-paid module pays no XP again', () => {
-    let p = started()
-    p = play(p, 'bug-hunt', 'arithmetic', 'right')
+  it('practising an already-paid module pays no XP again; a clean solve recovers it', () => {
+    // Solved after the miss, but with a hint: paid in full, not cleared.
+    const p = applyAnswer(
+      started(),
+      'bug-hunt',
+      'arithmetic',
+      true,
+      true,
+    ).progress
     openLab(p)
+    expect(screen.getByText('Not mastered')).toBeInTheDocument()
     click('Practice Average Disaster')
     answerModule(moduleOf('bug-hunt', 'arithmetic'), true)
     expect(screen.getByText('Replay · no XP')).toBeInTheDocument()
+    expect(
+      screen.getByText('Recovered', { selector: '.feedback__recovered' }),
+    ).toBeInTheDocument()
     expectTotalXp(200)
   })
 })
@@ -222,8 +232,10 @@ describe('Mastery Lab completion flow', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Mastery Lab' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Not mastered')).toBeInTheDocument()
+    // Recovered: it leaves the targets for good.
+    expect(targets()).not.toContain('Average Disaster')
     expect(screen.queryByText('Missed before')).toBeNull()
+    expect(screen.queryByText('Not mastered')).toBeNull()
   })
 })
 
@@ -251,9 +263,12 @@ describe('Mastery Lab concepts', () => {
     expect(within(loops).getByText('Not started')).toBeInTheDocument()
     expect(
       within(loops).getByRole('progressbar', {
-        name: 'Loops modules mastered',
+        name: 'Loops modules cleared',
       }),
-    ).toHaveAttribute('aria-valuetext', expect.stringMatching(/^0 of \d+/))
+    ).toHaveAttribute(
+      'aria-valuetext',
+      expect.stringMatching(/^0 mastered and 0 recovered of \d+ modules$/),
+    )
   })
 })
 

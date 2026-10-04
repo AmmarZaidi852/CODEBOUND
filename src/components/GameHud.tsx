@@ -19,6 +19,7 @@ interface GameHudProps {
 
 const marks: Partial<Record<ChallengeState, string>> = {
   completed: 'Complete',
+  recovered: 'Recovered',
   mastered: 'Mastered',
 }
 

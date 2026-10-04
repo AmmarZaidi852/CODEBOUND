@@ -5,6 +5,7 @@ import XpBadge from '../components/XpBadge.tsx'
 import { arcadeModules } from '../content/arcade.ts'
 import { arcadeStatus } from '../progression/arcade.ts'
 import {
+  allCleared,
   allMastered,
   labAvailable,
   needsPracticeCount,
@@ -29,6 +30,7 @@ function HomeScreen({ learned, onLearn, onPlay, onLab }: HomeScreenProps) {
   const total = arcadeModules.length
   const lab = labAvailable(progress)
   const mastered = lab && allMastered(progress)
+  const cleared = lab && allCleared(progress)
   const needs = lab ? needsPracticeCount(progress) : 0
   const learnLabel =
     learned.done === 0
@@ -104,9 +106,11 @@ function HomeScreen({ learned, onLearn, onPlay, onLab }: HomeScreenProps) {
               <p className="home__lab-status">
                 {mastered
                   ? 'All current modules mastered'
-                  : needs > 0
-                    ? `${needs} ${needs === 1 ? 'module needs' : 'modules need'} practice`
-                    : 'Practise your next targets'}
+                  : cleared
+                    ? 'All current modules cleared'
+                    : needs > 0
+                      ? `${needs} ${needs === 1 ? 'module needs' : 'modules need'} practice`
+                      : 'Practise your next targets'}
               </p>
             </div>
             <button
@@ -114,7 +118,7 @@ function HomeScreen({ learned, onLearn, onPlay, onLab }: HomeScreenProps) {
               className="btn home__lab-open"
               onClick={onLab}
             >
-              {mastered ? 'Review' : 'Open Lab'}
+              {cleared ? 'Review' : 'Open Lab'}
             </button>
           </section>
         )}

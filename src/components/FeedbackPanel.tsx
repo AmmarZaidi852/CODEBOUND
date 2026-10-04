@@ -7,6 +7,8 @@ interface FeedbackPanelProps {
   xpEarned: number
   /** First-try success: the challenge is now mastered. */
   mastered?: boolean
+  /** A clean solve after a miss: the challenge is now recovered. */
+  recovered?: boolean
   /** Attempted before; XP is only paid once. */
   replay?: boolean
   title: string
@@ -29,6 +31,7 @@ function FeedbackPanel({
   correct,
   xpEarned,
   mastered = false,
+  recovered = false,
   replay = false,
   title,
   whyNot,
@@ -50,6 +53,11 @@ function FeedbackPanel({
         </span>
         <span className="feedback__chips">
           {mastered && <span className="feedback__mastered">Mastered</span>}
+          {recovered && (
+            <span className="feedback__mastered feedback__recovered">
+              Recovered
+            </span>
+          )}
           {xpEarned > 0 && <span className="feedback__xp">+{xpEarned} XP</span>}
           {replay && xpEarned === 0 && (
             <span className="feedback__replay">Replay · no XP</span>

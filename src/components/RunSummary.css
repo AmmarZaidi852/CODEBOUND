@@ -147,6 +147,10 @@
   width: 8rem;
 }
 
+.run-summary__stats--five {
+  grid-template-columns: repeat(5, 1fr);
+}
+
 @media (max-width: 640px) {
   .run-summary__stats {
     grid-template-columns: repeat(2, 1fr);

@@ -296,6 +296,7 @@ function FunctionForgeRound({
           correct={result.correct}
           xpEarned={result.xpEarned}
           mastered={result.mastered}
+          recovered={result.recovered}
           replay={result.replay}
           title={result.correct ? 'Module online!' : 'Module fault'}
           whyNot={whyNot}

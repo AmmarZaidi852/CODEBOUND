@@ -9,7 +9,9 @@ import { ARCADE_FINAL } from '../content/arcade.ts'
 import { foundations } from '../content/foundations.ts'
 import { games } from '../content/games.ts'
 import {
+  allCleared,
   allMastered,
+  clearedCounts,
   conceptStatus,
   conceptTargets,
   labQueue,
@@ -36,6 +38,7 @@ const pad = (n: number) => String(n).padStart(2, '0')
 
 const conceptWords: Record<ConceptLabel, string> = {
   mastered: 'Mastered',
+  recovered: 'Recovered',
   practice: 'Practice',
   new: 'Not started',
 }
@@ -113,7 +116,11 @@ function LabScreen({
       queue: labQueue(progress),
       concepts: conceptStatus(progress),
       needs: needsPracticeCount(progress),
-      done: allMastered(progress),
+      // Practice is done once everything is cleared; first-try mastery of
+      // everything is a separate, rarer claim.
+      done: allCleared(progress),
+      firstTry: allMastered(progress),
+      counts: clearedCounts(progress),
     }),
     [progress],
   )
@@ -132,11 +139,13 @@ function LabScreen({
             <p className="eyebrow">Mastery // Training</p>
             <h1 className="lab__title">Mastery Lab</h1>
             <p className="lab__summary">
-              {lab.done
+              {lab.firstTry
                 ? 'All current modules mastered.'
-                : lab.needs > 0
-                  ? `${lab.needs} ${lab.needs === 1 ? 'module needs' : 'modules need'} practice.`
-                  : 'Nothing missed so far. New challenges are waiting.'}
+                : lab.done
+                  ? 'All current modules cleared.'
+                  : lab.needs > 0
+                    ? `${lab.needs} ${lab.needs === 1 ? 'module needs' : 'modules need'} practice.`
+                    : 'Nothing missed so far. New challenges are waiting.'}
             </p>
           </div>
         </header>
@@ -147,12 +156,26 @@ function LabScreen({
             aria-labelledby="lab-complete"
           >
             <h2 id="lab-complete" className="lab__section-title">
-              All current modules mastered
+              {lab.firstTry
+                ? 'All current modules mastered'
+                : 'All current modules cleared'}
             </h2>
             <p>
-              Every module available right now is mastered on the first try.
+              {lab.firstTry
+                ? 'Every module available right now is mastered on the first try.'
+                : 'Every module available right now is mastered or recovered through practice.'}{' '}
               Replay the Arcade or review the lessons any time.
             </p>
+            <dl className="lab__complete-counts">
+              <div>
+                <dt>First-try mastered</dt>
+                <dd>{lab.counts.mastered}</dd>
+              </div>
+              <div>
+                <dt>Recovered</dt>
+                <dd>{lab.counts.recovered}</dd>
+              </div>
+            </dl>
             <div className="lab__complete-actions">
               <button
                 type="button"
@@ -195,13 +218,14 @@ function LabScreen({
                   <span className="lab-concept__name">{c.title}</span>
                   <PixelProgress
                     className="lab-concept__bar"
-                    value={c.mastered}
+                    value={c.mastered + c.recovered}
                     total={c.total}
-                    label={`${c.title} modules mastered`}
-                    valueText={`${c.mastered} of ${c.total} modules mastered`}
+                    segments={c.states}
+                    label={`${c.title} modules cleared`}
+                    valueText={`${c.mastered} mastered and ${c.recovered} recovered of ${c.total} modules`}
                   />
                   <span className="lab-concept__count">
-                    {c.mastered}/{c.total}
+                    {c.mastered + c.recovered}/{c.total}
                   </span>
                   <span className="lab-concept__label">
                     {conceptWords[c.label]}
@@ -217,11 +241,16 @@ function LabScreen({
               aria-live="polite"
             >
               <h3 className="lab__concept-title">{opened.title}</h3>
+              <p className="lab__concept-counts">
+                {opened.mastered} / {opened.total} mastered · {opened.recovered}{' '}
+                recovered · {opened.total - opened.mastered - opened.recovered}{' '}
+                to clear
+              </p>
               <p>
-                {opened.label === 'mastered'
-                  ? `Every ${opened.title.toLowerCase()} module is mastered.`
+                {opened.label === 'mastered' || opened.label === 'recovered'
+                  ? `Every ${opened.title.toLowerCase()} module is cleared.`
                   : opened.learned
-                    ? `You have completed the ${opened.title} lesson, and ${opened.total - opened.mastered} ${opened.title.toLowerCase()} module${opened.total - opened.mastered === 1 ? '' : 's'} can still be mastered.`
+                    ? `You have completed the ${opened.title} lesson; the modules below still need clearing.`
                     : `The ${opened.title} lesson is in Python Foundations; these modules use the same idea.`}
               </p>
               {openedTargets.length > 0 ? (
@@ -239,7 +268,8 @@ function LabScreen({
                   </button>
                 </>
               ) : (
-                opened.label !== 'mastered' && (
+                opened.label !== 'mastered' &&
+                opened.label !== 'recovered' && (
                   <p>
                     More {opened.title.toLowerCase()} modules unlock as you
                     progress.

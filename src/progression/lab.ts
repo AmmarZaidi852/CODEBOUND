@@ -38,11 +38,12 @@ export interface LabModule {
 /** Why a module is recommended, most urgent first. */
 export type LabPriority =
   | 'missed' // 1. attempted, still not solved
-  | 'not-mastered' // 2. solved after a miss (or with a hint)
-  | 'advanced' // 3. an advanced module solved but not mastered
-  | 'boss' // 4. a boss solved but not mastered
+  | 'not-mastered' // 2. a core module solved with a hint, not cleared yet
+  | 'advanced' // 3. an advanced module solved, not cleared yet
+  | 'boss' // 4. a boss solved, not cleared yet
   | 'new' // 5. unlocked, never played
-  | 'mastered' // 6. nothing left to earn
+  | 'recovered' // 6. missed once, cleared later by a clean solve
+  | 'mastered' // 7. first try, no hint
 
 const PRIORITY_ORDER: readonly LabPriority[] = [
   'missed',
@@ -50,6 +51,7 @@ const PRIORITY_ORDER: readonly LabPriority[] = [
   'advanced',
   'boss',
   'new',
+  'recovered',
   'mastered',
 ]
 
@@ -59,6 +61,7 @@ export const priorityLabels: Record<LabPriority, string> = {
   advanced: 'Advanced practice',
   boss: 'Boss practice',
   new: 'New challenge',
+  recovered: 'Recovered',
   mastered: 'Mastered',
 }
 
@@ -116,6 +119,7 @@ function isUnlocked(m: LabModule, all: LabModule[], progress: Progress) {
 
 function priorityOf(m: LabModule): LabPriority {
   if (m.state === 'mastered') return 'mastered'
+  if (m.state === 'recovered') return 'recovered'
   if (m.state === 'unplayed') return m.attempted ? 'missed' : 'new'
   if (m.tier === 'boss') return 'boss'
   if (m.tier === 'advanced') return 'advanced'
@@ -155,31 +159,51 @@ export function labRanking(progress: Progress): LabTarget[] {
 export const labAvailable = (progress: Progress) =>
   Object.values(progress.challenges).some((r) => r.solved)
 
-/** The next modules worth practising (never already-mastered ones). */
+/** Cleared modules are done: mastered first try, or recovered later. */
+const isCleared = (t: { state: ChallengeState }) =>
+  t.state === 'mastered' || t.state === 'recovered'
+
+/** The next modules worth practising (never cleared ones). */
 export function labQueue(progress: Progress, limit = 5): LabTarget[] {
   return labRanking(progress)
-    .filter((t) => t.priority !== 'mastered')
+    .filter((t) => !isCleared(t))
     .slice(0, limit)
 }
 
-/** Modules answered before but not mastered yet. */
+/** Modules answered before but not cleared yet. */
 export const needsPracticeCount = (progress: Progress) =>
-  labRanking(progress).filter(
-    (t) => t.priority !== 'mastered' && t.priority !== 'new',
-  ).length
+  labRanking(progress).filter((t) => !isCleared(t) && t.priority !== 'new')
+    .length
 
-/** Every released module is mastered (so every module is unlocked, too). */
+/** Every released module is first-try mastered (so all are unlocked, too). */
 export const allMastered = (progress: Progress) =>
   allModules(progress).every((m) => m.state === 'mastered')
 
-export type ConceptLabel = 'mastered' | 'practice' | 'new'
+/** Every released module is cleared: mastered or recovered. */
+export const allCleared = (progress: Progress) =>
+  allModules(progress).every(isCleared)
+
+/** How many released modules are first-try mastered, and how many recovered. */
+export function clearedCounts(progress: Progress) {
+  const all = allModules(progress)
+  return {
+    mastered: all.filter((m) => m.state === 'mastered').length,
+    recovered: all.filter((m) => m.state === 'recovered').length,
+    total: all.length,
+  }
+}
+
+export type ConceptLabel = 'mastered' | 'recovered' | 'practice' | 'new'
 
 export interface ConceptStatus {
   id: ConceptId
   title: string
-  /** Modules using this concept that are mastered, out of all of them. */
+  /** Modules using this concept: first-try mastered, recovered, all. */
   mastered: number
+  recovered: number
   total: number
+  /** Saved states of those modules, for the bar. */
+  states: ChallengeState[]
   /** Whether the Foundations lesson is complete. */
   learned: boolean
   label: ConceptLabel
@@ -191,17 +215,24 @@ export function conceptStatus(progress: Progress): ConceptStatus[] {
   return foundations.map((c) => {
     const using = all.filter((m) => m.module.concepts.includes(c.id))
     const mastered = using.filter((m) => m.state === 'mastered').length
+    const recovered = using.filter((m) => m.state === 'recovered').length
     const label: ConceptLabel =
       mastered === using.length
         ? 'mastered'
-        : using.some((m) => m.attempted)
-          ? 'practice'
-          : 'new'
+        : mastered + recovered === using.length
+          ? 'recovered'
+          : using.some((m) => m.attempted)
+            ? 'practice'
+            : 'new'
+    const rank = { mastered: 0, recovered: 1, completed: 2, unplayed: 3 }
     return {
       id: c.id,
       title: c.title,
       mastered,
+      recovered,
       total: using.length,
+      // Cleared first, so the bar fills from the left.
+      states: using.map((m) => m.state).sort((a, b) => rank[a] - rank[b]),
       learned: progress.concepts.includes(c.id),
       label,
     }
@@ -215,9 +246,7 @@ export function conceptTargets(
   limit = 3,
 ): LabTarget[] {
   return labRanking(progress)
-    .filter(
-      (t) => t.priority !== 'mastered' && t.module.concepts.includes(concept),
-    )
+    .filter((t) => !isCleared(t) && t.module.concepts.includes(concept))
     .slice(0, limit)
 }
 

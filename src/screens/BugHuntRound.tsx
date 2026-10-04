@@ -113,6 +113,7 @@ function BugHuntRound({
           correct={result.correct}
           xpEarned={result.xpEarned}
           mastered={result.mastered}
+          recovered={result.recovered}
           replay={result.replay}
           title={result.correct ? 'Bug squashed!' : 'Not quite'}
           whyNot={selectedFix?.whyNot}

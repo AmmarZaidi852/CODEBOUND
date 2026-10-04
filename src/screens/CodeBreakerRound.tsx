@@ -140,6 +140,7 @@ function CodeBreakerRound({
           correct={result.correct}
           xpEarned={result.xpEarned}
           mastered={result.mastered}
+          recovered={result.recovered}
           replay={result.replay}
           title={result.correct ? 'Lock broken!' : 'Access denied'}
           whyNot={selectedOption?.whyNot}

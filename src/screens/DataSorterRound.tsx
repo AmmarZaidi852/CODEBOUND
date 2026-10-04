@@ -178,6 +178,7 @@ function DataSorterRound({
           correct={result.correct}
           xpEarned={result.xpEarned}
           mastered={result.mastered}
+          recovered={result.recovered}
           replay={result.replay}
           title={result.correct ? 'Data sorted!' : 'Not quite'}
           whyNot={challenge.explanation.mistake}

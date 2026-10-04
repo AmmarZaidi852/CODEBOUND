@@ -4,7 +4,9 @@ import { arcadeChallenges } from '../content/arcade.ts'
 import { gameModules } from '../content/gameChallenges.ts'
 import { games, type GameId } from '../content/games.ts'
 import {
+  allCleared,
   allMastered,
+  clearedCounts,
   conceptStatus,
   conceptTargets,
   labAvailable,
@@ -20,7 +22,12 @@ import {
 } from './progress.ts'
 import { loadProgress, saveProgress } from './storage.ts'
 
-type Result = 'right' | 'wrong' | 'fixed' | 'hinted'
+/**
+ * right: first try · wrong: a miss · fixed: miss, then a clean solve
+ * (recovered) · hint-fixed: miss, then solved with a hint (not cleared)
+ * · hinted: first try with a hint (not cleared).
+ */
+type Result = 'right' | 'wrong' | 'fixed' | 'hint-fixed' | 'hinted'
 
 /** Applies results to a progress, e.g. play(p, 'bug-hunt', 'variables', 'fixed'). */
 function play(
@@ -29,11 +36,12 @@ function play(
   id: string,
   result: Result = 'right',
 ): Progress {
-  if (result === 'fixed' || result === 'wrong') {
+  if (result === 'fixed' || result === 'hint-fixed' || result === 'wrong') {
     p = applyAnswer(p, source, id, false).progress
   }
   if (result === 'wrong') return p
-  return applyAnswer(p, source, id, true, result === 'hinted').progress
+  const hint = result === 'hinted' || result === 'hint-fixed'
+  return applyAnswer(p, source, id, true, hint).progress
 }
 
 /** Every module of the given tiers of one game solved first try. */
@@ -62,7 +70,7 @@ describe('Mastery Lab availability', () => {
 
 describe('Mastery Lab priority', () => {
   it('ranks a missed challenge above a merely completed one', () => {
-    let p = play(newProgress(), 'bug-hunt', 'arithmetic', 'fixed')
+    let p = play(newProgress(), 'bug-hunt', 'arithmetic', 'hint-fixed')
     p = play(p, 'code-breaker', 'basic-if', 'wrong')
     const ranking = labRanking(p)
     expect(ranking[0]).toMatchObject({
@@ -85,10 +93,10 @@ describe('Mastery Lab priority', () => {
 
   it('orders core, then advanced, then boss practice, then new challenges', () => {
     let p = clear(newProgress(), 'bug-hunt', ['core'])
-    p = play(p, 'bug-hunt', 'member-discount', 'fixed')
+    p = play(p, 'bug-hunt', 'member-discount', 'hint-fixed')
     p = play(p, 'bug-hunt', 'average-score', 'right')
-    p = play(p, 'bug-hunt', 'shop-checkout', 'fixed')
-    p = play(p, 'code-breaker', 'basic-if', 'fixed')
+    p = play(p, 'bug-hunt', 'shop-checkout', 'hint-fixed')
+    p = play(p, 'code-breaker', 'basic-if', 'hint-fixed')
     const queue = labQueue(p)
     expect(queue.slice(0, 4).map((t) => [t.id, t.priority])).toEqual([
       ['basic-if', 'not-mastered'],
@@ -100,7 +108,7 @@ describe('Mastery Lab priority', () => {
 
   it('puts mastered challenges last, and keeps them out of the queue', () => {
     let p = play(newProgress(), 'bug-hunt', 'variables', 'right')
-    p = play(p, 'bug-hunt', 'arithmetic', 'fixed')
+    p = play(p, 'bug-hunt', 'arithmetic', 'hint-fixed')
     const ranking = labRanking(p)
     expect(ranking.at(-1)).toMatchObject({
       id: 'variables',
@@ -121,7 +129,7 @@ describe('Mastery Lab priority', () => {
   })
 
   it('is deterministic, also after a reload', () => {
-    let p = play(newProgress(), 'bug-hunt', 'variables', 'fixed')
+    let p = play(newProgress(), 'bug-hunt', 'variables', 'hint-fixed')
     p = play(p, 'data-sorter', 'pop', 'wrong')
     p = play(p, 'function-forge', 'define', 'hinted')
     expect(labRanking(p)).toEqual(labRanking(p))
@@ -135,8 +143,8 @@ describe('Mastery Lab priority', () => {
     )
   })
 
-  it('counts modules needing practice (answered, not mastered)', () => {
-    let p = play(newProgress(), 'bug-hunt', 'variables', 'fixed')
+  it('counts modules needing practice (answered, not cleared)', () => {
+    let p = play(newProgress(), 'bug-hunt', 'variables', 'hint-fixed')
     p = play(p, 'bug-hunt', 'arithmetic', 'wrong')
     p = play(p, 'bug-hunt', 'strings', 'right')
     expect(needsPracticeCount(p)).toBe(2)
@@ -239,11 +247,112 @@ describe('Mastery Lab completion and concepts', () => {
   })
 
   it('maps a concept to the recommended modules that use it', () => {
-    let p = play(newProgress(), 'data-sorter', 'indexing', 'fixed')
-    p = play(p, 'bug-hunt', 'variables', 'fixed')
+    let p = play(newProgress(), 'data-sorter', 'indexing', 'hint-fixed')
+    p = play(p, 'bug-hunt', 'variables', 'hint-fixed')
     const targets = conceptTargets(p, 'indexing')
     expect(targets.length).toBeLessThanOrEqual(3)
     expect(targets[0]).toMatchObject({ id: 'indexing', source: 'data-sorter' })
     for (const t of targets) expect(t.module.concepts).toContain('indexing')
+  })
+})
+
+describe('Mastery Lab and recovery', () => {
+  it('a recovered module leaves the queue and ranks after new, before mastered', () => {
+    let p = play(newProgress(), 'bug-hunt', 'variables', 'right')
+    p = play(p, 'bug-hunt', 'arithmetic', 'wrong')
+    expect(labQueue(p)[0]).toMatchObject({
+      id: 'arithmetic',
+      priority: 'missed',
+    })
+    p = play(p, 'bug-hunt', 'arithmetic', 'right')
+    expect(ids(labQueue(p, 50))).not.toContain('bug-hunt:arithmetic')
+    const ranking = labRanking(p).map((t) => t.priority)
+    expect(ranking.slice(-2)).toEqual(['recovered', 'mastered'])
+    expect(ranking.indexOf('new')).toBeLessThan(ranking.indexOf('recovered'))
+    expect(needsPracticeCount(p)).toBe(0)
+  })
+
+  it('an unresolved module still ranks above recovered ones', () => {
+    let p = play(newProgress(), 'bug-hunt', 'variables', 'fixed')
+    p = play(p, 'code-breaker', 'basic-if', 'wrong')
+    p = play(p, 'data-sorter', 'lists', 'hint-fixed')
+    expect(
+      labQueue(p)
+        .slice(0, 2)
+        .map((t) => [t.id, t.priority]),
+    ).toEqual([
+      ['basic-if', 'missed'],
+      ['lists', 'not-mastered'],
+    ])
+    expect(needsPracticeCount(p)).toBe(2)
+  })
+
+  it('stays recovered after a reload, with the same queue', () => {
+    const p = play(newProgress(), 'bug-hunt', 'variables', 'fixed')
+    saveProgress(p)
+    const loaded = loadProgress()
+    expect(labRanking(loaded).find((t) => t.id === 'variables')?.priority).toBe(
+      'recovered',
+    )
+    expect(ids(labQueue(loaded))).toEqual(ids(labQueue(p)))
+  })
+
+  it('counts concepts as mastered, recovered and still to clear', () => {
+    let p = play(newProgress(), 'data-sorter', 'indexing', 'right')
+    p = play(p, 'data-sorter', 'set-item', 'fixed')
+    p = play(p, 'data-sorter', 'pop', 'wrong')
+    const indexing = conceptStatus(p).find((c) => c.id === 'indexing')!
+    expect(indexing).toMatchObject({
+      mastered: 1,
+      recovered: 1,
+      label: 'practice',
+    })
+    expect(indexing.states.slice(0, 3)).toEqual([
+      'mastered',
+      'recovered',
+      'unplayed',
+    ])
+  })
+
+  it('a concept with everything mastered or recovered reads Recovered', () => {
+    let p = newProgress()
+    for (const g of games) {
+      for (const m of gameModules[g.id]) {
+        if (m.concepts.includes('indexing')) {
+          p = play(p, g.id, m.id, m.id === 'pop' ? 'fixed' : 'right')
+        }
+      }
+    }
+    for (const c of arcadeChallenges) {
+      if (c.concepts.includes('indexing')) p = play(p, 'arcade', c.id)
+    }
+    expect(conceptStatus(p).find((c) => c.id === 'indexing')?.label).toBe(
+      'recovered',
+    )
+  })
+
+  it('all cleared and all first-try mastered are different claims', () => {
+    let p = newProgress()
+    for (const g of games) {
+      for (const m of gameModules[g.id]) {
+        p = play(p, g.id, m.id, m.id === 'variables' ? 'fixed' : 'right')
+      }
+    }
+    for (const c of arcadeChallenges) p = play(p, 'arcade', c.id)
+    expect(allCleared(p)).toBe(true)
+    expect(allMastered(p)).toBe(false)
+    expect(labQueue(p)).toEqual([])
+    expect(clearedCounts(p)).toMatchObject({ recovered: 1 })
+    expect(clearedCounts(p).mastered).toBe(clearedCounts(p).total - 1)
+  })
+
+  it('a hinted solve is not cleared until a clean solve recovers it', () => {
+    let p = play(newProgress(), 'bug-hunt', 'variables', 'hinted')
+    expect(labQueue(p)[0]).toMatchObject({
+      id: 'variables',
+      priority: 'not-mastered',
+    })
+    p = play(p, 'bug-hunt', 'variables', 'right')
+    expect(ids(labQueue(p, 50))).not.toContain('bug-hunt:variables')
   })
 })

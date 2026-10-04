@@ -92,6 +92,7 @@ function RunSummary({
   const total = states.length
   const done = states.filter((s) => s !== 'unplayed').length
   const mastered = states.filter((s) => s === 'mastered').length
+  const recovered = states.filter((s) => s === 'recovered').length
   const level = levelForXp(progress.xp)
   const step = nextStep(stats.section, states, tiers, boss)
   const sectionDone = states.every(
@@ -122,7 +123,9 @@ function RunSummary({
       </p>
       <h1 className="run-summary__title">{title}</h1>
       <p>{message}</p>
-      <dl className="run-summary__stats">
+      <dl
+        className={`run-summary__stats${recovered > 0 ? ' run-summary__stats--five' : ''}`}
+      >
         <div className="run-summary__stat--xp">
           <dt>XP earned</dt>
           <dd>+{stats.runXp}</dd>
@@ -145,6 +148,12 @@ function RunSummary({
             {mastered}/{total}
           </dd>
         </div>
+        {recovered > 0 && (
+          <div>
+            <dt>Recovered</dt>
+            <dd>{recovered}</dd>
+          </div>
+        )}
       </dl>
       <div className="run-summary__progress">
         <span>Game status: {statusLabels[status]}</span>
@@ -163,7 +172,7 @@ function RunSummary({
           ? step.text
           : status === 'mastered'
             ? 'Every module mastered on the first try.'
-            : `Every module complete · ${mastered} of ${total} mastered on the first try.`}
+            : `Every module complete · ${mastered} of ${total} mastered on the first try${recovered > 0 ? `, ${recovered} recovered through practice` : ''}.`}
       </p>
       <div className="run-summary__level">
         <span>Level {level}</span>

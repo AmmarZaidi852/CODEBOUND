@@ -255,6 +255,7 @@ function CodeRound({
           correct={result.correct}
           xpEarned={result.xpEarned}
           mastered={result.mastered}
+          recovered={result.recovered}
           // A retry in this session is not a "replay" of an old run.
           replay={result.replay && checks === 1}
           title={result.correct ? theme.titles.ok : theme.titles.fail}
