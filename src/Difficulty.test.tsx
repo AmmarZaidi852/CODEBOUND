@@ -284,6 +284,7 @@ describe('playing through the tiers', () => {
     ).toEqual({
       solved: true,
       mastered: false,
+      recovered: true,
       xp: 100,
     })
     unmount()

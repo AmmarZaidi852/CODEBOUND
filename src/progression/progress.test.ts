@@ -29,25 +29,28 @@ describe('progression rules', () => {
     expect(right.outcome).toEqual({
       xpEarned: 100,
       mastered: true,
+      recovered: false,
       replay: false,
     })
     const wrong = answer(newProgress(), 'a', false)
     expect(wrong.outcome).toEqual({
       xpEarned: 25,
       mastered: false,
+      recovered: false,
       replay: false,
     })
   })
 
-  it('marks a first-try success mastered and a later success completed', () => {
+  it('marks a first-try success mastered and a later clean success recovered', () => {
     const first = answer(newProgress(), 'a', true).progress
     expect(gameStates(first, 'bug-hunt', ['a'])).toEqual(['mastered'])
 
     const missed = answer(newProgress(), 'a', false).progress
     expect(gameStates(missed, 'bug-hunt', ['a'])).toEqual(['unplayed'])
     const fixed = answer(missed, 'a', true)
-    expect(gameStates(fixed.progress, 'bug-hunt', ['a'])).toEqual(['completed'])
+    expect(gameStates(fixed.progress, 'bug-hunt', ['a'])).toEqual(['recovered'])
     expect(fixed.outcome.mastered).toBe(false)
+    expect(fixed.outcome.recovered).toBe(true)
   })
 
   it('never pays twice: replays earn nothing, a later fix tops up to 100', () => {
@@ -56,6 +59,7 @@ describe('progression rules', () => {
     expect(replay.outcome).toEqual({
       xpEarned: 0,
       mastered: false,
+      recovered: false,
       replay: true,
     })
     expect(answer(p, 'a', false).outcome.xpEarned).toBe(0)
@@ -74,6 +78,7 @@ describe('progression rules', () => {
     expect(p.progress.challenges[challengeKey('bug-hunt', 'a')]).toEqual({
       solved: true,
       mastered: true,
+      recovered: false,
       xp: 100,
     })
   })
@@ -83,14 +88,17 @@ describe('progression rules', () => {
     expect(hinted.outcome).toEqual({
       xpEarned: 100,
       mastered: false,
+      recovered: false,
       replay: false,
     })
     expect(gameStates(hinted.progress, 'bug-hunt', ['a'])).toEqual([
       'completed',
     ])
-    // Replaying later without a hint cannot master it retroactively.
+    // Replaying later without a hint cannot master it retroactively; a clean
+    // solve recovers it instead (no XP: it already paid 100).
     const again = applyAnswer(hinted.progress, 'bug-hunt', 'a', true)
-    expect(gameStates(again.progress, 'bug-hunt', ['a'])).toEqual(['completed'])
+    expect(gameStates(again.progress, 'bug-hunt', ['a'])).toEqual(['recovered'])
+    expect(again.outcome).toMatchObject({ xpEarned: 0, mastered: false })
   })
 
   it('a hint opened before a wrong first attempt changes nothing else', () => {
@@ -99,6 +107,11 @@ describe('progression rules', () => {
     const fixed = applyAnswer(p.progress, 'bug-hunt', 'a', true)
     expect(fixed.outcome.xpEarned).toBe(75)
     expect(fixed.progress.xp).toBe(100)
+  })
+
+  it('derives game status with recovered modules counted as complete', () => {
+    expect(gameStatus(['recovered', 'unplayed'])).toBe('in-progress')
+    expect(gameStatus(['recovered', 'mastered'])).toBe('complete')
   })
 
   it('pays a concept once', () => {
@@ -131,5 +144,84 @@ describe('progression rules', () => {
     p = applyRunEnd(p, 'bug-hunt', { fullRun: true, correct: 2 })
     p = applyRunEnd(p, 'bug-hunt', { fullRun: false, correct: 5 })
     expect(p.games['bug-hunt']).toEqual({ runs: 3, bestRun: 3 })
+  })
+})
+
+describe('recovery', () => {
+  const key = challengeKey('bug-hunt', 'a')
+  const hinted = (p: Progress, correct: boolean) =>
+    applyAnswer(p, 'bug-hunt', 'a', correct, true)
+
+  it('a first-try miss is neither mastered nor recovered', () => {
+    const p = answer(newProgress(), 'a', false).progress
+    expect(p.challenges[key]).toEqual({
+      solved: false,
+      mastered: false,
+      recovered: false,
+      xp: 25,
+    })
+  })
+
+  it('the first clean solve after a miss recovers it, paying only the +75 top-up', () => {
+    const missed = answer(newProgress(), 'a', false).progress
+    const fixed = answer(missed, 'a', true)
+    expect(fixed.outcome).toEqual({
+      xpEarned: 75,
+      mastered: false,
+      recovered: true,
+      replay: true,
+    })
+    expect(fixed.progress.challenges[key]).toEqual({
+      solved: true,
+      mastered: false,
+      recovered: true,
+      xp: 100,
+    })
+  })
+
+  it('a hinted solve after a miss does not recover; a later clean one does', () => {
+    let p = answer(newProgress(), 'a', false).progress
+    const withHint = hinted(p, true)
+    expect(withHint.outcome).toMatchObject({ xpEarned: 75, recovered: false })
+    p = withHint.progress
+    expect(gameStates(p, 'bug-hunt', ['a'])).toEqual(['completed'])
+    const clean = answer(p, 'a', true)
+    expect(clean.outcome).toMatchObject({ xpEarned: 0, recovered: true })
+  })
+
+  it('a recovered challenge never becomes mastered, and stays recovered', () => {
+    let p = answer(newProgress(), 'a', false).progress
+    p = answer(p, 'a', true).progress
+    for (const correct of [true, false, true]) {
+      const r = answer(p, 'a', correct)
+      expect(r.outcome).toMatchObject({
+        xpEarned: 0,
+        mastered: false,
+        recovered: false,
+      })
+      p = r.progress
+    }
+    expect(p.challenges[key]).toEqual({
+      solved: true,
+      mastered: false,
+      recovered: true,
+      xp: 100,
+    })
+  })
+
+  it('a mastered challenge never becomes recovered', () => {
+    let p = answer(newProgress(), 'a', true).progress
+    p = answer(p, 'a', false).progress
+    p = answer(p, 'a', true).progress
+    expect(p.challenges[key]).toMatchObject({
+      mastered: true,
+      recovered: false,
+    })
+    expect(gameStates(p, 'bug-hunt', ['a'])).toEqual(['mastered'])
+  })
+
+  it('a wrong answer pays its normal +25 and never recovers', () => {
+    const p = answer(answer(newProgress(), 'a', false).progress, 'a', false)
+    expect(p.outcome).toMatchObject({ xpEarned: 0, recovered: false })
   })
 })

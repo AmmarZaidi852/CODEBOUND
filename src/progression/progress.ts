@@ -16,6 +16,12 @@ export interface ChallengeRecord {
   solved: boolean
   /** The very first attempt was correct. Can never be earned later. */
   mastered: boolean
+  /**
+   * Not mastered, but later solved cleanly (correct, no hint) after a
+   * miss or a hinted solve. Never set on a mastered challenge. Missing in
+   * saves from before Phase 12, where it means false.
+   */
+  recovered: boolean
   /** XP this challenge has paid out so far (capped at its best result). */
   xp: number
 }
@@ -76,7 +82,12 @@ export interface Progress {
   arcade: ArcadeRecord
 }
 
-export type ChallengeState = 'unplayed' | 'completed' | 'mastered'
+/**
+ * unplayed: never solved · completed: solved, not cleared yet (missed or
+ * hinted first) · recovered: cleared later by a clean solve · mastered:
+ * correct on the very first attempt, no hint.
+ */
+export type ChallengeState = 'unplayed' | 'completed' | 'recovered' | 'mastered'
 export type GameStatus = 'new' | 'in-progress' | 'complete' | 'mastered'
 
 export const statusLabels: Record<GameStatus, string> = {
@@ -90,6 +101,8 @@ export interface AnswerOutcome {
   xpEarned: number
   /** This answer earned mastery (first attempt, correct). */
   mastered: boolean
+  /** This answer recovered the challenge (a clean solve after a miss). */
+  recovered: boolean
   /** The challenge had been attempted before. */
   replay: boolean
 }
@@ -112,7 +125,8 @@ export function challengeState(
   record: ChallengeRecord | undefined,
 ): ChallengeState {
   if (!record?.solved) return 'unplayed'
-  return record.mastered ? 'mastered' : 'completed'
+  if (record.mastered) return 'mastered'
+  return record.recovered ? 'recovered' : 'completed'
 }
 
 /**
@@ -121,6 +135,9 @@ export function challengeState(
  * A challenge pays out the XP of its best result once:
  * first attempt +100 / +25 as before; solving a missed challenge later tops
  * it up to 100 (+75); anything else pays nothing, so replays cannot farm XP.
+ * Recovery: a correct, hint-free answer to a challenge that was attempted
+ * before and is not mastered marks it recovered (once, for good). It pays
+ * no XP of its own; `mastered` never changes after the first attempt.
  */
 export function applyAnswer(
   progress: Progress,
@@ -133,9 +150,16 @@ export function applyAnswer(
   const prev = progress.challenges[key]
   const paid = prev?.xp ?? 0
   const xpEarned = Math.max(0, xpForResult(correct) - paid)
+  const recovers =
+    prev !== undefined &&
+    !prev.mastered &&
+    !prev.recovered &&
+    correct &&
+    !hinted
   const record: ChallengeRecord = {
     solved: (prev?.solved ?? false) || correct,
     mastered: prev ? prev.mastered : correct && !hinted,
+    recovered: (prev?.recovered ?? false) || recovers,
     xp: paid + xpEarned,
   }
   return {
@@ -147,6 +171,7 @@ export function applyAnswer(
     outcome: {
       xpEarned,
       mastered: !prev && correct && !hinted,
+      recovered: recovers,
       replay: prev !== undefined,
     },
   }
@@ -245,7 +270,7 @@ export function bossState(
   const at = tiers.indexOf('boss')
   if (at === -1) return null
   if (states[at] === 'mastered') return 'mastered'
-  if (states[at] === 'completed') return 'cleared'
+  if (states[at] === 'completed' || states[at] === 'recovered') return 'cleared'
   const ready = states.every((s, i) => tiers[i] === 'boss' || s !== 'unplayed')
   return ready ? 'ready' : 'locked'
 }

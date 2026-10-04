@@ -99,9 +99,12 @@ export function sanitize(data: unknown): Progress {
     for (const [key, value] of Object.entries(data.challenges)) {
       if (!isRecord(value) || !sources.has(key.split(':')[0])) continue
       const solved = value.solved === true
+      const mastered = solved && value.mastered === true
       challenges[key] = {
         solved,
-        mastered: solved && value.mastered === true,
+        mastered,
+        // Absent before Phase 12: false. Never alongside mastery.
+        recovered: solved && !mastered && value.recovered === true,
         xp: count(value.xp),
       }
     }

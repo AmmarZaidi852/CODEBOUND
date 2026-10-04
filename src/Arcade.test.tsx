@@ -232,15 +232,25 @@ describe('Arcade challenge integration', () => {
     // Score Total belongs to Function Forge: the arcade completed it there.
     expect(
       loadProgress().challenges[challengeKey('function-forge', 'score-total')],
-    ).toEqual({ solved: true, mastered: true, xp: 100 })
+    ).toEqual({ solved: true, mastered: true, recovered: false, xp: 100 })
     click('Back to games')
     const forge = screen
       .getByRole('heading', { name: 'Function Forge' })
       .closest('li')!
     expect(within(forge).getByText('Advanced 01/02')).toBeInTheDocument()
     // Arcade-only challenges have their own records.
-    expect(saved(1)).toEqual({ solved: true, mastered: true, xp: 100 })
-    expect(saved(LAST)).toEqual({ solved: true, mastered: true, xp: 100 })
+    expect(saved(1)).toEqual({
+      solved: true,
+      mastered: true,
+      recovered: false,
+      xp: 100,
+    })
+    expect(saved(LAST)).toEqual({
+      solved: true,
+      mastered: true,
+      recovered: false,
+      xp: 100,
+    })
   })
 })
 
@@ -259,7 +269,7 @@ describe('Arcade XP and mastery', () => {
     expectTotalXp(CORE_XP + 100)
   })
 
-  it('wrong then right pays +25 then +75 and is completed, not mastered', () => {
+  it('wrong then right pays +25 then +75 and is recovered, not mastered', () => {
     openGames(coreDone())
     click('Play Arcade Run')
     play(0)
@@ -268,7 +278,12 @@ describe('Arcade XP and mastery', () => {
     click('Try again')
     answerModule(arcadeModules[1].module, true)
     expectTotalXp(CORE_XP + 100)
-    expect(saved(1)).toEqual({ solved: true, mastered: false, xp: 100 })
+    expect(saved(1)).toEqual({
+      solved: true,
+      mastered: false,
+      recovered: true,
+      xp: 100,
+    })
   })
 
   it('a full run pays only each new challenge once; a replay pays 0', () => {
@@ -297,14 +312,24 @@ describe('Arcade XP and mastery', () => {
     expect(
       screen.queryByText('Mastered', { selector: '.feedback__mastered' }),
     ).toBeNull()
-    expect(saved(1)).toEqual({ solved: true, mastered: false, xp: 100 })
+    expect(saved(1)).toEqual({
+      solved: true,
+      mastered: false,
+      recovered: false,
+      xp: 100,
+    })
   })
 
   it('a wrong answer in the arcade never removes existing mastery', () => {
     openGames(coreDone())
     click('Play Arcade Run')
     play(0, false)
-    expect(saved(0)).toEqual({ solved: true, mastered: true, xp: 100 })
+    expect(saved(0)).toEqual({
+      solved: true,
+      mastered: true,
+      recovered: false,
+      xp: 100,
+    })
   })
 })
 

@@ -135,6 +135,7 @@ describe('checking code', () => {
     ).toEqual({
       solved: true,
       mastered: false,
+      recovered: true,
       xp: 100,
     })
   })

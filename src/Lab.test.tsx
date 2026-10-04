@@ -131,7 +131,7 @@ describe('Mastery Lab practice uses the canonical challenge', () => {
     expect(screen.getByText('Mastery Lab · Missed before')).toBeInTheDocument()
   })
 
-  it('a missed module solved in the Lab pays the +75 top-up and updates the game', () => {
+  it('a missed module solved in the Lab pays the +75 top-up, is recovered, and updates the game', () => {
     openLab(started())
     expectTotalXp(125)
     click('Practice Average Disaster')
@@ -140,13 +140,14 @@ describe('Mastery Lab practice uses the canonical challenge', () => {
     expect(saved('bug-hunt', 'arithmetic')).toEqual({
       solved: true,
       mastered: false,
+      recovered: true,
       xp: 100,
     })
     expect(screen.getByText('Target cleared')).toBeInTheDocument()
-    expect(screen.getByText('Completed, not mastered')).toBeInTheDocument()
     expect(
-      screen.getByText(/Mastery is only earned on a first attempt/),
+      screen.getByText('Recovered', { selector: 'dd' }),
     ).toBeInTheDocument()
+    expect(screen.getByText(/cleared it through practice/)).toBeInTheDocument()
 
     // The game sees the same record.
     click('Back to Lab')

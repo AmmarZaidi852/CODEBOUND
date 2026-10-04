@@ -171,19 +171,25 @@ describe('arcade XP and mastery use the normal rules', () => {
   it('first try +100 and mastered; the run pays exactly that', () => {
     // `variables` was already solved in Bug Hunt, so the arcade pays 0.
     const r = answer(startArcade(coreDone()), right)
-    expect(r.outcome).toEqual({ xpEarned: 0, mastered: false, replay: true })
+    expect(r.outcome).toEqual({
+      xpEarned: 0,
+      mastered: false,
+      recovered: false,
+      replay: true,
+    })
     const fresh = startArcade(newProgress())
     const first = answer(fresh, right)
     expect(first.outcome).toEqual({
       xpEarned: 100,
       mastered: true,
+      recovered: false,
       replay: false,
     })
     expect(first.progress.arcade.run?.xp).toBe(100)
     expect(first.progress.xp).toBe(100)
   })
 
-  it('wrong then right pays +25 then +75 and is completed, not mastered', () => {
+  it('wrong then right pays +25 then +75 and is recovered, not mastered', () => {
     let p = startArcade(newProgress())
     p = answer(p, right).progress
     const miss = answer(p, wrongWrite)
@@ -192,7 +198,12 @@ describe('arcade XP and mastery use the normal rules', () => {
     expect(fix.outcome.xpEarned).toBe(75)
     const record =
       fix.progress.challenges[challengeKey('code-breaker', 'vault-threshold')]
-    expect(record).toEqual({ solved: true, mastered: false, xp: 100 })
+    expect(record).toEqual({
+      solved: true,
+      mastered: false,
+      recovered: true,
+      xp: 100,
+    })
     expect(fix.progress.arcade.run).toMatchObject({ correct: 2, firstTry: 1 })
   })
 
@@ -217,7 +228,7 @@ describe('arcade XP and mastery use the normal rules', () => {
     expect(r.outcome.xpEarned).toBe(0)
     expect(
       r.progress.challenges[challengeKey('bug-hunt', 'variables')],
-    ).toEqual({ solved: true, mastered: true, xp: 100 })
+    ).toEqual({ solved: true, mastered: true, recovered: false, xp: 100 })
   })
 
   it('arcade-only challenges are saved under their own source', () => {
@@ -225,6 +236,7 @@ describe('arcade XP and mastery use the normal rules', () => {
     expect(p.challenges[challengeKey('arcade', 'final')]).toEqual({
       solved: true,
       mastered: true,
+      recovered: false,
       xp: 100,
     })
   })

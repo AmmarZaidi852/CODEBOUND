@@ -54,12 +54,57 @@ describe('progress storage', () => {
       xp: 0,
       concepts: ['variables'],
       challenges: {
-        'bug-hunt:a': { solved: true, mastered: true, xp: 100 },
-        'bug-hunt:b': { solved: false, mastered: false, xp: 0 },
+        'bug-hunt:a': {
+          solved: true,
+          mastered: true,
+          recovered: false,
+          xp: 100,
+        },
+        'bug-hunt:b': {
+          solved: false,
+          mastered: false,
+          recovered: false,
+          xp: 0,
+        },
       },
       games: { 'bug-hunt': { runs: 2, bestRun: 0 } },
       arcade: { run: null, runs: 0, best: null },
     })
+  })
+
+  it('loads saves from before recovery existed, and keeps recovery consistent', () => {
+    const p = sanitize({
+      ...newProgress(),
+      challenges: {
+        'bug-hunt:old': { solved: true, mastered: false, xp: 100 },
+        'bug-hunt:rec': {
+          solved: true,
+          mastered: false,
+          recovered: true,
+          xp: 100,
+        },
+        'bug-hunt:both': {
+          solved: true,
+          mastered: true,
+          recovered: true,
+          xp: 100,
+        },
+        'bug-hunt:unsolved': {
+          solved: false,
+          mastered: false,
+          recovered: true,
+          xp: 25,
+        },
+      },
+    })
+    expect(p.challenges['bug-hunt:old'].recovered).toBe(false)
+    expect(p.challenges['bug-hunt:rec'].recovered).toBe(true)
+    // Recovery never sits alongside mastery, or on an unsolved challenge.
+    expect(p.challenges['bug-hunt:both']).toMatchObject({
+      mastered: true,
+      recovered: false,
+    })
+    expect(p.challenges['bug-hunt:unsolved'].recovered).toBe(false)
   })
 
   it('keeps working when storage is unavailable', () => {

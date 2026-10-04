@@ -29,7 +29,8 @@ interface LabPracticeScreenProps {
 
 const savedWords = {
   mastered: 'Mastered',
-  completed: 'Completed, not mastered',
+  completed: 'Completed, not cleared',
+  recovered: 'Recovered',
   unplayed: 'Not solved yet',
 }
 
@@ -99,11 +100,13 @@ function LabPracticeScreen({
           <p className="lab-result__note">
             {left > 0
               ? `Solving it later pays the remaining +${left} XP.`
-              : now === 'completed'
-                ? 'Mastery is only earned on a first attempt, so this module stays completed. Practising it still sharpens the idea.'
-                : practice.xp > 0
-                  ? 'Practice pays the same XP as the game, once per module.'
-                  : 'This module has already paid its XP. Replays are practice only.'}
+              : now === 'recovered' && practice.result?.recovered
+                ? 'You missed this module before and cleared it through practice. It leaves your targets.'
+                : now === 'completed'
+                  ? 'Solved with a hint. Clear it once without one to recover it.'
+                  : practice.xp > 0
+                    ? 'Practice pays the same XP as the game, once per module.'
+                    : 'This module has already paid its XP. Replays are practice only.'}
           </p>
           {next && (
             <p className="lab-result__next">
