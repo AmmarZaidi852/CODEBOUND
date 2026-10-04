@@ -1,6 +1,6 @@
 import { missionTier } from '../challenges/meta.ts'
 import TierTag, { BossStrip } from '../components/TierTag.tsx'
-import { useState, type RefObject } from 'react'
+import { useState } from 'react'
 import {
   isCorrectAnswer,
   type DataAnswer,
@@ -13,22 +13,8 @@ import FeedbackPanel from '../components/FeedbackPanel.tsx'
 import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
 import ListCells, { type CellState } from '../components/ListCells.tsx'
-import type { RunResult } from '../game/useChallengeRun.ts'
-import type { ChallengeState } from '../progression/progress.ts'
-
-interface DataSorterRoundProps {
-  challenge: DataSorterChallenge
-  index: number
-  total: number
-  /** Saved state of every challenge in the game. */
-  states: readonly ChallengeState[]
-  result: RunResult | null
-  isLast: boolean
-  onSubmit: (correct: boolean) => void
-  onNext: () => void
-  titleRef: RefObject<HTMLHeadingElement | null>
-  feedbackRef: RefObject<HTMLHeadingElement | null>
-}
+import type { RoundProps } from './roundProps.ts'
+import './DataSorterScreen.css'
 
 /**
  * One Data Sorter challenge. Holds the player's in-progress answer
@@ -46,7 +32,8 @@ function DataSorterRound({
   onNext,
   titleRef,
   feedbackRef,
-}: DataSorterRoundProps) {
+  hud = { art: 'data-sorter', name: 'Data Sorter' },
+}: RoundProps & { challenge: DataSorterChallenge }) {
   const { task } = challenge
   const [picked, setPicked] = useState<number | null>(null)
   // Indexes into the tile pool, in the order the player placed them.
@@ -82,8 +69,8 @@ function DataSorterRound({
   return (
     <>
       <GameHud
-        art="data-sorter"
-        name="Data Sorter"
+        art={hud.art}
+        name={hud.name}
         index={index}
         total={total}
         states={states}

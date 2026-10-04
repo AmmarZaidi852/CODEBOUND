@@ -1,6 +1,6 @@
 import { missionTier } from '../challenges/meta.ts'
 import TierTag, { BossStrip } from '../components/TierTag.tsx'
-import { useState, type RefObject } from 'react'
+import { useState } from 'react'
 import {
   correctForgeCode,
   fillSlot,
@@ -18,22 +18,8 @@ import FeedbackPanel from '../components/FeedbackPanel.tsx'
 import FunctionPipeline from '../components/FunctionPipeline.tsx'
 import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
-import type { RunResult } from '../game/useChallengeRun.ts'
-import type { ChallengeState } from '../progression/progress.ts'
-
-interface FunctionForgeRoundProps {
-  challenge: FunctionForgeChallenge
-  index: number
-  total: number
-  /** Saved state of every challenge in the game. */
-  states: readonly ChallengeState[]
-  result: RunResult | null
-  isLast: boolean
-  onSubmit: (correct: boolean) => void
-  onNext: () => void
-  titleRef: RefObject<HTMLHeadingElement | null>
-  feedbackRef: RefObject<HTMLHeadingElement | null>
-}
+import type { RoundProps } from './roundProps.ts'
+import './FunctionForgeScreen.css'
 
 const statusLabels = { idle: 'Ready', online: 'Online', fault: 'Fault' }
 const statusStates = { idle: 'idle', online: 'ok', fault: 'fail' } as const
@@ -54,7 +40,8 @@ function FunctionForgeRound({
   onNext,
   titleRef,
   feedbackRef,
-}: FunctionForgeRoundProps) {
+  hud = { art: 'function-forge', name: 'Function Forge' },
+}: RoundProps & { challenge: FunctionForgeChallenge }) {
   const { task, call } = challenge
   // Assemble: indexes into task.tokens, in placement order.
   const [placed, setPlaced] = useState<number[]>([])
@@ -128,8 +115,8 @@ function FunctionForgeRound({
   return (
     <>
       <GameHud
-        art="function-forge"
-        name="Function Forge"
+        art={hud.art}
+        name={hud.name}
         index={index}
         total={total}
         states={states}

@@ -55,7 +55,7 @@ function startIndex(
 
 /**
  * State for one play-through of a game's challenges:
- * pick an answer → submit once → feedback → next → ... → finished.
+ * answer → submit once → feedback → next → ... → finished.
  * Games decide whether an answer is correct; saved progress decides the
  * XP and mastery, and where Continue starts.
  */
@@ -79,7 +79,6 @@ export function useChallengeRun(
   })
 
   const [index, setIndex] = useState(start)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [result, setResult] = useState<RunResult | null>(null)
   const [runXp, setRunXp] = useState(0)
   const [correct, setCorrect] = useState(0)
@@ -97,10 +96,6 @@ export function useChallengeRun(
   }, [result])
 
   const isLast = index === end
-
-  function select(id: string) {
-    if (!result) setSelectedId(id)
-  }
 
   /**
    * Records the answer once; later calls for the same challenge are ignored.
@@ -130,7 +125,6 @@ export function useChallengeRun(
       return
     }
     setIndex(index + 1)
-    setSelectedId(null)
     setResult(null)
   }
 
@@ -145,7 +139,6 @@ export function useChallengeRun(
   return {
     index,
     isLast,
-    selectedId,
     result,
     finished,
     /** Saved state of every challenge, for the HUD. */
@@ -153,7 +146,6 @@ export function useChallengeRun(
     stats,
     titleRef,
     feedbackRef,
-    select,
     submit,
     retry,
     next,

@@ -1,6 +1,6 @@
 import { missionTier } from '../challenges/meta.ts'
 import TierTag, { BossStrip } from '../components/TierTag.tsx'
-import { useMemo, useRef, useState, type RefObject } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   checkCode,
   resultName,
@@ -16,15 +16,14 @@ import FeedbackPanel from '../components/FeedbackPanel.tsx'
 import GameHud from '../components/GameHud.tsx'
 import InlineCode from '../components/InlineCode.tsx'
 import ListCells from '../components/ListCells.tsx'
-import type { GameId } from '../content/games.ts'
-import type { RunResult } from '../game/useChallengeRun.ts'
+import type { SpriteId } from '../art/sprites.ts'
 import { runProgram } from '../python/interpreter.ts'
-import type { ChallengeState } from '../progression/progress.ts'
+import type { RoundProps } from './roundProps.ts'
 import './CodeRound.css'
 
 /** How a game dresses its "write" modules. */
 export interface CodeRoundTheme {
-  game: GameId
+  art: SpriteId
   name: string
   status: { label: string; idle: string; ok: string; fail: string }
   titles: { ok: string; fail: string }
@@ -32,19 +31,10 @@ export interface CodeRoundTheme {
   label: string
 }
 
-interface CodeRoundProps {
+interface CodeRoundProps extends RoundProps {
   challenge: CodeChallenge
   theme: CodeRoundTheme
-  index: number
-  total: number
-  states: readonly ChallengeState[]
-  result: RunResult | null
-  isLast: boolean
-  onSubmit: (correct: boolean, hinted: boolean) => void
   onRetry: () => void
-  onNext: () => void
-  titleRef: RefObject<HTMLHeadingElement | null>
-  feedbackRef: RefObject<HTMLHeadingElement | null>
 }
 
 /** The list a challenge starts from, by running its starter code. */
@@ -74,6 +64,7 @@ function CodeRound({
   onNext,
   titleRef,
   feedbackRef,
+  hud,
 }: CodeRoundProps) {
   const starter = starterSource(challenge)
   const [source, setSource] = useState(starter)
@@ -116,8 +107,8 @@ function CodeRound({
   return (
     <>
       <GameHud
-        art={theme.game}
-        name={theme.name}
+        art={hud?.art ?? theme.art}
+        name={hud?.name ?? theme.name}
         index={index}
         total={total}
         states={states}
