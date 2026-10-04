@@ -1,4 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react'
+import { applyArcadeAnswer, leaveArcadeModule, startArcade } from './arcade.ts'
 import {
   applyAnswer,
   applyConcept,
@@ -47,6 +48,19 @@ function ProgressProvider({ children, initial }: ProgressProviderProps) {
     },
     finishRun(game, run) {
       commit(applyRunEnd(latest.current, game, run))
+    },
+    startArcade() {
+      commit(startArcade(latest.current))
+    },
+    answerArcade(ref, total, answer) {
+      const result = applyArcadeAnswer(latest.current, ref, total, answer)
+      commit(result.progress)
+      return { outcome: result.outcome, finished: result.finished }
+    },
+    leaveArcadeModule(index, total) {
+      const result = leaveArcadeModule(latest.current, index, total)
+      if (result.progress !== latest.current) commit(result.progress)
+      return result.finished
     },
     reset() {
       clearProgress()

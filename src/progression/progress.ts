@@ -27,6 +27,44 @@ export interface GameRecord {
   bestRun: number
 }
 
+/**
+ * Who owns a challenge's saved record: the game it belongs to, or
+ * 'arcade' for the few challenges that only appear in the Arcade Run.
+ */
+export type ChallengeSource = GameId | 'arcade'
+
+/** An Arcade Run in progress, saved so it survives leaving or reloading. */
+export interface ArcadeRun {
+  /** Index of the module to play next. */
+  at: number
+  /** Checks already made on module `at` (write modules allow retries). */
+  tries: number
+  /** Modules solved this run. */
+  correct: number
+  /** Modules solved on their first Check this run, without a hint. */
+  firstTry: number
+  /** Every Check (answer) this run, and how many were correct. */
+  checks: number
+  correctChecks: number
+  /** XP this run paid out (normal challenge XP, nothing extra). */
+  xp: number
+}
+
+/** The best finished Arcade Run. Compared by correct, then firstTry, then accuracy. */
+export interface ArcadeBest {
+  correct: number
+  firstTry: number
+  /** Correct checks / all checks, as a whole percentage. */
+  accuracy: number
+}
+
+export interface ArcadeRecord {
+  run: ArcadeRun | null
+  /** Runs played to the end. */
+  runs: number
+  best: ArcadeBest | null
+}
+
 export interface Progress {
   version: typeof PROGRESS_VERSION
   xp: number
@@ -35,6 +73,7 @@ export interface Progress {
   /** Keyed by challengeKey(game, challengeId). */
   challenges: Record<string, ChallengeRecord>
   games: Partial<Record<GameId, GameRecord>>
+  arcade: ArcadeRecord
 }
 
 export type ChallengeState = 'unplayed' | 'completed' | 'mastered'
@@ -62,11 +101,12 @@ export function newProgress(): Progress {
     concepts: [],
     challenges: {},
     games: {},
+    arcade: { run: null, runs: 0, best: null },
   }
 }
 
-export const challengeKey = (game: GameId, challengeId: string) =>
-  `${game}:${challengeId}`
+export const challengeKey = (source: ChallengeSource, challengeId: string) =>
+  `${source}:${challengeId}`
 
 export function challengeState(
   record: ChallengeRecord | undefined,
@@ -84,12 +124,12 @@ export function challengeState(
  */
 export function applyAnswer(
   progress: Progress,
-  game: GameId,
+  source: ChallengeSource,
   challengeId: string,
   correct: boolean,
   hinted = false,
 ): { progress: Progress; outcome: AnswerOutcome } {
-  const key = challengeKey(game, challengeId)
+  const key = challengeKey(source, challengeId)
   const prev = progress.challenges[key]
   const paid = prev?.xp ?? 0
   const xpEarned = Math.max(0, xpForResult(correct) - paid)

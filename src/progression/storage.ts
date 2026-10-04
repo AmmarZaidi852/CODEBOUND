@@ -4,6 +4,9 @@ import { games, type GameId } from '../content/games.ts'
 import {
   newProgress,
   PROGRESS_VERSION,
+  type ArcadeBest,
+  type ArcadeRecord,
+  type ArcadeRun,
   type ChallengeRecord,
   type GameRecord,
   type Progress,
@@ -19,12 +22,53 @@ export const STORAGE_KEY = 'codebound.progress'
 
 const conceptIds = new Set<string>(foundations.map((c) => c.id))
 const gameIds = new Set<string>(games.map((g) => g.id))
+/** Owners of saved challenge records: the games, plus the Arcade's own. */
+const sources = new Set<string>([...gameIds, 'arcade'])
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v)
 
 const count = (v: unknown) =>
   typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0
+
+function sanitizeArcadeRun(v: unknown): ArcadeRun | null {
+  if (!isRecord(v)) return null
+  const run: ArcadeRun = {
+    at: count(v.at),
+    tries: count(v.tries),
+    correct: count(v.correct),
+    firstTry: count(v.firstTry),
+    checks: count(v.checks),
+    correctChecks: count(v.correctChecks),
+    xp: count(v.xp),
+  }
+  // Counts that cannot have come from real play mean the run is corrupt.
+  const consistent =
+    run.correctChecks <= run.checks &&
+    run.correct <= run.correctChecks &&
+    run.firstTry <= run.correct &&
+    run.correct <= run.at
+  return consistent ? run : null
+}
+
+function sanitizeArcadeBest(v: unknown): ArcadeBest | null {
+  if (!isRecord(v)) return null
+  const best = {
+    correct: count(v.correct),
+    firstTry: count(v.firstTry),
+    accuracy: Math.min(100, count(v.accuracy)),
+  }
+  return best.firstTry <= best.correct ? best : null
+}
+
+function sanitizeArcade(v: unknown): ArcadeRecord {
+  if (!isRecord(v)) return { run: null, runs: 0, best: null }
+  return {
+    run: sanitizeArcadeRun(v.run),
+    runs: count(v.runs),
+    best: sanitizeArcadeBest(v.best),
+  }
+}
 
 function storage(): Storage | null {
   try {
@@ -51,7 +95,7 @@ export function sanitize(data: unknown): Progress {
   const challenges: Record<string, ChallengeRecord> = {}
   if (isRecord(data.challenges)) {
     for (const [key, value] of Object.entries(data.challenges)) {
-      if (!isRecord(value) || !gameIds.has(key.split(':')[0])) continue
+      if (!isRecord(value) || !sources.has(key.split(':')[0])) continue
       const solved = value.solved === true
       challenges[key] = {
         solved,
@@ -78,6 +122,8 @@ export function sanitize(data: unknown): Progress {
     concepts,
     challenges,
     games: gameRecords,
+    // Optional: saves from before the Arcade simply have none yet.
+    arcade: sanitizeArcade(data.arcade),
   }
 }
 

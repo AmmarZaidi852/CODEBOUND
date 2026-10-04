@@ -58,6 +58,7 @@ describe('progress storage', () => {
         'bug-hunt:b': { solved: false, mastered: false, xp: 0 },
       },
       games: { 'bug-hunt': { runs: 2, bestRun: 0 } },
+      arcade: { run: null, runs: 0, best: null },
     })
   })
 
