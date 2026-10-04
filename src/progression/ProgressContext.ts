@@ -13,7 +13,7 @@ export interface ProgressApi {
   progress: Progress
   /** `hinted`: a hint was used, so a correct first try is not mastered. */
   answer: (
-    game: GameId,
+    source: ChallengeSource,
     challengeId: string,
     correct: boolean,
     hinted?: boolean,

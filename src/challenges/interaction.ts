@@ -29,3 +29,10 @@ export function interactionOf(module: GameModule): Interaction {
     ? 'choose'
     : 'predict'
 }
+
+/** A module's display name, whatever its game calls it. */
+export function moduleTitle(module: GameModule): string {
+  if ('system' in module) return module.system
+  if ('name' in module) return module.name
+  return module.title
+}
