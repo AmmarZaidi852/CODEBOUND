@@ -36,7 +36,7 @@ Jersey 10 was chosen over Pixelify Sans because Pixelify drew C like O and 5 lik
 
 - Surfaces: near-black navy page (`--color-bg`), panels (`--color-surface`), inset terminals (`--color-inset`).
 - **Green** is the brand and Foundations colour. Success is green; errors are red. Both always come with words and an icon, never colour alone.
-- Each area has one **tone**, set with `data-theme` on the screen root: Foundations green, Bug Hunt amber, Code Breaker magenta, Data Sorter cyan, Function Forge violet. `--tone`, `--tone-dim` and `--tone-wash` follow it, so the same component recolours itself per game.
+- Each area has one **tone**, set with `data-theme` on the screen root: Foundations green, Bug Hunt amber, Code Breaker magenta, Data Sorter cyan, Function Forge violet, and the Arcade a neutral silver (where every area meets). `--tone`, `--tone-dim` and `--tone-wash` follow it, so the same component recolours itself per game.
 - Text on a solid tone fill uses `--color-on-tone` (near-black).
 
 ### Shapes and details
@@ -59,6 +59,7 @@ All artwork is original, drawn as character grids in `src/art/sprites.ts` and re
 | Code Breaker   | Security padlock, digital key, encrypted bits                                                       |
 | Data Sorter    | Data crates sorted by height on an indexed shelf, one dropping into its slot                        |
 | Function Forge | Input block → machine with gears and a `»` display → output block                                   |
+| Arcade         | Arcade cabinet; four chips in the area colours are wired into one screen                            |
 
 ### Buttons
 
@@ -182,6 +183,39 @@ Advanced and boss modules only use concepts the player has already been taught b
 - **The boss unlocks** once every CORE and ADVANCED module is complete (a missed module still has to be solved). Continue walks CORE → ADVANCED → BOSS.
 - **Same rules everywhere:** XP, mastery, hints and replay work exactly as for any module. A first-try boss is _mastered_; a missed or hinted one is _cleared_.
 - **Where it shows:** cartridges read `CORE 07/07 · ADVANCED 01/02 · BOSS LOCKED / READY / CLEARED / MASTERED`; missions carry a small ADVANCED / BOSS MODULE tag; the boss gets a heavier frame and a _SYSTEM CRITICAL · FINAL TEST_ strip. The Conditions, Lists, Loops and Functions lessons mention where the idea is combined later.
+
+## Arcade Run
+
+A replayable **mode**, not a fifth game: one short run that mixes ideas from all four games, so the player has to recognise what each problem needs outside the game where they learned it. It teaches no new Python and has no XP or progression of its own.
+
+**Unlock.** Once every CORE module of all four games is complete (missed-then-solved counts; mastery is not needed, nor any Advanced or Boss module). Before that the cartridge reads _Arcade locked_ with "Complete the Core modules in all four games." and `CORE n/4 GAMES`. The unlock is derived from saved progress, so it survives reloads.
+
+**The run: 8 modules**, a deliberate curve, never the same interaction three times in a row:
+
+| #   | Module                 | From           | Kind    | Ideas                                                  |
+| --- | ---------------------- | -------------- | ------- | ------------------------------------------------------ |
+| 1   | Average Disaster       | Bug Hunt       | Choose  | variables, operators                                   |
+| 2   | Delivery Gate _(new)_  | Arcade         | Write   | `>=`, `and`, `not`                                     |
+| 3   | Purge Slot             | Data Sorter    | Choose  | lists, indexing                                        |
+| 4   | Signal Doubler         | Data Sorter    | Build   | loops                                                  |
+| 5   | Trace It               | Function Forge | Predict | functions                                              |
+| 6   | Score Total (advanced) | Function Forge | Write   | functions + lists + loops                              |
+| 7   | Override Switch (adv.) | Code Breaker   | Predict | and / or / not with brackets                           |
+| 8   | Shield Breach _(new)_  | Arcade         | Write   | **Final Run**: function, loop, `if`, maths, three bugs |
+
+Modules are referenced by id, so each challenge keeps one definition and its progress is shared with its game (solving Score Total here also completes it in Function Forge). Only two challenges are new, and both use taught syntax only. Delivery Gate moves Code Breaker's idea into a new setting ("at least 5 packages and the dock not locked"). Shield Breach is the Final Run: repair a function that resets its total inside the loop, adds the whole hit instead of the part above the shield, and prints instead of returning.
+
+**Screen.** Each module is played by its own game's round, in that game's colours, under one HUD: `ARCADE RUN · MODULE 03 / 08`. The last module carries a _FINAL RUN_ tag and an _Arcade final · Every system at once_ strip (it is not called a boss). After a miss, one quiet line names the module's concepts and points to Python Foundations; the run is never interrupted.
+
+**Rules (unchanged):** XP, mastery, hints and replays work exactly as in the games. Each challenge pays its best result once (+100 first try, +25 then +75, replays 0), whichever mode it is played in; there is no multiplier and no completion bonus. Mastery is the normal one (first check, no hint, saved per challenge); a wrong Arcade answer never removes it.
+
+**Continue / Replay.** Position and counts are saved after every answer. Leaving or reloading keeps the run: the cartridge shows _In progress · Module 04 / 08_ with **Continue Arcade** (back to that module) and Replay (a new run from 01). A finished run shows **Replay Arcade**.
+
+**Completion.** _Run complete_: XP earned, correct /8, first try /8, accuracy (correct checks ÷ all checks), checks, how many of the 8 are mastered in saved progress, the concepts covered, and the best run. Then Back to games / Replay run.
+
+**Best run.** Recorded only when a run reaches module 8. It keeps one record, compared by correct, then first-try solves, then accuracy: `BEST 7/8 · 6 FIRST TRY · 78%`. A better replay replaces it (_New best run_); a worse one doesn't. Beating it pays no XP. "First try" is counted for the run (solved on its first check without a hint), because saved mastery can't change on a replay.
+
+**Home** shows a small `ARCADE READY · 8 MODULE RUN` (or _in progress_) line once unlocked; the main Learning / Play buttons are unchanged. **Reset local progress** clears the Arcade run and best run with everything else.
 
 ## Python Foundations
 

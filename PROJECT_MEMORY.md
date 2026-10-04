@@ -1,8 +1,8 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 9 — Difficulty tiers: Advanced & Boss modules (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 10.
+- **Current phase:** Phase 10 — Arcade Challenge Runs (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 11.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -23,6 +23,8 @@ React 19 · TypeScript 6 · Vite 8 · `@fontsource/jersey-10` (self-hosted displ
 | 8   | Functions  | What does `add(2, 3)` return? (def/params) | Function Forge |
 
 Games (all playable), modules = CORE + 2 ADVANCED + 1 BOSS: Bug Hunt 10, Code Breaker 10, Data Sorter 12, Function Forge 13. Write modules per game (core + advanced + boss): 4 / 4 / 4 / 5.
+
+Arcade Run (a mode, not a game): 8 mixed modules, unlocked once all four Core tiers are complete.
 
 ## Implemented
 
@@ -88,6 +90,18 @@ Games (all playable), modules = CORE + 2 ADVANCED + 1 BOSS: Bug Hunt 10, Code Br
   - Tests (352 total): every new module (solutions, equivalent solutions, mistakes, typed answers, malformed / unsupported code, hints never contain a finished line; choose / predict / build answers proven by running the code in the simulator, including every Bug Hunt patch); `Difficulty.test.tsx` (tier order, harder tiers combine more already-taught concepts, interaction mix, tier counts / sections, boss locked → ready → cleared / mastered, boss XP rules, core → advanced → boss runs, Continue routing, cartridge labels, boss state after reload). Existing full-game flows play each tier from the completion screen. Test helper fix: Bug Hunt patch radios are matched by their whitespace-collapsed accessible name.
   - Browser-verified in Chrome (Bug Hunt with core seeded complete): cartridge CORE 07/07 · ADVANCED 00/02 · BOSS LOCKED → Continue opened module 08 with the ADVANCED tag; Member Discount first try +100 mastered; Average Score typed with real keys, first check (`str()` only) diagnosed "prints 11.5… divides before it adds" (+25), equivalent `(b + a) / 2` accepted (+75); Advanced complete screen (+200, "Boss module ready", Play Boss); boss framed SYSTEM CRITICAL · FINAL TEST, Shop Checkout typed with Enter auto-indent and Backspace dedent → mastered +100; "Boss mastered" stamp, 10/10 complete, 9/10 mastered, Game status Complete; reload kept 1000 XP and BOSS MASTERED on the cartridge. 375px frame: no page overflow, no buttons under 40px, tier row wraps cleanly. No console errors.
 
+- **Phase 10 — Arcade Challenge Runs:**
+  - **Groundwork refactor (no behaviour change):** `BugHuntRound` / `CodeBreakerRound` extracted like the other rounds; all rounds share `RoundProps` with an optional HUD override; `ModuleRound` renders any module; the four game screens are thin wrappers over `GameScreen`; `codeThemes` holds each game's write-module dressing. The runner no longer tracks a selected option (rounds own their answer state).
+  - **Mode, not a game:** `content/arcade.ts` lists 8 `{ source, id }` refs resolved to the games' own challenge objects (one definition, one validator, progress shared with the game). Order: Average Disaster (choose) → Delivery Gate (write, new) → Purge Slot (choose) → Signal Doubler (build) → Trace It (predict) → Score Total (write, advanced) → Override Switch (predict, advanced) → Shield Breach (write, new, Final Run). Every game, every interaction and all 8 Foundations concepts appear; never three of one interaction in a row.
+  - **New content (2):** Delivery Gate (at least 5 packages and not locked: `>=`, `and`, `not` in a new setting; diagnoses `>`, a missing rule, `or`). Shield Breach (repair a function with three bugs: total reset inside the loop, whole hit added, print instead of return; diagnoses each, plus a missing start value and an early return). Saved under source `arcade`.
+  - **Unlock:** every CORE module of all four games complete (derived, persists; mastery, Advanced and Boss not needed). Locked card: "Arcade locked", "Complete the Core modules in all four games.", `CORE n/4 GAMES`.
+  - **Persistence:** `progress.arcade = { run, runs, best }` in the same key (schema still `version: 1`; older saves get an empty record). The run saves `at`, `tries`, `correct`, `firstTry`, `checks`, `correctChecks`, `xp` after every answer. A module is settled when solved or answered wrong without a retry; a write module left unsolved moves on at Next (`leaveArcadeModule`, idempotent). Leaving or reloading resumes at the right module (an answered module left before Next is kept; a missed write module reopens). Storage drops impossible counts, a position past the run, or a bad best.
+  - **XP / mastery:** every answer goes through `applyAnswer(source, id, …)`: +100 / +25 then +75 / 0 on replays, hints block mastery, a wrong arcade answer never removes mastery, no multiplier or completion bonus. Challenges already earned in their game pay 0 in the Arcade.
+  - **Best run:** recorded only when a run reaches module 8; one record compared by correct, then first-try, then accuracy (correct checks ÷ checks, whole %). Stored as `{ correct, firstTry, accuracy }`. "First try" is per run (first check, no hint): saved mastery can't change on replay, so it is the run's mastery-standard count. No XP for a new best.
+  - **UI:** Arcade cartridge below the four games (sideways on wide screens, dashed and greyed when locked; Ready / In progress · Module 04 / 08 / Complete · n runs; best run; Play / Continue Arcade + Replay / Replay Arcade). `ArcadeScreen` plays each module in its own round and game colours under one "Arcade Run" HUD; the last module has a FINAL RUN tag and "Arcade final · Every system at once" strip. After a miss, one muted line names the module's concepts and points to Python Foundations. `ArcadeSummary`: Run complete, XP, correct, first try, accuracy, checks, saved mastery of the 8, concepts, best run (New best only when an earlier best is beaten), Back to games / Replay run. Home: small "Arcade ready · 8 module run" / "in progress" line once unlocked. Original cabinet sprite; neutral silver tone. Reset confirmation now mentions Arcade progress.
+  - Tests (415 total): `progression/arcade.test.ts` (unlock, status, position, retries, leave, XP, hints, mastery kept, arcade source, best-run rules, storage), `content/arcade.test.ts` (refs resolve to the games' own objects, no repeats, at most 3 new, every game and interaction, curve, concept coverage, both new modules' solutions / equivalents / mistakes / typed answers / hints), `Arcade.test.tsx` (app-level: locked → unlock → reload, start at 1, Continue after leaving and reload, Replay, Final Run framing, summary, shared progress with Function Forge, XP 0 / 100 / 25+75 / +400 then +0, hints, mastery kept, best run kept / replaced, reset relocks and clears). One existing storage test now also expects the empty `arcade` record; nothing weakened.
+  - Browser-verified in Chrome (fresh player): Arcade locked; all four Core tiers played through the real game UI (one Bug Hunt write miss, then Retry unfinished), Core 1/4 → 4/4, Arcade ready; reload kept it; run started by mouse; module 1 patch picked by mouse (Replay · no XP); Delivery Gate typed with real keys: `>=` only → "dock is locked, but… still accepted" +25, then `and not locked` → +75; left at module 04, reloaded, Home "in progress · module 4 of 8", Continue Arcade → module 04; finished with one miss: +325, 7/8, 6 first try, 78%, best recorded; replay all correct: only Override Switch's +75 top-up, "New best run" 8/8 · 8 · 100%; second replay +0 with the "already earned" note; card shows best and 3 runs; Function Forge card shows ADVANCED 01/02 from the Arcade; reset via the confirmation cleared everything; Arcade locked again with no best after reload; all four games and the Variables lesson still play. 375px frame: Home, locked / complete card, HUD, choices, editor, miss feedback with refresher, summary and best run: no page overflow, no buttons under 40px. Keyboard focus visible on the card. No console errors.
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
 ## Not implemented (by design)
@@ -117,9 +131,17 @@ Real Python execution (write modules use the controlled subset simulator), free-
 - The suggested next step (Play Advanced / Play Boss) is a secondary button next to Back to games.
 - Code isn't saved between visits; Reset and re-entering a module start from the starter code.
 - Data Sorter shows one shared "typical mistake" note per challenge; values are integers only.
+- The Arcade Run is one fixed order of 8 modules; replays repeat it (for practice and the best run, not new content).
+- A player who unlocked the Arcade has already solved its 4 Core modules, so those pay 0 XP there; only the 4 others can pay.
+- Arcade answers count for the owning game: solving Score Total or Override Switch in the Arcade advances that game's Advanced tier.
+- The best run's "first try" is per run (not saved mastery), so a replay can improve it while saved mastery stays as it was.
+- Leaving the Arcade after a write-module miss reopens that module with the starter code (code is never saved).
+- Home's Arcade line reads "Arcade ready" after a finished run too (the card shows Complete and the best run).
+- On phones the feedback strip wraps to two lines when the "Replay · no XP" chip is shown (shared component, also in the games).
 
 ## Git
 
 - Branch: `main`
+- Phase 10 work starts after `946a00d` (end of Phase 9): refactor `576faea`, model `b8090b9`, content `fd20348`, interface `e709b10`, tests `0b097b1`, reset copy `045bd09`, then docs.
 - Phase 9 work starts after `4821dea` (end of Phase 8 docs); code commits `72214c9`, `30744e9`, tests `fff3e86`, then docs.
 - Phase 8 work starts after `4fec17b` (end of Phase 7); its last code commit is `cb11746`, followed by docs. Phase 7 ended at `4fec17b`, Phase 6 at `5d9424d`, Phase 5 at `2fedf90`.
