@@ -1,8 +1,8 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 8 — Real coding challenges & challenge depth (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 9.
+- **Current phase:** Phase 9 — Difficulty tiers: Advanced & Boss modules (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 10.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -22,7 +22,7 @@ React 19 · TypeScript 6 · Vite 8 · `@fontsource/jersey-10` (self-hosted displ
 | 7   | Loops      | How many times does the loop body run?     | Data Sorter    |
 | 8   | Functions  | What does `add(2, 3)` return? (def/params) | Function Forge |
 
-Games (all playable), modules including write modules: Bug Hunt 7 (2 write), Code Breaker 7 (2), Data Sorter 9 (2), Function Forge 10 (3).
+Games (all playable), modules = CORE + 2 ADVANCED + 1 BOSS: Bug Hunt 10, Code Breaker 10, Data Sorter 12, Function Forge 13. Write modules per game (core + advanced + boss): 4 / 4 / 4 / 5.
 
 ## Implemented
 
@@ -79,6 +79,15 @@ Games (all playable), modules including write modules: Bug Hunt 7 (2 write), Cod
   - Tests (284 total): simulator (printing, precedence, blocks, functions, lists, Python error messages, syntax-mistake messages, unsupported code, no page access, runaway limits), every write module (solution passes, starter fails, equivalent solutions, common mistakes, typed answers, malformed code, hints never contain the answer), module placement, hint mastery rule, CodeRound UI (label/description, Check enable, Reset, auto-indent, attempts, retry XP, second wrong check 0, Show solution, malformed/unsupported, hints), and write modules with Continue / persistence / replay / completion. Screen tests run against each game's own challenges as before; app-level tests play the real module lists through `src/test/play.ts`.
   - Browser-verified in Chrome: Bug Hunt patches then Ticket Counter typed with real keys (wrong `-` → "printed 5, should print 24", +25; hint; fix → +75, not mastered); Code Breaker Vault Threshold (failing case named, fix accepted); Data Sorter via Continue to Fix the Reading (off-by-one diagnosed, result list drawn) and Queue Intake (hinted first try +100, not mastered); Function Forge Doubler (print vs return diagnosed, fixed), Adder first try mastered, Use It typed with real Enter/Backspace (auto-indent/dedent) → mastered, completion 10/10 complete, 9/10 mastered; reload kept XP and every write-module record; replaying Ticket Counter showed COMPLETE and "Replay · no XP" with XP unchanged. 375px frame: no page overflow (long lines scroll inside the editor), no small buttons after the Reset fix. No console errors.
 
+- **Phase 9 — Difficulty tiers (Advanced & Boss):**
+  - **Metadata** on every challenge object (`src/challenges/meta.ts`): `tier` (core default / advanced / boss) and `concepts` (Foundations concepts used). `interactionOf()` derives choose / build / predict / write from the challenge shape.
+  - **12 new modules** (`src/content/depthChallenges.ts`), only combining taught concepts. Bug Hunt: Member Discount (choose), Average Score (write), boss Shop Checkout. Code Breaker: Override Switch (predict), Shift Scheduler (write), boss Vault Core. Data Sorter: Threshold Filter (build), Count Alerts (write), boss Sensor Repair. Function Forge: Fee Calculator (predict), Score Total (write), boss Shipping Rule. Every boss is a write module; each write module diagnoses its reasoning mistakes. Write modules can draw a different result list (`resultVariable`). No simulator changes were needed.
+  - **Structure:** each game is CORE → 2 ADVANCED → 1 BOSS. A run plays one tier section; the completion screen stamps Core / Advanced complete, Boss cleared / mastered and offers Retry unfinished, Play Advanced, Play Boss or Replay. The boss unlocks once every core and advanced module is complete; a `boss` start while locked falls back to Continue. Continue (first unfinished) now walks CORE → ADVANCED → BOSS.
+  - **Rules unchanged:** XP, mastery, hints, replay. A first-try boss is mastered; missed or hinted is cleared. No new saved fields (schema still `version: 1`); tier state is derived.
+  - **UI:** ADVANCED / BOSS MODULE mission tag; boss gets a heavier frame and a SYSTEM CRITICAL · FINAL TEST strip; cartridges show `CORE 07/07 · ADVANCED 01/02 · BOSS LOCKED / READY / CLEARED / MASTERED`. Conditions, Lists, Loops and Functions lessons say where the idea is combined later.
+  - Tests (352 total): every new module (solutions, equivalent solutions, mistakes, typed answers, malformed / unsupported code, hints never contain a finished line; choose / predict / build answers proven by running the code in the simulator, including every Bug Hunt patch); `Difficulty.test.tsx` (tier order, harder tiers combine more already-taught concepts, interaction mix, tier counts / sections, boss locked → ready → cleared / mastered, boss XP rules, core → advanced → boss runs, Continue routing, cartridge labels, boss state after reload). Existing full-game flows play each tier from the completion screen. Test helper fix: Bug Hunt patch radios are matched by their whitespace-collapsed accessible name.
+  - Browser-verified in Chrome (Bug Hunt with core seeded complete): cartridge CORE 07/07 · ADVANCED 00/02 · BOSS LOCKED → Continue opened module 08 with the ADVANCED tag; Member Discount first try +100 mastered; Average Score typed with real keys, first check (`str()` only) diagnosed "prints 11.5… divides before it adds" (+25), equivalent `(b + a) / 2` accepted (+75); Advanced complete screen (+200, "Boss module ready", Play Boss); boss framed SYSTEM CRITICAL · FINAL TEST, Shop Checkout typed with Enter auto-indent and Backspace dedent → mastered +100; "Boss mastered" stamp, 10/10 complete, 9/10 mastered, Game status Complete; reload kept 1000 XP and BOSS MASTERED on the cartridge. 375px frame: no page overflow, no buttons under 40px, tier row wraps cleanly. No console errors.
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
 ## Not implemented (by design)
@@ -104,10 +113,13 @@ Real Python execution (write modules use the controlled subset simulator), free-
 - Write modules check behaviour on their test cases plus a few token requirements; unusual but valid solutions that avoid a required form (e.g. Vault Threshold written as `power > 49`) are asked to use the taught form, with an explanation.
 - A hint opened, then the module left without checking, isn't remembered; mastery is still possible on a later first check.
 - Output is compared exactly, so a stray trailing space in printed text counts as different (the message shows what was printed).
+- Completion's "correct this run" counts a module fixed after a miss as correct (mastered count shows first-try wins).
+- The suggested next step (Play Advanced / Play Boss) is a secondary button next to Back to games.
 - Code isn't saved between visits; Reset and re-entering a module start from the starter code.
 - Data Sorter shows one shared "typical mistake" note per challenge; values are integers only.
 
 ## Git
 
 - Branch: `main`
+- Phase 9 work starts after `4821dea` (end of Phase 8 docs); code commits `72214c9`, `30744e9`, tests `fff3e86`, then docs.
 - Phase 8 work starts after `4fec17b` (end of Phase 7); its last code commit is `cb11746`, followed by docs. Phase 7 ended at `4fec17b`, Phase 6 at `5d9424d`, Phase 5 at `2fedf90`.

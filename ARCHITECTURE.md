@@ -14,7 +14,7 @@ src/
   components/               Reusable UI (see below)
   art/                      Pixel-art toolkit (pixel.ts: grid → SVG paths) and the original sprites (sprites.ts)
   content/                  Static data: game list, each game's challenges, Python Foundations concepts
-  challenges/               Challenge types, deterministic validation, listOps (tiny list model), code.ts (write modules + checkCode)
+  challenges/               Challenge types, deterministic validation, listOps (tiny list model), code.ts (write modules + checkCode), meta.ts (tier + concepts), interaction.ts
   python/                   Controlled simulator for the taught Python subset: lexer, parser, interpreter (no eval, no real Python)
   game/xp.ts                XP rewards and level maths
   game/useChallengeRun.ts   Shared state for one run through a game; asks progression for XP and mastery
@@ -35,7 +35,11 @@ Tests sit next to the code they cover (`*.test.ts[x]`).
   - `storage.ts` is the only code that touches `localStorage` (key `codebound.progress`). Loading validates everything (`sanitize`): missing data, invalid JSON, an unknown version, or blocked storage give a fresh player; bad fields are dropped. Saves and clears never throw.
   - The provider loads before the first render (so a reload shows no XP or level-up animation) and saves inside the same `commit()` that updates state.
   - `useChallengeRun(game, challenges, startAt)` picks the first module (`continue` → first unfinished, `start` → 01), reports each answer to `answer()`, and calls `finishRun()` at the end. Screens get `startAt` and `onPlayAgain(startAt)`; `App` remounts the game with a new `key` for another run.
-  - `content/gameChallenges.ts` defines each game's **module list** (its own challenges with write modules interleaved, in play order), `gameChallengeIds` for reading saved state, and `writeModuleCounts` for the cartridges.
+  - `content/gameChallenges.ts` defines each game's **module list** (CORE: its own challenges with write modules interleaved; then 2 ADVANCED and 1 BOSS module from `content/depthChallenges.ts`), `gameChallengeIds` for reading saved state, and `writeModuleCounts` for the cartridges.
+- **Difficulty tiers.** Every challenge carries `ChallengeMeta` (`src/challenges/meta.ts`) on the object itself: `tier?: 'core' | 'advanced' | 'boss'` (omitted = core, read with `tierOf`) and `concepts: ConceptId[]`. `interactionOf()` (`src/challenges/interaction.ts`) derives choose / build / predict / write from the challenge's shape; nothing stores it twice.
+  - `progress.ts` adds pure tier rules: `tierCounts` (done / total per tier), `bossState` (`locked` until every CORE and ADVANCED module is complete, then `ready`, then `cleared` / `mastered`) and `sectionOf` (the consecutive modules sharing a tier). No new saved fields: tiers are derived from the module list, so the schema stays `version: 1`.
+  - A run plays one tier section. `useChallengeRun`'s `RunStart` is `'continue' | 'start' | 'advanced' | 'boss'`; a `'boss'` start while the boss is locked falls back to Continue. The completion screen offers the next section (Retry unfinished / Play Advanced / Play Boss / Replay).
+  - Tests (`Difficulty.test.tsx`) check tier order, that harder tiers combine more concepts that were already taught, the interaction mix, boss rules and tier play-throughs.
 - **Content is data.** Each game has its own typed challenge shape in `src/challenges/` and a list of challenges in `src/content/`. Adding a challenge means adding an object to that list.
   - `BugHuntChallenge`: buggy code + candidate one-line patches.
   - `CodeBreakerChallenge`: a security rule, a system-state readout, lock code with an optional `____` slot, and options that either fill the slot or predict the output.
