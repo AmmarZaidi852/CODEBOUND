@@ -44,6 +44,9 @@
   --violet: #ab8cff;
   --violet-dim: #5a3fb0;
   --red: #ff5f6d;
+  /* Arcade Run: where every area meets, so a neutral bright tone. */
+  --silver: #dfe6ff;
+  --silver-dim: #6b779e;
 
   --color-accent: var(--green);
   --color-success: var(--green);
@@ -115,6 +118,11 @@
 [data-theme='function-forge'] {
   --tone: var(--violet);
   --tone-dim: var(--violet-dim);
+}
+
+[data-theme='arcade'] {
+  --tone: var(--silver);
+  --tone-dim: var(--silver-dim);
 }
 
 *,

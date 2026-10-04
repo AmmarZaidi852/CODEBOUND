@@ -1,0 +1,77 @@
+/*
+ * The Arcade cartridge reuses the game-card look, laid out sideways on
+ * wide screens so it reads as a bonus slot under the four games.
+ */
+.arcade-card {
+  margin-top: 1.25rem;
+}
+
+/* Doubled classes: game-card styles load after this file. */
+@media (min-width: 720px) {
+  .game-card.arcade-card {
+    flex-direction: row;
+  }
+
+  .game-card__screen.arcade-card__screen {
+    flex: 0 0 15rem;
+    border-right: 2px solid var(--color-border);
+    border-bottom: 0;
+  }
+}
+
+.arcade-card__tagline {
+  margin: -0.35rem 0 0;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Locked: present but quiet (dashed, like locked Foundations rows). */
+.game-card.arcade-card--locked {
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.arcade-card--locked .game-card__art {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.arcade-card--locked .game-card__status {
+  color: var(--color-text-muted);
+}
+
+.arcade-card--in-progress .arcade-card__state,
+.arcade-card--new .arcade-card__state {
+  --state-color: var(--tone);
+}
+
+.arcade-card--complete .arcade-card__state {
+  --state-color: var(--color-success);
+}
+
+.arcade-card--in-progress .arcade-card__state span,
+.arcade-card--new .arcade-card__state span,
+.arcade-card--complete .arcade-card__state span {
+  background: var(--state-color);
+}
+
+.arcade-card__hint,
+.arcade-card__best {
+  width: 100%;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.arcade-card__hint {
+  color: var(--color-text);
+}
+
+.arcade-card__best {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-strong);
+}

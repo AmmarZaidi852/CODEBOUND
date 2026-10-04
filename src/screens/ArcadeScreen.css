@@ -1,0 +1,8 @@
+/* A quiet pointer back to the lessons after a miss; never in the way. */
+.arcade__review {
+  margin: 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--color-border-strong);
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+}

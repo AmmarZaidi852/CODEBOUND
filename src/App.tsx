@@ -6,6 +6,7 @@ import { foundationsProgress, nextConcept } from './game/foundationsProgress.ts'
 import type { RunStart } from './game/useChallengeRun.ts'
 import { useProgress } from './progression/ProgressContext.ts'
 import ProgressProvider from './progression/ProgressProvider.tsx'
+import ArcadeScreen from './screens/ArcadeScreen.tsx'
 import BugHuntScreen from './screens/BugHuntScreen.tsx'
 import CodeBreakerScreen from './screens/CodeBreakerScreen.tsx'
 import ConceptScreen from './screens/ConceptScreen.tsx'
@@ -15,7 +16,7 @@ import FunctionForgeScreen from './screens/FunctionForgeScreen.tsx'
 import GameSelectScreen from './screens/GameSelectScreen.tsx'
 import HomeScreen from './screens/HomeScreen.tsx'
 
-type Screen = 'home' | 'select' | 'foundations' | 'concept' | 'game'
+type Screen = 'home' | 'select' | 'foundations' | 'concept' | 'game' | 'arcade'
 
 /** The game being played, how it was entered, and where it starts. */
 interface Run {
@@ -36,17 +37,19 @@ const gameScreens = {
 
 /** Switches screens. All saved state lives in ProgressProvider. */
 function Screens() {
-  const { progress, completeConcept } = useProgress()
+  const { progress, completeConcept, startArcade } = useProgress()
   const completed = progress.concepts
 
   const [screen, setScreen] = useState<Screen>('home')
   const [conceptId, setConceptId] = useState<ConceptId>(foundations[0].id)
   const [run, setRun] = useState<Run | null>(null)
+  /** Bumped to remount the Arcade for a new run. */
+  const [arcadeAttempt, setArcadeAttempt] = useState(0)
 
   // Every screen starts at the top, not at the previous screen's scroll.
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [screen, conceptId, run])
+  }, [screen, conceptId, run, arcadeAttempt])
 
   function openConcept(id: ConceptId) {
     setConceptId(id)
@@ -56,6 +59,23 @@ function Screens() {
   function openGame(game: GameId, from: Run['from'], startAt: RunStart) {
     setRun({ game, from, startAt, attempt: (run?.attempt ?? 0) + 1 })
     setScreen('game')
+  }
+
+  /** Continue resumes the saved run; start (or no saved run) begins at 01. */
+  function openArcade(mode: 'start' | 'continue') {
+    if (mode === 'start' || !progress.arcade.run) startArcade()
+    setArcadeAttempt((n) => n + 1)
+    setScreen('arcade')
+  }
+
+  if (screen === 'arcade') {
+    return (
+      <ArcadeScreen
+        key={arcadeAttempt}
+        onExit={() => setScreen('select')}
+        onReplay={() => openArcade('start')}
+      />
+    )
   }
 
   if (screen === 'game' && run) {
@@ -76,6 +96,7 @@ function Screens() {
       <GameSelectScreen
         onBack={() => setScreen('home')}
         onSelect={(id, startAt) => openGame(id, 'select', startAt)}
+        onArcade={openArcade}
       />
     )
   }

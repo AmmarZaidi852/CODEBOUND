@@ -29,6 +29,8 @@ export interface CodeRoundTheme {
   titles: { ok: string; fail: string }
   /** Mission label for this module, e.g. "Bug 03 · Write the fix". */
   label: string
+  /** Replaces the tier tag and adds a strip, e.g. the Arcade's Final Run. */
+  final?: { tag: string; strip: string }
 }
 
 interface CodeRoundProps extends RoundProps {
@@ -119,12 +121,25 @@ function CodeRound({
         }}
       />
 
-      <section className={`mission panel${missionTier(challenge.tier)}`}>
-        <BossStrip tier={challenge.tier} />
+      <section
+        className={`mission panel${theme.final ? ' mission--boss' : missionTier(challenge.tier)}`}
+      >
+        {theme.final ? (
+          <p className="mission__boss-strip">
+            <span aria-hidden="true" />
+            {theme.final.strip}
+          </p>
+        ) : (
+          <BossStrip tier={challenge.tier} />
+        )}
         <p className="mission__id">
           {theme.label}
           <span className="code-round__mode">Write</span>
-          <TierTag tier={challenge.tier} />
+          {theme.final ? (
+            <span className="tier-tag tier-tag--boss">{theme.final.tag}</span>
+          ) : (
+            <TierTag tier={challenge.tier} />
+          )}
         </p>
         <h1 className="game__title" ref={titleRef} tabIndex={-1}>
           {challenge.title}

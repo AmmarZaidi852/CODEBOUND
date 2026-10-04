@@ -54,3 +54,18 @@ export const codeThemes: Record<GameId, (index: number) => CodeRoundTheme> = {
     label: `Function Module ${pad(index + 1)} · Write the function`,
   }),
 }
+
+/** Write modules that only exist in the Arcade Run. */
+export const arcadeCodeTheme = (
+  index: number,
+  final: boolean,
+): CodeRoundTheme => ({
+  art: 'arcade',
+  name: 'Arcade Run',
+  status: { label: 'Run', idle: 'Live', ok: 'Clear', fail: 'Fault' },
+  titles: { ok: 'System clear!', fail: 'Not quite' },
+  label: `Arcade ${pad(index + 1)} · Write the code`,
+  final: final
+    ? { tag: 'Final run', strip: 'Arcade final · Every system at once' }
+    : undefined,
+})

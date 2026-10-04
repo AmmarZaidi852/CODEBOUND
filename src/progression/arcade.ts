@@ -19,14 +19,18 @@ import {
 
 export type ArcadeStatus = 'locked' | 'new' | 'in-progress' | 'complete'
 
-/** The Arcade unlocks once every CORE module of all four games is complete. */
-export function arcadeUnlocked(progress: Progress): boolean {
-  return games.every((game) => {
+/** How many games have every CORE module complete. */
+export function coreGamesComplete(progress: Progress): number {
+  return games.filter((game) => {
     const states = gameStates(progress, game.id, gameChallengeIds[game.id])
     const tiers = gameModuleTiers[game.id]
     return states.every((s, i) => tiers[i] !== 'core' || s !== 'unplayed')
-  })
+  }).length
 }
+
+/** The Arcade unlocks once every CORE module of all four games is complete. */
+export const arcadeUnlocked = (progress: Progress) =>
+  coreGamesComplete(progress) === games.length
 
 export function arcadeStatus(progress: Progress): ArcadeStatus {
   if (progress.arcade.run) return 'in-progress'

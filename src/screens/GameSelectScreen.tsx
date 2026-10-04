@@ -1,3 +1,4 @@
+import ArcadeCard from '../components/ArcadeCard.tsx'
 import PixelProgress from '../components/PixelProgress.tsx'
 import PixelSprite from '../components/PixelSprite.tsx'
 import TopBar from '../components/TopBar.tsx'
@@ -23,6 +24,7 @@ import './GameSelectScreen.css'
 interface GameSelectScreenProps {
   onBack: () => void
   onSelect: (id: GameId, startAt: RunStart) => void
+  onArcade: (mode: 'start' | 'continue') => void
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -35,7 +37,11 @@ const bossLabels: Record<BossState, string> = {
 }
 
 /** Cartridge shelf: one card per game, each showing its saved progress. */
-function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
+function GameSelectScreen({
+  onBack,
+  onSelect,
+  onArcade,
+}: GameSelectScreenProps) {
   const { progress } = useProgress()
 
   return (
@@ -189,6 +195,7 @@ function GameSelectScreen({ onBack, onSelect }: GameSelectScreenProps) {
             )
           })}
         </ul>
+        <ArcadeCard onPlay={onArcade} />
       </main>
     </div>
   )

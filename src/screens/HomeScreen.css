@@ -115,6 +115,25 @@
   color: var(--color-text-muted);
 }
 
+/* A small status line, not another big button. */
+.home__arcade {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+.home__arcade span {
+  width: 0.45rem;
+  height: 0.45rem;
+  background: currentColor;
+}
+
 .home__player {
   display: flex;
   flex-wrap: wrap;

@@ -2,6 +2,8 @@ import PixelProgress from '../components/PixelProgress.tsx'
 import PixelSprite from '../components/PixelSprite.tsx'
 import ResetProgress from '../components/ResetProgress.tsx'
 import XpBadge from '../components/XpBadge.tsx'
+import { arcadeModules } from '../content/arcade.ts'
+import { arcadeStatus } from '../progression/arcade.ts'
 import { useProgress } from '../progression/ProgressContext.ts'
 import './HomeScreen.css'
 
@@ -14,7 +16,11 @@ interface HomeScreenProps {
 
 /** Title screen: logo, hero terminal, the two ways in, and player stats. */
 function HomeScreen({ learned, onLearn, onPlay }: HomeScreenProps) {
-  const { xp } = useProgress().progress
+  const { progress } = useProgress()
+  const { xp } = progress
+  const arcade = arcadeStatus(progress)
+  const run = progress.arcade.run
+  const total = arcadeModules.length
   const learnLabel =
     learned.done === 0
       ? 'START LEARNING'
@@ -66,6 +72,14 @@ function HomeScreen({ learned, onLearn, onPlay }: HomeScreenProps) {
             PLAY
           </button>
           <p className="home__hint">Jump into any of the four games</p>
+          {arcade !== 'locked' && (
+            <p className="home__arcade" data-theme="arcade">
+              <span aria-hidden="true" />
+              {run
+                ? `Arcade run in progress · module ${run.at + 1} of ${total}`
+                : `Arcade ready · ${total} module run`}
+            </p>
+          )}
         </div>
 
         <div className="home__player">

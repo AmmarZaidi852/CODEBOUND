@@ -13,6 +13,7 @@ export type SpriteId =
   | 'code-breaker'
   | 'data-sorter'
   | 'function-forge'
+  | 'arcade'
 
 export interface Sprite {
   grid: Grid
@@ -356,6 +357,54 @@ const forgeFunction: Sprite = {
   ]),
 }
 
+// ── Arcade: a cabinet where all four areas feed one screen ───────────────
+
+const arcadeScreen: Grid = [
+  blank(10),
+  's' + 'aa' + 'ssss' + 'vv' + 's',
+  's' + 'aa' + 's' + 'gg' + 's' + 'vv' + 's',
+  'sss' + 'g' + 'ww' + 'g' + 'sss',
+  's' + 'pp' + 's' + 'gg' + 's' + 'cc' + 's',
+  's' + 'pp' + 'ssss' + 'cc' + 's',
+  blank(10),
+  's' + rep('g', 6) + rep('G', 2) + 's',
+]
+
+const cabinet: Grid = [
+  '.' + rep('k', 14) + '.',
+  '.k' + rep('t', 12) + 'k.',
+  '.k' + rep('twT', 4) + 'k.',
+  '.k' + rep('T', 12) + 'k.',
+  rep('k', 16),
+  'km' + rep('k', 12) + 'mk',
+  ...arcadeScreen.map((row) => 'kmk' + row + 'kmk'),
+  'km' + rep('k', 12) + 'mk',
+  'k' + rep('m', 14) + 'k',
+  'km' + 'kk' + 'lll' + 'r' + 'l' + 'a' + 'l' + 'c' + 'll' + 'mk',
+  rep('k', 16),
+  'km' + rep('d', 12) + 'mk',
+  'km' + rep('d', 5) + 'aa' + rep('d', 5) + 'mk',
+  rep('k', 16),
+]
+
+/** A small chip in one area's colour, wired into the cabinet. */
+const chip = (color: string): Grid => ['kkk', `k${color}k`, 'kkk']
+const wire: Grid = [rep('m', 4)]
+
+const arcade: Sprite = {
+  grid: compose(32, 24, [
+    [8, 1, cabinet],
+    [1, 8, chip('a')],
+    [4, 9, wire],
+    [1, 14, chip('p')],
+    [4, 15, wire],
+    [28, 8, chip('v')],
+    [24, 9, wire],
+    [28, 14, chip('c')],
+    [24, 15, wire],
+  ]),
+}
+
 export const sprites: Record<SpriteId, Sprite> = {
   hero,
   foundations,
@@ -363,4 +412,5 @@ export const sprites: Record<SpriteId, Sprite> = {
   'code-breaker': codeBreaker,
   'data-sorter': dataSorter,
   'function-forge': forgeFunction,
+  arcade,
 }
