@@ -44,8 +44,8 @@ function ResetProgress() {
           Reset local progress?
         </p>
         <p id="reset-text">
-          This erases your XP, level, Foundations and game progress saved in
-          this browser. It cannot be undone.
+          This erases your XP, level, Foundations, game and Arcade progress
+          saved in this browser. It cannot be undone.
         </p>
         <div className="reset-progress__actions">
           <button
