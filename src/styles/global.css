@@ -125,6 +125,12 @@
   --tone-dim: var(--silver-dim);
 }
 
+/* Mastery Lab: a training room in the system's own green. */
+[data-theme='lab'] {
+  --tone: var(--green);
+  --tone-dim: var(--green-dim);
+}
+
 *,
 *::before,
 *::after {

@@ -220,3 +220,30 @@ export function conceptTargets(
     )
     .slice(0, limit)
 }
+
+/** One module by reference, with its saved state (what practice opens). */
+export function findLabModule(
+  progress: Progress,
+  ref: { source: ChallengeSource; id: string },
+): LabModule | undefined {
+  return allModules(progress).find(
+    (m) => m.source === ref.source && m.id === ref.id,
+  )
+}
+
+/**
+ * Saved states of the list a module belongs to (its game, or the Arcade
+ * Run), so practice shows the same HUD as playing it there.
+ */
+export function homeStates(
+  progress: Progress,
+  source: ChallengeSource,
+): ChallengeState[] {
+  const list: { source: ChallengeSource; id: string }[] =
+    source === 'arcade'
+      ? [...arcadeModules]
+      : gameModules[source].map((m) => ({ source, id: m.id }))
+  return list.map((m) =>
+    challengeState(progress.challenges[challengeKey(m.source, m.id)]),
+  )
+}

@@ -14,6 +14,7 @@ export type SpriteId =
   | 'data-sorter'
   | 'function-forge'
   | 'arcade'
+  | 'lab'
 
 export interface Sprite {
   grid: Grid
@@ -405,6 +406,37 @@ const arcade: Sprite = {
   ]),
 }
 
+// ── Mastery Lab: a core chip feeding a training console ─────────────────
+
+const coreChip: Grid = [
+  '.k.k.k.k.',
+  rep('k', 9),
+  'k' + rep('t', 6) + 'Tk',
+  'ktw' + rep('t', 3) + 'TTk',
+  'k' + rep('t', 6) + 'Tk',
+  rep('k', 9),
+  '.k.k.k.k.',
+]
+
+const feed: Grid = ['.g...g...g.', '.g...g...g.', 'ggg.ggg.ggg', '.g...g...g.']
+
+const trainingScreen: Grid = [
+  blank(18),
+  'sgs' + rep('g', 7) + rep('s', 8),
+  's' + rep('gG', 4) + rep('s', 9),
+  'sgs' + rep('c', 5) + rep('s', 10),
+  blank(18),
+]
+
+const lab: Sprite = {
+  grid: compose(32, 24, [
+    [11, 0, coreChip],
+    [10, 7, feed],
+    [4, 11, monitor(trainingScreen, 'k' + rep('m', 21) + 'g' + 'k')],
+    [10, 22, [rep('k', 12)]],
+  ]),
+}
+
 export const sprites: Record<SpriteId, Sprite> = {
   hero,
   foundations,
@@ -413,4 +445,5 @@ export const sprites: Record<SpriteId, Sprite> = {
   'data-sorter': dataSorter,
   'function-forge': forgeFunction,
   arcade,
+  lab,
 }

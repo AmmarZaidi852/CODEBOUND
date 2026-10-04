@@ -4,6 +4,8 @@ import { foundations } from './content/foundations.ts'
 import type { GameId } from './content/games.ts'
 import { foundationsProgress, nextConcept } from './game/foundationsProgress.ts'
 import type { RunStart } from './game/useChallengeRun.ts'
+import type { LabPriority } from './progression/lab.ts'
+import type { ChallengeSource } from './progression/progress.ts'
 import { useProgress } from './progression/ProgressContext.ts'
 import ProgressProvider from './progression/ProgressProvider.tsx'
 import ArcadeScreen from './screens/ArcadeScreen.tsx'
@@ -15,8 +17,26 @@ import FoundationsScreen from './screens/FoundationsScreen.tsx'
 import FunctionForgeScreen from './screens/FunctionForgeScreen.tsx'
 import GameSelectScreen from './screens/GameSelectScreen.tsx'
 import HomeScreen from './screens/HomeScreen.tsx'
+import LabPracticeScreen from './screens/LabPracticeScreen.tsx'
+import LabScreen from './screens/LabScreen.tsx'
 
-type Screen = 'home' | 'select' | 'foundations' | 'concept' | 'game' | 'arcade'
+type Screen =
+  | 'home'
+  | 'select'
+  | 'foundations'
+  | 'concept'
+  | 'game'
+  | 'arcade'
+  | 'lab'
+  | 'practice'
+
+/** A module opened from the Mastery Lab, and why it was recommended. */
+interface Practice {
+  target: { source: ChallengeSource; id: string }
+  priority: LabPriority
+  /** Bumped to remount for the next practice. */
+  attempt: number
+}
 
 /** The game being played, how it was entered, and where it starts. */
 interface Run {
@@ -45,11 +65,12 @@ function Screens() {
   const [run, setRun] = useState<Run | null>(null)
   /** Bumped to remount the Arcade for a new run. */
   const [arcadeAttempt, setArcadeAttempt] = useState(0)
+  const [practice, setPractice] = useState<Practice | null>(null)
 
   // Every screen starts at the top, not at the previous screen's scroll.
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [screen, conceptId, run, arcadeAttempt])
+  }, [screen, conceptId, run, arcadeAttempt, practice])
 
   function openConcept(id: ConceptId) {
     setConceptId(id)
@@ -66,6 +87,34 @@ function Screens() {
     if (mode === 'start' || !progress.arcade.run) startArcade()
     setArcadeAttempt((n) => n + 1)
     setScreen('arcade')
+  }
+
+  function openPractice(target: Practice['target'], priority: LabPriority) {
+    setPractice({ target, priority, attempt: (practice?.attempt ?? 0) + 1 })
+    setScreen('practice')
+  }
+
+  if (screen === 'practice' && practice) {
+    return (
+      <LabPracticeScreen
+        key={practice.attempt}
+        target={practice.target}
+        priority={practice.priority}
+        onLab={() => setScreen('lab')}
+        onNext={openPractice}
+      />
+    )
+  }
+
+  if (screen === 'lab') {
+    return (
+      <LabScreen
+        onBack={() => setScreen('home')}
+        onPractice={openPractice}
+        onArcade={() => openArcade('start')}
+        onFoundations={() => setScreen('foundations')}
+      />
+    )
   }
 
   if (screen === 'arcade') {
@@ -138,6 +187,7 @@ function Screens() {
       learned={foundationsProgress(foundations, completed)}
       onLearn={() => setScreen('foundations')}
       onPlay={() => setScreen('select')}
+      onLab={() => setScreen('lab')}
     />
   )
 }

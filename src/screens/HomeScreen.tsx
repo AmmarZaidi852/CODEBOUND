@@ -4,6 +4,11 @@ import ResetProgress from '../components/ResetProgress.tsx'
 import XpBadge from '../components/XpBadge.tsx'
 import { arcadeModules } from '../content/arcade.ts'
 import { arcadeStatus } from '../progression/arcade.ts'
+import {
+  allMastered,
+  labAvailable,
+  needsPracticeCount,
+} from '../progression/lab.ts'
 import { useProgress } from '../progression/ProgressContext.ts'
 import './HomeScreen.css'
 
@@ -12,15 +17,19 @@ interface HomeScreenProps {
   learned: { done: number; total: number }
   onLearn: () => void
   onPlay: () => void
+  onLab: () => void
 }
 
 /** Title screen: logo, hero terminal, the two ways in, and player stats. */
-function HomeScreen({ learned, onLearn, onPlay }: HomeScreenProps) {
+function HomeScreen({ learned, onLearn, onPlay, onLab }: HomeScreenProps) {
   const { progress } = useProgress()
   const { xp } = progress
   const arcade = arcadeStatus(progress)
   const run = progress.arcade.run
   const total = arcadeModules.length
+  const lab = labAvailable(progress)
+  const mastered = lab && allMastered(progress)
+  const needs = lab ? needsPracticeCount(progress) : 0
   const learnLabel =
     learned.done === 0
       ? 'START LEARNING'
@@ -81,6 +90,34 @@ function HomeScreen({ learned, onLearn, onPlay }: HomeScreenProps) {
             </p>
           )}
         </div>
+
+        {lab && (
+          <section
+            className="home__lab"
+            data-theme="lab"
+            aria-labelledby="home-lab-title"
+          >
+            <div>
+              <h2 className="home__lab-title" id="home-lab-title">
+                Mastery Lab
+              </h2>
+              <p className="home__lab-status">
+                {mastered
+                  ? 'All current modules mastered'
+                  : needs > 0
+                    ? `${needs} ${needs === 1 ? 'module needs' : 'modules need'} practice`
+                    : 'Practise your next targets'}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn home__lab-open"
+              onClick={onLab}
+            >
+              {mastered ? 'Review' : 'Open Lab'}
+            </button>
+          </section>
+        )}
 
         <div className="home__player">
           <span className="home__player-label">Player</span>
