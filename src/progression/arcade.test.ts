@@ -288,6 +288,28 @@ describe('arcade storage', () => {
     expect(p.arcade).toEqual({ run: null, runs: 0, best: null })
   })
 
+  it('drops a run whose position is past the end of the run', () => {
+    const run = {
+      at: 8,
+      tries: 0,
+      correct: 0,
+      firstTry: 0,
+      checks: 0,
+      correctChecks: 0,
+      xp: 0,
+    }
+    expect(
+      sanitize({ ...newProgress(), arcade: { run, runs: 0, best: null } })
+        .arcade.run,
+    ).toBeNull()
+    expect(
+      sanitize({
+        ...newProgress(),
+        arcade: { run: { ...run, at: 7 }, runs: 0, best: null },
+      }).arcade.run,
+    ).toEqual({ ...run, at: 7 })
+  })
+
   it('caps accuracy at 100', () => {
     const p = sanitize({
       ...newProgress(),

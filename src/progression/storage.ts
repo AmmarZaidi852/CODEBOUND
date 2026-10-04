@@ -1,4 +1,5 @@
 import type { ConceptId } from '../challenges/foundations.ts'
+import { arcadeModules } from '../content/arcade.ts'
 import { foundations } from '../content/foundations.ts'
 import { games, type GameId } from '../content/games.ts'
 import {
@@ -44,6 +45,7 @@ function sanitizeArcadeRun(v: unknown): ArcadeRun | null {
   }
   // Counts that cannot have come from real play mean the run is corrupt.
   const consistent =
+    run.at < arcadeModules.length &&
     run.correctChecks <= run.checks &&
     run.correct <= run.correctChecks &&
     run.firstTry <= run.correct &&

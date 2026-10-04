@@ -3,6 +3,7 @@ import type { CodeChallenge } from '../challenges/code.ts'
 import type { CodeBreakerChallenge } from '../challenges/codeBreaker.ts'
 import type { DataSorterChallenge } from '../challenges/dataSorter.ts'
 import type { FunctionForgeChallenge } from '../challenges/functionForge.ts'
+import type { GameModule } from '../challenges/interaction.ts'
 import { tierOf, type Tier } from '../challenges/meta.ts'
 import { bugHuntChallenges as bh } from './bugHuntChallenges.ts'
 import {
@@ -101,6 +102,14 @@ export const functionForgeModules: (FunctionForgeChallenge | CodeChallenge)[] =
     scoreTotal,
     shippingRule,
   ]
+
+/** Every game's modules in play order. */
+export const gameModules: Record<GameId, readonly GameModule[]> = {
+  'bug-hunt': bugHuntModules,
+  'code-breaker': codeBreakerModules,
+  'data-sorter': dataSorterModules,
+  'function-forge': functionForgeModules,
+}
 
 /** How many "write" modules each game has, for the cartridge label. */
 export const writeModuleCounts: Record<GameId, number> = {
