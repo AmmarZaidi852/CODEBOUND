@@ -1,8 +1,8 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 10 — Arcade Challenge Runs (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 11.
+- **Current phase:** Phase 11 — Mastery Lab & Smart Practice (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 12.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -25,6 +25,8 @@ React 19 · TypeScript 6 · Vite 8 · `@fontsource/jersey-10` (self-hosted displ
 Games (all playable), modules = CORE + 2 ADVANCED + 1 BOSS: Bug Hunt 10, Code Breaker 10, Data Sorter 12, Function Forge 13. Write modules per game (core + advanced + boss): 4 / 4 / 4 / 5.
 
 Arcade Run (a mode, not a game): 8 mixed modules, unlocked once all four Core tiers are complete.
+
+Mastery Lab (a practice surface, not a game): recommends existing modules from saved progress once one challenge is solved.
 
 ## Implemented
 
@@ -102,6 +104,14 @@ Arcade Run (a mode, not a game): 8 mixed modules, unlocked once all four Core ti
   - Tests (415 total): `progression/arcade.test.ts` (unlock, status, position, retries, leave, XP, hints, mastery kept, arcade source, best-run rules, storage), `content/arcade.test.ts` (refs resolve to the games' own objects, no repeats, at most 3 new, every game and interaction, curve, concept coverage, both new modules' solutions / equivalents / mistakes / typed answers / hints), `Arcade.test.tsx` (app-level: locked → unlock → reload, start at 1, Continue after leaving and reload, Replay, Final Run framing, summary, shared progress with Function Forge, XP 0 / 100 / 25+75 / +400 then +0, hints, mastery kept, best run kept / replaced, reset relocks and clears). One existing storage test now also expects the empty `arcade` record; nothing weakened.
   - Browser-verified in Chrome (fresh player): Arcade locked; all four Core tiers played through the real game UI (one Bug Hunt write miss, then Retry unfinished), Core 1/4 → 4/4, Arcade ready; reload kept it; run started by mouse; module 1 patch picked by mouse (Replay · no XP); Delivery Gate typed with real keys: `>=` only → "dock is locked, but… still accepted" +25, then `and not locked` → +75; left at module 04, reloaded, Home "in progress · module 4 of 8", Continue Arcade → module 04; finished with one miss: +325, 7/8, 6 first try, 78%, best recorded; replay all correct: only Override Switch's +75 top-up, "New best run" 8/8 · 8 · 100%; second replay +0 with the "already earned" note; card shows best and 3 runs; Function Forge card shows ADVANCED 01/02 from the Arcade; reset via the confirmation cleared everything; Arcade locked again with no best after reload; all four games and the Variables lesson still play. 375px frame: Home, locked / complete card, HUD, choices, editor, miss feedback with refresher, summary and best run: no page overflow, no buttons under 40px. Keyboard focus visible on the card. No console errors.
 
+- **Phase 11 — Mastery Lab & Smart Practice:**
+  - **Engine** (`progression/lab.ts`, pure, nothing persisted): ranks every released, unlocked module: 1 missed (answered, unsolved) · 2 not mastered (core, solved after a miss or hint) · 3 advanced solved not mastered · 4 boss solved not mastered · 5 new · 6 mastered (never shown). Ties take turns across games, then game order. "Unlocked" mirrors the games (core; advanced after that game's core; boss when ready; Arcade-only after the Arcade unlocks). Also: queue (top 5), needs-practice count, all-mastered, availability (one solved challenge), concept status (mastered / total modules per Foundations concept + lesson done), concept targets, module lookup and HUD states.
+  - **Persistence decision:** no new fields. Everything is derived from challenge records, tiers, concept mappings and Arcade unlock, so reset clears the Lab with the rest and reloads give the same queue.
+  - **UI:** Home panel once available ("N module(s) need(s) practice" / "All current modules mastered", Open Lab / Review). `LabScreen`: header with an original training-console sprite (green `lab` tone), Your next targets (rank, title, game · tier, reason tag, concepts, Practice), Concept status rows (segmented bar, n/m, word; each a button with `aria-expanded` that opens up to 3 targets + Practice <concept>), and an All current modules mastered panel (Replay Arcade / Review Foundations / Back to Home). `LabPracticeScreen` + `useLabPractice`: the canonical module via `ModuleRound` with its game's index, HUD, labels and colours under a "Mastery Lab · reason" strip; recorded with the same `answer()`; after the normal feedback a result panel shows saved state, XP, what is still earnable (or why it stays completed), the next target, Next practice (skips the module just practised) / Back to Lab.
+  - **XP / mastery:** unchanged (the provider's `answer()` now accepts the `arcade` source too).
+  - Tests (451 total): `progression/lab.test.ts` (availability, priority order, hints, mastered last and never queued, round-robin, determinism across reload, locked / unreleased never shown, all-mastered, concepts, concept targets) and `Lab.test.tsx` (Home panel, queue order, no locked modules, same queue after reload, canonical module with its game's HUD, +75 top-up updating Bug Hunt, repeat miss 0 with what is left, Lab mastery shown in Code Breaker, no duplicate XP, Next practice, Back to Lab, concept rows and Practice <concept>, all-mastered on Home and in the Lab with Replay Arcade / Review Foundations, reset).
+  - Browser-verified in Chrome (fresh player): Home unchanged and no Lab until a solve; after a mastered + missed Bug Hunt pair, the Home panel and Lab queue (Average Disaster "Missed before", then new challenges across games); Lab practice opened the module as Bug 02 · MODULE 02 / 10; wrong again → +0 and "remaining +75"; Back to Lab (still first); solved → +75 (125 → 200), saved completed not mastered; Bug Hunt shows MODULES 02 / 10 with the module marked COMPLETE and replays pay +0; reload kept XP and an identical queue; concept Operators → Practice Operators opened the canonical module; Next practice → Ticket Counter (mastered +100); Back to Lab; seeded all-mastered state → Home "All current modules mastered / Review", Lab panel, Replay Arcade and Review Foundations work; reset via confirmation removed the save and the Lab panel, and after one new solve the Lab recalculated; four games, Foundations and a full Arcade run still work, and afterwards the Lab offered newly unlocked Advanced modules while skipping ones mastered in the Arcade. 375px frame: Home panel, Lab queue, concept rows and detail, practice, feedback and result: no page overflow, no clipped titles, no buttons under 40px. Keyboard focus visible on concept rows. No console errors.
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
 ## Not implemented (by design)
@@ -138,10 +148,15 @@ Real Python execution (write modules use the controlled subset simulator), free-
 - Leaving the Arcade after a write-module miss reopens that module with the starter code (code is never saved).
 - Home's Arcade line reads "Arcade ready" after a finished run too (the card shows Complete and the best run).
 - On phones the feedback strip wraps to two lines when the "Replay · no XP" chip is shown (shared component, also in the games).
+- Mastery is only earned on a module's first attempt (Phase 7 rule, unchanged), so a module solved after a miss stays a NOT MASTERED Lab target permanently, and "All current modules mastered" is only reachable for modules first answered correctly without a hint. The result panel says so; there is no "cleared in practice" marker.
+- Lab recommendations follow fixed rules (no history of when a module was last practised), so the top target only changes when its saved state changes; Next practice skips the module just practised.
+- Concept bars count every released module using the concept, including ones still locked.
+- Practice opened from a concept uses the same reason tags as the main queue; the Lab does not track separate per-concept practice.
 
 ## Git
 
 - Branch: `main`
+- Phase 11 work starts after `5894924` (end of Phase 10): engine `17dc581`, UI `ce33e0d`, tests `913c0fc`, then docs.
 - Phase 10 work starts after `946a00d` (end of Phase 9): refactor `576faea`, model `b8090b9`, content `fd20348`, interface `e709b10`, tests `0b097b1`, reset copy `045bd09`, then docs.
 - Phase 9 work starts after `4821dea` (end of Phase 8 docs); code commits `72214c9`, `30744e9`, tests `fff3e86`, then docs.
 - Phase 8 work starts after `4fec17b` (end of Phase 7); its last code commit is `cb11746`, followed by docs. Phase 7 ended at `4fec17b`, Phase 6 at `5d9424d`, Phase 5 at `2fedf90`.

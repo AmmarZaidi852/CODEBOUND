@@ -36,7 +36,7 @@ Jersey 10 was chosen over Pixelify Sans because Pixelify drew C like O and 5 lik
 
 - Surfaces: near-black navy page (`--color-bg`), panels (`--color-surface`), inset terminals (`--color-inset`).
 - **Green** is the brand and Foundations colour. Success is green; errors are red. Both always come with words and an icon, never colour alone.
-- Each area has one **tone**, set with `data-theme` on the screen root: Foundations green, Bug Hunt amber, Code Breaker magenta, Data Sorter cyan, Function Forge violet, and the Arcade a neutral silver (where every area meets). `--tone`, `--tone-dim` and `--tone-wash` follow it, so the same component recolours itself per game.
+- Each area has one **tone**, set with `data-theme` on the screen root: Foundations green, Bug Hunt amber, Code Breaker magenta, Data Sorter cyan, Function Forge violet, the Arcade a neutral silver (where every area meets), and the Mastery Lab the system green. `--tone`, `--tone-dim` and `--tone-wash` follow it, so the same component recolours itself per game.
 - Text on a solid tone fill uses `--color-on-tone` (near-black).
 
 ### Shapes and details
@@ -60,6 +60,7 @@ All artwork is original, drawn as character grids in `src/art/sprites.ts` and re
 | Data Sorter    | Data crates sorted by height on an indexed shelf, one dropping into its slot                        |
 | Function Forge | Input block → machine with gears and a `»` display → output block                                   |
 | Arcade         | Arcade cabinet; four chips in the area colours are wired into one screen                            |
+| Mastery Lab    | Training console fed by a core chip (three arrows down into a screen with a segmented bar)          |
 
 ### Buttons
 
@@ -216,6 +217,31 @@ Modules are referenced by id, so each challenge keeps one definition and its pro
 **Best run.** Recorded only when a run reaches module 8. It keeps one record, compared by correct, then first-try solves, then accuracy: `BEST 7/8 · 6 FIRST TRY · 78%`. A better replay replaces it (_New best run_); a worse one doesn't. Beating it pays no XP. "First try" is counted for the run (solved on its first check without a hint), because saved mastery can't change on a replay.
 
 **Home** shows a small `ARCADE READY · 8 MODULE RUN` (or _in progress_) line once unlocked; the main Learning / Play buttons are unchanged. **Reset local progress** clears the Arcade run and best run with everything else.
+
+## Mastery Lab
+
+A training room that answers "I have played CODEBOUND. What should I practise next?". It is not a game and has no XP, streaks or rewards of its own: it only points at existing modules.
+
+**Access.** Once the player has solved one challenge, Home shows a small secondary panel (_MASTERY LAB · 3 modules need practice_ / _All current modules mastered_, with **Open Lab** / **Review**). The main Learning / Play buttons are unchanged.
+
+**Next targets (top 5).** Every released module the player can open now is ranked by a fixed set of rules. There is no randomness, so the same progress always gives the same list:
+
+| #   | Reason tag        | Module                                             |
+| --- | ----------------- | -------------------------------------------------- |
+| 1   | MISSED BEFORE     | answered, still not solved                         |
+| 2   | NOT MASTERED      | a core module solved after a miss (or with a hint) |
+| 3   | ADVANCED PRACTICE | an advanced module solved but not mastered         |
+| 4   | BOSS PRACTICE     | a boss solved but not mastered                     |
+| 5   | NEW CHALLENGE     | unlocked, never played                             |
+| 6   | (never listed)    | mastered                                           |
+
+Ties take turns across games (each game's first, then each game's second…), so the list mixes areas. "Open now" mirrors the games: Core always, Advanced once that game's Core is complete, the Boss once it is ready, the Arcade's own modules once the Arcade unlocks. Locked or unreleased modules never appear. Each card shows rank, title, game and tier (_Arcade · Final Run_ for Shield Breach), the reason tag, its concepts and **Practice**.
+
+**Practice.** It opens the canonical module exactly as in its game (same round, HUD, labels and colours), under a slim _MASTERY LAB · reason_ strip. Answers are recorded through the game's own `answer()`. XP, mastery, hints and replays therefore follow the normal rules: +100 first try, +25 for a first miss, +75 for the first solve after a miss, then 0. There are no multipliers or bonuses. After the normal feedback, a compact result shows the saved state (Mastered / Completed, not mastered / Not solved yet), the XP this practice, what can still be earned, the next target, and **Next practice** / **Back to Lab**. Next practice opens the top recommendation other than the module just practised.
+
+**Concept status.** One row per Foundations concept: a segmented bar and count of mastered modules using it, plus a word (_Mastered_ / _Practice_ / _Not started_). Every row is a button that opens that concept's top three recommendations and a **Practice <concept>** button. It also says whether the lesson is done. No new lessons; it only connects concepts to existing modules.
+
+**All current modules mastered.** When every released module is mastered, the targets give way to _ALL CURRENT MODULES MASTERED_ with **Replay Arcade**, **Review Foundations** and **Back to Home**. The wording leaves room for future content.
 
 ## Python Foundations
 
