@@ -1,8 +1,8 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 11 — Mastery Lab & Smart Practice (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 12.
+- **Current phase:** Phase 12 — Mastery Recovery & Adaptive Practice (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 13.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -112,6 +112,16 @@ Mastery Lab (a practice surface, not a game): recommends existing modules from s
   - Tests (451 total): `progression/lab.test.ts` (availability, priority order, hints, mastered last and never queued, round-robin, determinism across reload, locked / unreleased never shown, all-mastered, concepts, concept targets) and `Lab.test.tsx` (Home panel, queue order, no locked modules, same queue after reload, canonical module with its game's HUD, +75 top-up updating Bug Hunt, repeat miss 0 with what is left, Lab mastery shown in Code Breaker, no duplicate XP, Next practice, Back to Lab, concept rows and Practice <concept>, all-mastered on Home and in the Lab with Replay Arcade / Review Foundations, reset).
   - Browser-verified in Chrome (fresh player): Home unchanged and no Lab until a solve; after a mastered + missed Bug Hunt pair, the Home panel and Lab queue (Average Disaster "Missed before", then new challenges across games); Lab practice opened the module as Bug 02 · MODULE 02 / 10; wrong again → +0 and "remaining +75"; Back to Lab (still first); solved → +75 (125 → 200), saved completed not mastered; Bug Hunt shows MODULES 02 / 10 with the module marked COMPLETE and replays pay +0; reload kept XP and an identical queue; concept Operators → Practice Operators opened the canonical module; Next practice → Ticket Counter (mastered +100); Back to Lab; seeded all-mastered state → Home "All current modules mastered / Review", Lab panel, Replay Arcade and Review Foundations work; reset via confirmation removed the save and the Lab panel, and after one new solve the Lab recalculated; four games, Foundations and a full Arcade run still work, and afterwards the Lab offered newly unlocked Advanced modules while skipping ones mastered in the Arcade. 375px frame: Home panel, Lab queue, concept rows and detail, practice, feedback and result: no page overflow, no clipped titles, no buttons under 40px. Keyboard focus visible on concept rows. No console errors.
 
+- **Phase 12 — Mastery Recovery & Adaptive Practice:**
+  - **Definitions:** `mastered` = correct on the very first attempt without a hint (unchanged, never set later). `recovered` = not mastered, later answered correctly **without a hint** after an earlier attempt (a miss, or a hinted solve). Mastered and recovered are both "cleared". The first clean solve is enough; no streaks, timers or bonuses.
+  - **Hints:** a hinted solve never recovers (or masters); a later clean solve recovers it. This also lets a hinted first try be cleared.
+  - **XP:** unchanged. The first solve after a miss pays +75 as before (and recovers if hint-free); recovery itself pays nothing; replays pay 0.
+  - **Persistence decision:** one new field, `ChallengeRecord.recovered`; it can't be derived, because XP and `solved` don't record whether a later answer was hint-free. Schema stays `version: 1`: a missing field loads as `false`, recovered on a mastered or unsolved record is dropped. Reset clears it with the key. `ChallengeState` gains `'recovered'` (complete for game status; a recovered boss is "cleared").
+  - **Lab:** priority missed → not mastered (hinted) → advanced → boss → new → recovered → mastered; recovered and mastered are never queued or counted as needing practice. "All current modules cleared" (mastered or recovered, with both counts) is the practice-complete state; "All current modules mastered" only when every module is first-try. Concept status: Mastered / Recovered / Practice / Not started; the bar counts cleared modules; the detail shows "n / m mastered · r recovered · k to clear". The result panel says "You missed this module before and cleared it through practice."
+  - **Games:** RECOVERED chip on the result strip when an answer recovers, RECOVERED HUD mark on replays, a Recovered tile on the completion screen when present (and "n recovered through practice" once the game is complete). Arcade shares recovery through the same records; its best-run "first try" is unchanged. Foundations unchanged.
+  - Tests (474 total): recovery rules (`progress.test.ts`), storage of old / odd saves, Lab ranking / persistence / concepts / all-cleared vs all-mastered / hinted solves (`lab.test.ts`), and `Recovery.test.tsx` (game replay recovery with +75 and chip, HUD mark, completion tiles, Lab miss → recover → gone → reload → shown in game, concept counts, all-cleared vs all-mastered UI, Arcade retry recovery shared with the Lab with run counts unchanged, reset). Existing record expectations now state `recovered` exactly; Phase 11 Lab tests that meant "solved but not cleared" now use a hinted fix. None removed or weakened.
+  - Browser-verified in Chrome (fresh player): Bug Hunt played for real (two misses); Lab listed both as Missed before; Average Disaster opened from the Lab and solved by mouse without a hint: SYSTEM ONLINE · RECOVERED · +75 (250 → 325), record recovered; result "Recovered" + "cleared it through practice"; Back to Lab: gone from targets, Glitched Nameplate (still missed) first; reload kept the record and the queue; Home "1 module needs practice"; Operators concept "1 / 24 mastered · 1 recovered · 22 to clear"; Bug Hunt replay showed RECOVERED on the HUD and paid +0; seeded all-cleared → "All current modules cleared" (45 first-try, 2 recovered, concepts read Recovered) vs all-first-try → "All current modules mastered" (Recovered 0); Arcade: Delivery Gate missed then retried → RECOVERED +75, best run 8/8 · 7 first try · 89%; Bug Hunt completion showed MASTERED 6/10 and RECOVERED 1; Foundations lesson +25; reset via the confirmation cleared the key and the Lab panel; afterwards a first-try solve was mastered, not recovered. 375px frame: Lab queue, concept detail, practice feedback and result, HUD mark, five-tile completion: no overflow, no clipping, no buttons under 40px; desktop five-tile row fits. Keyboard focus visible. No console errors.
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
 ## Not implemented (by design)
@@ -148,7 +158,10 @@ Real Python execution (write modules use the controlled subset simulator), free-
 - Leaving the Arcade after a write-module miss reopens that module with the starter code (code is never saved).
 - Home's Arcade line reads "Arcade ready" after a finished run too (the card shows Complete and the best run).
 - On phones the feedback strip wraps to two lines when the "Replay · no XP" chip is shown (shared component, also in the games).
-- Mastery is only earned on a module's first attempt (Phase 7 rule, unchanged), so a module solved after a miss stays a NOT MASTERED Lab target permanently, and "All current modules mastered" is only reachable for modules first answered correctly without a hint. The result panel says so; there is no "cleared in practice" marker.
+- (Resolved in Phase 12) Modules solved after a miss used to stay Lab targets forever; a clean solve now recovers them.
+- Recovery happens on the first clean solve after a miss, including an immediate retry of a write module in the same run, so most missed write modules are recovered at once if the player retries without a hint.
+- The Lab has no view that lists recovered modules for review; they are counted (concepts, all-cleared panel, completion screen) but not listed.
+- Cartridge segments show recovered modules like completed ones (no separate segment style); the word RECOVERED appears on the HUD, chip and summary.
 - Lab recommendations follow fixed rules (no history of when a module was last practised), so the top target only changes when its saved state changes; Next practice skips the module just practised.
 - Concept bars count every released module using the concept, including ones still locked.
 - Practice opened from a concept uses the same reason tags as the main queue; the Lab does not track separate per-concept practice.
@@ -156,6 +169,7 @@ Real Python execution (write modules use the controlled subset simulator), free-
 ## Git
 
 - Branch: `main`
+- Phase 12 work starts after `da77da7` (end of Phase 11): model `c0c38e6`, Lab + game UI `aa77e48`, tests `4ef20ee`, then docs.
 - Phase 11 work starts after `5894924` (end of Phase 10): engine `17dc581`, UI `ce33e0d`, tests `913c0fc`, then docs.
 - Phase 10 work starts after `946a00d` (end of Phase 9): refactor `576faea`, model `b8090b9`, content `fd20348`, interface `e709b10`, tests `0b097b1`, reset copy `045bd09`, then docs.
 - Phase 9 work starts after `4821dea` (end of Phase 8 docs); code commits `72214c9`, `30744e9`, tests `fff3e86`, then docs.

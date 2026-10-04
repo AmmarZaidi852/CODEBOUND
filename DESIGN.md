@@ -109,13 +109,16 @@ Progress is saved in the browser (`localStorage`) and restored on every visit: X
 
 **Challenge states**
 
-| State     | Meaning                                                                                  |
-| --------- | ---------------------------------------------------------------------------------------- |
-| Unplayed  | Never answered correctly (it may have been attempted and missed).                        |
-| Completed | Answered correctly, but the first attempt was wrong.                                     |
-| Mastered  | The very first attempt was correct. Mastery can only be earned then, never by replaying. |
+| State     | Meaning                                                                                                         |
+| --------- | --------------------------------------------------------------------------------------------------------------- |
+| Unplayed  | Never answered correctly (it may have been attempted and missed).                                               |
+| Completed | Answered correctly, but not cleared yet: the first attempt was wrong (or used a hint) and no clean solve since. |
+| Recovered | Missed (or hinted) first, then solved correctly **without a hint** on a later attempt. Cleared.                 |
+| Mastered  | The very first attempt was correct, without a hint. Only earned then, never by replaying. Cleared.              |
 
-**Game states**: **New** (nothing completed) · **In progress** (some completed) · **Complete** (all completed) · **Mastered** (all mastered).
+Two ways to clear a module: **first try → MASTERED**, or **miss → practice → RECOVERED**. The first clean solve after a miss is enough: no streaks, timers or repeats. Recovery pays no XP of its own (the first solve after a miss still pays its +75 top-up, as before). A recovered module never becomes mastered, and a mastered one is never recovered. A hinted solve doesn't recover a module; a later clean solve does. Recovery shows as a **RECOVERED** chip on the result strip, a RECOVERED mark on the HUD when replaying, and a Recovered tile on the completion screen. MASTERED keeps its first-try meaning everywhere.
+
+**Game states**: **New** (nothing completed) · **In progress** (some completed) · **Complete** (all completed or recovered) · **Mastered** (all first-try mastered).
 
 **XP once per challenge.** A challenge pays the XP of its best result, once:
 
@@ -226,22 +229,23 @@ A training room that answers "I have played CODEBOUND. What should I practise ne
 
 **Next targets (top 5).** Every released module the player can open now is ranked by a fixed set of rules. There is no randomness, so the same progress always gives the same list:
 
-| #   | Reason tag        | Module                                             |
-| --- | ----------------- | -------------------------------------------------- |
-| 1   | MISSED BEFORE     | answered, still not solved                         |
-| 2   | NOT MASTERED      | a core module solved after a miss (or with a hint) |
-| 3   | ADVANCED PRACTICE | an advanced module solved but not mastered         |
-| 4   | BOSS PRACTICE     | a boss solved but not mastered                     |
-| 5   | NEW CHALLENGE     | unlocked, never played                             |
-| 6   | (never listed)    | mastered                                           |
+| #   | Reason tag        | Module                                            |
+| --- | ----------------- | ------------------------------------------------- |
+| 1   | MISSED BEFORE     | answered, still not solved                        |
+| 2   | NOT MASTERED      | a core module solved with a hint, not cleared yet |
+| 3   | ADVANCED PRACTICE | an advanced module solved, not cleared yet        |
+| 4   | BOSS PRACTICE     | a boss solved, not cleared yet                    |
+| 5   | NEW CHALLENGE     | unlocked, never played                            |
+| 6   | (never listed)    | recovered: cleared through practice               |
+| 7   | (never listed)    | mastered: cleared on the first try                |
 
 Ties take turns across games (each game's first, then each game's second…), so the list mixes areas. "Open now" mirrors the games: Core always, Advanced once that game's Core is complete, the Boss once it is ready, the Arcade's own modules once the Arcade unlocks. Locked or unreleased modules never appear. Each card shows rank, title, game and tier (_Arcade · Final Run_ for Shield Breach), the reason tag, its concepts and **Practice**.
 
-**Practice.** It opens the canonical module exactly as in its game (same round, HUD, labels and colours), under a slim _MASTERY LAB · reason_ strip. Answers are recorded through the game's own `answer()`. XP, mastery, hints and replays therefore follow the normal rules: +100 first try, +25 for a first miss, +75 for the first solve after a miss, then 0. There are no multipliers or bonuses. After the normal feedback, a compact result shows the saved state (Mastered / Completed, not mastered / Not solved yet), the XP this practice, what can still be earned, the next target, and **Next practice** / **Back to Lab**. Next practice opens the top recommendation other than the module just practised.
+**Practice.** It opens the canonical module exactly as in its game (same round, HUD, labels and colours), under a slim _MASTERY LAB · reason_ strip. Answers are recorded through the game's own `answer()`. XP, mastery, hints and replays therefore follow the normal rules: +100 first try, +25 for a first miss, +75 for the first solve after a miss, then 0. There are no multipliers or bonuses. After the normal feedback, a compact result shows the saved state (Mastered / Recovered / Completed, not cleared / Not solved yet), the XP this practice, what can still be earned, the next target, and **Next practice** / **Back to Lab**. Next practice opens the top recommendation other than the module just practised.
 
-**Concept status.** One row per Foundations concept: a segmented bar and count of mastered modules using it, plus a word (_Mastered_ / _Practice_ / _Not started_). Every row is a button that opens that concept's top three recommendations and a **Practice <concept>** button. It also says whether the lesson is done. No new lessons; it only connects concepts to existing modules.
+**Concept status.** One row per Foundations concept: a segmented bar and count of cleared modules using it (mastered segments brighter), plus a word (_Mastered_ / _Recovered_ when everything is cleared and some recovered / _Practice_ / _Not started_). The detail reads e.g. _5 / 7 mastered · 1 recovered · 1 to clear_. Every row is a button that opens that concept's top three recommendations and a **Practice <concept>** button. It also says whether the lesson is done. No new lessons; it only connects concepts to existing modules.
 
-**All current modules mastered.** When every released module is mastered, the targets give way to _ALL CURRENT MODULES MASTERED_ with **Replay Arcade**, **Review Foundations** and **Back to Home**. The wording leaves room for future content.
+**All current modules cleared.** When every released module is mastered or recovered, the targets give way to _ALL CURRENT MODULES CLEARED_ with the first-try mastered and recovered counts, **Replay Arcade**, **Review Foundations** and **Back to Home**. Only when every module is first-try mastered does it say _ALL CURRENT MODULES MASTERED_ instead. Home's Lab panel uses the same two phrases. The wording leaves room for future content.
 
 ## Python Foundations
 
