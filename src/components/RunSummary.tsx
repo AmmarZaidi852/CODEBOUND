@@ -53,6 +53,15 @@ function nextStep(
     }
   }
   if (next === 'boss') {
+    // Never offer a cleared boss as new (an Advanced replay, or a save
+    // whose boss was cleared before later Advanced modules were added).
+    if (boss === 'cleared' || boss === 'mastered') {
+      return {
+        text: `Boss already ${boss}: replay it any time.`,
+        action: 'boss',
+        label: 'Replay Boss',
+      }
+    }
     return boss === 'locked'
       ? {
           text: 'Boss locked: complete every Core and Advanced module first.',
