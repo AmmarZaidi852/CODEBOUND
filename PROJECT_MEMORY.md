@@ -1,8 +1,8 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 12 — Mastery Recovery & Adaptive Practice (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 13.
+- **Current phase:** Phase 13 — Advanced workshop modules (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 14.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -22,7 +22,7 @@ React 19 · TypeScript 6 · Vite 8 · `@fontsource/jersey-10` (self-hosted displ
 | 7   | Loops      | How many times does the loop body run?     | Data Sorter    |
 | 8   | Functions  | What does `add(2, 3)` return? (def/params) | Function Forge |
 
-Games (all playable), modules = CORE + 2 ADVANCED + 1 BOSS: Bug Hunt 10, Code Breaker 10, Data Sorter 12, Function Forge 13. Write modules per game (core + advanced + boss): 4 / 4 / 4 / 5.
+Games (all playable), modules = CORE + ADVANCED (4–5) + 1 BOSS: Bug Hunt 12, Code Breaker 12, Data Sorter 15, Function Forge 16. Write modules per game (core + advanced + boss): 5 / 4 / 4 / 6.
 
 Arcade Run (a mode, not a game): 8 mixed modules, unlocked once all four Core tiers are complete.
 
@@ -122,6 +122,13 @@ Mastery Lab (a practice surface, not a game): recommends existing modules from s
   - Tests (474 total): recovery rules (`progress.test.ts`), storage of old / odd saves, Lab ranking / persistence / concepts / all-cleared vs all-mastered / hinted solves (`lab.test.ts`), and `Recovery.test.tsx` (game replay recovery with +75 and chip, HUD mark, completion tiles, Lab miss → recover → gone → reload → shown in game, concept counts, all-cleared vs all-mastered UI, Arcade retry recovery shared with the Lab with run counts unchanged, reset). Existing record expectations now state `recovered` exactly; Phase 11 Lab tests that meant "solved but not cleared" now use a hinted fix. None removed or weakened.
   - Browser-verified in Chrome (fresh player): Bug Hunt played for real (two misses); Lab listed both as Missed before; Average Disaster opened from the Lab and solved by mouse without a hint: SYSTEM ONLINE · RECOVERED · +75 (250 → 325), record recovered; result "Recovered" + "cleared it through practice"; Back to Lab: gone from targets, Glitched Nameplate (still missed) first; reload kept the record and the queue; Home "1 module needs practice"; Operators concept "1 / 24 mastered · 1 recovered · 22 to clear"; Bug Hunt replay showed RECOVERED on the HUD and paid +0; seeded all-cleared → "All current modules cleared" (45 first-try, 2 recovered, concepts read Recovered) vs all-first-try → "All current modules mastered" (Recovered 0); Arcade: Delivery Gate missed then retried → RECOVERED +75, best run 8/8 · 7 first try · 89%; Bug Hunt completion showed MASTERED 6/10 and RECOVERED 1; Foundations lesson +25; reset via the confirmation cleared the key and the Lab panel; afterwards a first-try solve was mastered, not recovered. 375px frame: Lab queue, concept detail, practice feedback and result, HUD mark, five-tile completion: no overflow, no clipping, no buttons under 40px; desktop five-tile row fits. Keyboard focus visible. No console errors.
 
+- **Phase 13 — Advanced workshop modules:**
+  - **10 new ADVANCED modules** (`src/content/workshopChallenges.ts`), taught concepts only, built around tracing or repairing code: a variable updated across lines, boolean logic where two answers look plausible, list indexes that shift, returned values reused. Bug Hunt: Life Counter, Score Bonus (write). Code Breaker: Twin Gates, Cooling Relay. Data Sorter: Inventory Shuffle, Shifted Slot, Running Total. Function Forge: Double Trace, Bonus Chain, Power Limiter (write). Mix: 3 choose, 3 predict, 2 build, 2 write.
+  - **Placement:** appended after each game's existing ADVANCED modules, before the BOSS. Games now have 12 / 12 / 15 / 16 modules. CORE is untouched, so saved Core progress and unlocks (including the Arcade unlock) are unchanged; the boss now also needs the new advanced modules complete.
+  - **Rules unchanged:** XP, mastery, recovery, hints, replay, Lab ranking. No new saved fields (schema still `version: 1`).
+  - Tests (501 total): `content/workshopChallenges.test.ts` (metadata and placement, unique ids, concepts, interaction mix, every wrong option explained, answers proven by running the code in the simulator, write-module solutions / equivalent fixes / mistakes / typed answers). Existing tests that hard-coded module counts now use the new counts or read them from the module lists; no assertions weakened. Lint, format check and build pass; working tree clean after the feature commit.
+  - Not browser-verified (content only, rendered through the existing rounds; no UI changes).
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
 ## Not implemented (by design)
@@ -169,6 +176,7 @@ Real Python execution (write modules use the controlled subset simulator), free-
 ## Git
 
 - Branch: `main`
+- Phase 13 work starts after `23e069d` (end of Phase 12): content + tests `a9b5a66` (`feat: add 10 workshop modules to the Advanced tier of each game`), then docs.
 - Phase 12 work starts after `da77da7` (end of Phase 11): model `c0c38e6`, Lab + game UI `aa77e48`, tests `4ef20ee`, then docs.
 - Phase 11 work starts after `5894924` (end of Phase 10): engine `17dc581`, UI `ce33e0d`, tests `913c0fc`, then docs.
 - Phase 10 work starts after `946a00d` (end of Phase 9): refactor `576faea`, model `b8090b9`, content `fd20348`, interface `e709b10`, tests `0b097b1`, reset copy `045bd09`, then docs.
