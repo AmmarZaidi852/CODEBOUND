@@ -152,7 +152,7 @@ Every game mixes four kinds of play: **Choose** (pick a patch, condition or line
 
 **The code terminal** is CODEBOUND's own editor, not an IDE: the same dark terminal frame as code blocks, line numbers, light keyword / string / number colouring (meaning never depends on colour), a tone-coloured caret and focus ring, and Reset. Enter keeps the indent and adds one level after `:`; Backspace in leading spaces removes one level; Tab is not captured, so keyboard users can always leave. Text is 16px so phones don't zoom; long lines scroll inside the editor.
 
-**Checking.** Check is enabled once the code differs from the starter (and from the last checked version). The code runs in a small, controlled simulator of the Python subset the lessons teach (see `ARCHITECTURE.md`). **CODEBOUND never executes user code as real Python or as JavaScript.** Each module defines test cases (system values given, then expected output, final variables or function return values) and a few requirements (e.g. "use `append()`", "don't type the 24 yourself"). Equivalent solutions pass (`x * 2` or `2 * x`, `print("a", b)` or `"a " + str(b)`).
+**Checking.** Check is enabled once the code differs from the starter (and from the last checked version). The code runs in a small, controlled simulator of the Python subset the lessons teach (see `ARCHITECTURE.md`). **CODEBOUND never executes user code as real Python or as JavaScript.** Each module defines test cases (system values given, then expected output, final variables or function return values) and a few requirements (e.g. "use `append()`", "don't type the 24 yourself"). Equivalent solutions pass (`x * 2` or `2 * x`, `print("a", b)` or `"a " + str(b)`). A loop that never ends is stopped safely after the step limit and named: _`while heat >= 50` never became False. Does the loop change `heat`?_ Long output scrolls inside its box.
 
 **Feedback says what the checker found, not just "wrong":** "When power = 50, your code printed LOCKED. It should print OPEN." · "You changed index 2, which is the third item…" · "`double(4)` printed 8 but returned None. Use `return`…" · "Line 3 · TypeError: can only concatenate str…". The player's output (or resulting list, as cells) is shown. The solution is never shown unless the player presses **Show solution**; otherwise the next step is **Try again**.
 
@@ -171,17 +171,17 @@ Each game is played in three short sections, so a session stays small and the ne
 | Tier     | Modules             | What it asks                                                               |
 | -------- | ------------------- | -------------------------------------------------------------------------- |
 | CORE     | the game's own 7–10 | One idea at a time (the modules above, write modules included).            |
-| ADVANCED | 4–5                 | Two or more taught ideas combined; a mix of Choose, Build, Predict, Write. |
+| ADVANCED | 4–7                 | Two or more taught ideas combined; a mix of Choose, Build, Predict, Write. |
 | BOSS     | 1                   | One real program that brings 3+ ideas together. Always Write.              |
 
-| Game           | Advanced                                                                                                                | Boss                       |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Bug Hunt       | Member Discount (choose), Average Score (write), Life Counter (choose), Score Bonus (write)                             | Shop Checkout (three bugs) |
-| Code Breaker   | Override Switch (predict), Shift Scheduler (write), Twin Gates (predict), Cooling Relay (choose)                        | Vault Core                 |
-| Data Sorter    | Threshold Filter (build), Count Alerts (write), Inventory Shuffle (build), Shifted Slot (choose), Running Total (build) | Sensor Repair              |
-| Function Forge | Fee Calculator (predict), Score Total (write), Double Trace (predict), Bonus Chain (predict), Power Limiter (write)     | Shipping Rule              |
+| Game           | Advanced                                                                                                                                                             | Boss                       |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Bug Hunt       | Member Discount (choose), Average Score (write), Life Counter (choose), Score Bonus (write)                                                                          | Shop Checkout (three bugs) |
+| Code Breaker   | Override Switch (predict), Shift Scheduler (write), Twin Gates (predict), Cooling Relay (choose), Countdown Lock (predict), Retry Limit (choose), Stuck Loop (write) | Vault Core                 |
+| Data Sorter    | Threshold Filter (build), Count Alerts (write), Inventory Shuffle (build), Shifted Slot (choose), Running Total (build)                                              | Sensor Repair              |
+| Function Forge | Fee Calculator (predict), Score Total (write), Double Trace (predict), Bonus Chain (predict), Power Limiter (write)                                                  | Shipping Rule              |
 
-The first two Advanced modules of each game came with the tiers (Phase 9). The rest (Phase 13) ask the player to trace or repair code: a variable updated across lines, `or` versus `and`, `elif` boundaries, list indexes that shift after a `pop`, a total carried through a loop, returned values reused.
+The first two Advanced modules of each game came with the tiers (Phase 9). The rest (Phase 13) ask the player to trace or repair code: a variable updated across lines, `or` versus `and`, `elif` boundaries, list indexes that shift after a `pop`, a total carried through a loop, returned values reused. Code Breaker's last three (Phase 15) practise `while` loops: trace a countdown, pick the condition that allows exactly 3 tries, and repair a loop that never ends.
 
 Advanced and boss modules only use concepts the player has already been taught by that game's Foundations lessons and core modules.
 
@@ -191,10 +191,11 @@ Advanced and boss modules only use concepts the player has already been taught b
 - **Where it shows:** cartridges read `CORE 07/07 · ADVANCED 01/04 · BOSS LOCKED / READY / CLEARED / MASTERED`; missions carry a small ADVANCED / BOSS MODULE tag; the boss gets a heavier frame and a _SYSTEM CRITICAL · FINAL TEST_ strip. The Conditions, Lists, Loops and Functions lessons mention where the idea is combined later.
 - **When a boss is already cleared** (replaying the Advanced section of a finished game), the completion screen says _Boss already cleared_ / _mastered_ and offers **Replay Boss**, never "Boss module ready".
 - **Saves from before new Advanced modules were added** (Phase 13) keep everything they earned: XP, records, boss cleared / mastered and the Arcade unlock. The game reads _In progress_ again (`ADVANCED 02/04 · BOSS MASTERED`), Continue opens the first new module, and each new module pays the normal XP. The Mastery Lab lists them as _New challenge_, so Home's Lab panel reads _Practise your next targets_ until they are cleared. The boss is not locked again.
+- **Saves from before While loops** (Phase 15) work the same way for Code Breaker's three `while` modules, with one visible difference: a Code Breaker boss that was _ready_ but never played reads _Locked_ again until the three new modules are complete (the normal boss rule). A cleared or mastered boss stays cleared or mastered. Core completion and the Arcade unlock do not change.
 
 ## Arcade Run
 
-A replayable **mode**, not a fifth game: one short run that mixes ideas from all four games, so the player has to recognise what each problem needs outside the game where they learned it. It teaches no new Python and has no XP or progression of its own.
+A replayable **mode**, not a fifth game: one short run that mixes ideas from all four games, so the player has to recognise what each problem needs outside the game where they learned it. It teaches no new Python and has no XP or progression of its own. It covers the first eight Foundations concepts; While loops (added later) is practised in Code Breaker only.
 
 **Unlock.** Once every CORE module of all four games is complete (missed-then-solved counts; mastery is not needed, nor any Advanced or Boss module). Before that the cartridge reads _Arcade locked_ with "Complete the Core modules in all four games." and `CORE n/4 GAMES`. The unlock is derived from saved progress, so it survives reloads.
 
@@ -253,21 +254,21 @@ Ties take turns across games (each game's first, then each game's second…), so
 
 ## Python Foundations
 
-Eight short lessons in order: Variables → Data types → Operators → Conditions → Lists → Indexing → Loops → Functions. Each is one screen: a one-sentence idea, a tiny example, one quick micro-challenge, and feedback. Then the player either practises in the linked game or moves to the next concept.
+Nine short lessons in order: Variables → Data types → Operators → Conditions → Lists → Indexing → Loops → Functions → While loops. Each is one screen: a one-sentence idea, a tiny example, one quick micro-challenge, and feedback. Then the player either practises in the linked game or moves to the next concept.
 
 | Concepts                                         | Practised in   |
 | ------------------------------------------------ | -------------- |
 | Variables, Data types                            | Bug Hunt       |
-| Operators, Conditions                            | Code Breaker   |
+| Operators, Conditions, While loops               | Code Breaker   |
 | Lists, Indexing, Loops                           | Data Sorter    |
 | Functions (`def`, parameters, `return`, calling) | Function Forge |
 
-Variables starts open. Answering a concept's micro-challenge completes it and unlocks the next. Completed concepts stay open for review. Each lesson's Try it notes that its linked game has **Write** modules where you type the code yourself.
+Variables starts open. Answering a concept's micro-challenge completes it and unlocks the next. While loops comes last (it builds on Conditions, Loops and updating a variable), so a player who finished the original eight sees _8/9_ and _CONTINUE LEARNING_, with While loops current; no earlier unlock changes. Completed concepts stay open for review. Each lesson's Try it notes that its linked game has **Write** modules where you type the code yourself.
 
 ## Games
 
 - **Bug Hunt** (playable, 12 modules: 7 core + 4 advanced + 1 boss): find the broken line in a short script and choose the patch that fixes it (variables, arithmetic, strings, booleans, if/else), plus 2 write modules where the player fixes the code by typing.
-- **Code Breaker** (playable, 12 modules: 5 locks + 2 write modules + 4 advanced + 1 boss; in the write modules the player repairs or writes the condition and it is tested against several system states): break security locks with logic instead of fixing bugs. Each lock shows a rule and the system's current values. The player picks the condition or operator that enforces the rule (it fills a slot in the lock's code), or predicts what the code prints. Lessons cover `if`, comparison operators, `if / elif / else`, `and` / `or` / `not`, and combined conditions. The HUD's security status shows Locked → Unlocked / Still locked.
+- **Code Breaker** (playable, 15 modules: 5 locks + 2 write modules + 7 advanced + 1 boss; in the write modules the player repairs or writes the condition and it is tested against several system states): break security locks with logic instead of fixing bugs. Each lock shows a rule and the system's current values. The player picks the condition or operator that enforces the rule (it fills a slot in the lock's code), or predicts what the code prints. Lessons cover `if`, comparison operators, `if / elif / else`, `and` / `or` / `not`, combined conditions, and (in Advanced) `while` loops. The HUD's security status shows Locked → Unlocked / Still locked.
 - **Function Forge** (playable, 16 modules: 10 core + 5 advanced + 1 boss): configure function "modules" (define → call → one parameter → `return` → write a `return` → two parameters → write a two-parameter function → trace → build → write a call). The player assembles code from tokens, taps arguments into a call's parameter slots, or picks a line / predicts a return value. The code updates live, and an INPUT → `function()` → OUTPUT pipeline shows the call; after running, a wrong call shows what it really returned (e.g. `-7` or a `NameError`). Forge status goes Ready → Online / Fault.
 - **Data Sorter** (playable, 15 modules: 7 terminals + 2 write modules + 5 advanced + 1 boss; in the write modules the player types the list operation and sees the resulting list as cells): organise data by working with the list itself instead of picking from text answers. The player taps a cell ("what is at index 2?", "what does `pop(2)` remove?") or builds the resulting list from value tiles (assignment, `append()`, combined operations, `for`-loop output with `len()`). Lists are drawn as cells with zero-based index labels. Feedback shows the resulting list, what happened step by step, and the rule to remember.
 
