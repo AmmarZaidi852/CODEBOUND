@@ -48,7 +48,7 @@ describe('App', () => {
         name: dataSorterChallenges[0].name,
       }),
     ).toBeInTheDocument()
-    expectStep('Data Sorter', 1, 12)
+    expectStep('Data Sorter', 1, 15)
   })
 
   it('opens Code Breaker from game selection', () => {
@@ -62,7 +62,7 @@ describe('App', () => {
         name: codeBreakerChallenges[0].system,
       }),
     ).toBeInTheDocument()
-    expectStep('Code Breaker', 1, 10)
+    expectStep('Code Breaker', 1, 12)
   })
 
   it('returns home from game selection', () => {
@@ -128,7 +128,7 @@ describe('App', () => {
     // Re-entering Bug Hunt continues at the first unfinished module and
     // keeps the XP total.
     fireEvent.click(screen.getByRole('button', { name: 'Continue Bug Hunt' }))
-    expectStep('Bug Hunt', 2, 10)
+    expectStep('Bug Hunt', 2, 12)
     expect(screen.getByText('125 XP')).toBeInTheDocument()
   })
 

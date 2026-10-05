@@ -22,11 +22,12 @@ describe('game module lists', () => {
     }
     const writes = (list: object[]) =>
       list.filter((m) => (m as CodeChallenge).kind === 'code').length
-    // CORE write modules (Phase 8) plus ADVANCED / BOSS ones (Phase 9).
-    expect(writes(bugHuntModules)).toBe(4)
+    // CORE write modules (Phase 8), ADVANCED / BOSS ones (Phase 9), and
+    // Score Bonus and Power Limiter (Phase 13).
+    expect(writes(bugHuntModules)).toBe(5)
     expect(writes(codeBreakerModules)).toBe(4)
     expect(writes(dataSorterModules)).toBe(4)
-    expect(writes(functionForgeModules)).toBe(5)
+    expect(writes(functionForgeModules)).toBe(6)
   })
 
   it('keeps every existing challenge, in its original order', async () => {
@@ -56,6 +57,6 @@ describe('game module lists', () => {
     expect(gameChallengeIds['bug-hunt']).toEqual(
       bugHuntModules.map((m) => m.id),
     )
-    expect(gameChallengeIds['function-forge']).toHaveLength(13)
+    expect(gameChallengeIds['function-forge']).toHaveLength(16)
   })
 })

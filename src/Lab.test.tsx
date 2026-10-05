@@ -124,7 +124,7 @@ describe('Mastery Lab practice uses the canonical challenge', () => {
   it('opens the module exactly as in its game', () => {
     openLab(started())
     click('Practice Average Disaster')
-    expectStep('Bug Hunt', 2, 10)
+    expectStep('Bug Hunt', 2, 12)
     expect(
       screen.getByRole('heading', { level: 1, name: 'Average Disaster' }),
     ).toBeInTheDocument()
@@ -156,7 +156,7 @@ describe('Mastery Lab practice uses the canonical challenge', () => {
     const card = screen
       .getByRole('heading', { name: 'Bug Hunt' })
       .closest('li')!
-    expect(within(card).getByText('Modules 02 / 10')).toBeInTheDocument()
+    expect(within(card).getByText('Modules 02 / 12')).toBeInTheDocument()
   })
 
   it('a wrong answer follows the normal rules and says what is left', () => {

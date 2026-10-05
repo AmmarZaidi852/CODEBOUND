@@ -118,7 +118,7 @@ describe('Recovery in the games', () => {
     click('Continue Bug Hunt')
     answerBugHunt(bugHuntModules[core.length - 1], true)
     nextModule(true)
-    expectStat('Mastered', '5/10')
+    expectStat('Mastered', '5/12')
     expectStat('Recovered', '2')
   })
 })
@@ -173,7 +173,7 @@ describe('Recovery in the Mastery Lab', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Indexing/ }))
     const detail = within(document.getElementById('lab-concept-detail')!)
     expect(
-      detail.getByText(/1 \/ 5 mastered · 1 recovered · 3 to clear/),
+      detail.getByText(/1 \/ 7 mastered · 1 recovered · 5 to clear/),
     ).toBeInTheDocument()
   })
 

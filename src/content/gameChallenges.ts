@@ -33,13 +33,25 @@ import {
   vaultCore,
 } from './depthChallenges.ts'
 import { dataSorterChallenges as ds } from './dataSorterChallenges.ts'
+import {
+  bonusChain,
+  coolingRelay,
+  doubleTrace,
+  inventoryShuffle,
+  lifeCounter,
+  powerLimiter,
+  runningTotal,
+  scoreBonus,
+  shiftedSlot,
+  twinGates,
+} from './workshopChallenges.ts'
 import { functionForgeChallenges as ff } from './functionForgeChallenges.ts'
 import type { GameId } from './games.ts'
 
 /*
  * Each game's modules in play order: CORE (its own challenges, with
  * "write" modules right after the challenge that introduces the idea),
- * then ADVANCED (two ideas combined), then one BOSS (everything at once).
+ * then ADVANCED (two or more ideas combined), then one BOSS (everything at once).
  */
 
 const byId = <T extends { id: string }>(list: T[], id: string) =>
@@ -55,6 +67,8 @@ export const bugHuntModules: (BugHuntChallenge | CodeChallenge)[] = [
   byId(bh, 'if-else'),
   memberDiscount,
   averageScore,
+  lifeCounter,
+  scoreBonus,
   shopCheckout,
 ]
 
@@ -68,6 +82,8 @@ export const codeBreakerModules: (CodeBreakerChallenge | CodeChallenge)[] = [
   byId(cb, 'combined'),
   overrideSwitch,
   shiftScheduler,
+  twinGates,
+  coolingRelay,
   vaultCore,
 ]
 
@@ -83,6 +99,9 @@ export const dataSorterModules: (DataSorterChallenge | CodeChallenge)[] = [
   byId(ds, 'for-loop'),
   thresholdFilter,
   countAlerts,
+  inventoryShuffle,
+  shiftedSlot,
+  runningTotal,
   sensorRepair,
 ]
 
@@ -100,6 +119,9 @@ export const functionForgeModules: (FunctionForgeChallenge | CodeChallenge)[] =
     useIt,
     feeCalculator,
     scoreTotal,
+    doubleTrace,
+    bonusChain,
+    powerLimiter,
     shippingRule,
   ]
 

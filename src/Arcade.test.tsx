@@ -237,7 +237,7 @@ describe('Arcade challenge integration', () => {
     const forge = screen
       .getByRole('heading', { name: 'Function Forge' })
       .closest('li')!
-    expect(within(forge).getByText('Advanced 01/02')).toBeInTheDocument()
+    expect(within(forge).getByText('Advanced 01/05')).toBeInTheDocument()
     // Arcade-only challenges have their own records.
     expect(saved(1)).toEqual({
       solved: true,

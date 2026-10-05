@@ -61,11 +61,21 @@ const all = (indexes: number[], r: Result = 'right') =>
   Object.fromEntries(indexes.map((i) => [i, r]))
 
 describe('difficulty metadata', () => {
-  it.each(games)('%s: CORE, then ADVANCED, then one BOSS', (_, modules) => {
+  // Phase 9 added two ADVANCED modules per game; Phase 13 added 2 / 2 / 3 / 3.
+  const advancedCount: Record<GameId, number> = {
+    'bug-hunt': 4,
+    'code-breaker': 4,
+    'data-sorter': 5,
+    'function-forge': 5,
+  }
+
+  it.each(games)('%s: CORE, then ADVANCED, then one BOSS', (game, modules) => {
     const order = modules.map(tierOf)
     const rank: Record<Tier, number> = { core: 0, advanced: 1, boss: 2 }
     expect(order).toEqual([...order].sort((a, b) => rank[a] - rank[b]))
-    expect(order.filter((t) => t === 'advanced')).toHaveLength(2)
+    expect(order.filter((t) => t === 'advanced')).toHaveLength(
+      advancedCount[game],
+    )
     expect(order.filter((t) => t === 'boss')).toHaveLength(1)
     expect(order.at(-1)).toBe('boss')
   })
@@ -123,7 +133,7 @@ describe('tier progress rules', () => {
     expect(tierCounts(states(p), tiers, 'core')).toEqual({ done: 7, total: 7 })
     expect(tierCounts(states(p), tiers, 'advanced')).toEqual({
       done: 1,
-      total: 2,
+      total: 4,
     })
     expect(sectionOf(tiers, 0)).toEqual({
       tier: 'core',
@@ -133,7 +143,7 @@ describe('tier progress rules', () => {
     expect(sectionOf(tiers, ADVANCED[1])).toEqual({
       tier: 'advanced',
       start: ADVANCED[0],
-      end: ADVANCED[1],
+      end: ADVANCED.at(-1),
     })
   })
 
@@ -214,12 +224,12 @@ describe('playing through the tiers', () => {
       savedBugHunt({ 0: 'right', 1: 'wrong', 2: 'right' }),
       'Continue Bug Hunt',
     )
-    expectStep('Bug Hunt', 2, 10)
+    expectStep('Bug Hunt', 2, 12)
   })
 
   it('Continue opens Advanced once core is complete', () => {
     openBugHunt(savedBugHunt(all(CORE)), 'Continue Bug Hunt')
-    expectStep('Bug Hunt', ADVANCED[0] + 1, 10)
+    expectStep('Bug Hunt', ADVANCED[0] + 1, 12)
   })
 
   it('Continue opens the boss once it is ready, framed as a boss module', () => {
@@ -227,7 +237,7 @@ describe('playing through the tiers', () => {
       savedBugHunt({ ...all(CORE), ...all(ADVANCED) }),
       'Continue Bug Hunt',
     )
-    expectStep('Bug Hunt', BOSS + 1, 10)
+    expectStep('Bug Hunt', BOSS + 1, 12)
     expect(
       screen.getByText('Boss module', { selector: '.tier-tag' }),
     ).toBeInTheDocument()
@@ -238,12 +248,14 @@ describe('playing through the tiers', () => {
     openBugHunt(savedBugHunt(all(CORE)), 'Continue Bug Hunt')
     answerBugHunt(bugHuntModules[ADVANCED[0]], false)
     nextModule(false)
-    answerBugHunt(bugHuntModules[ADVANCED[1]], true)
-    nextModule(true)
+    ADVANCED.slice(1).forEach((i) => {
+      answerBugHunt(bugHuntModules[i], true)
+      nextModule(i === ADVANCED.at(-1))
+    })
     expect(screen.getByText('1 module left to complete.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Play Boss' })).toBeNull()
     click('Retry unfinished')
-    expectStep('Bug Hunt', ADVANCED[0] + 1, 10)
+    expectStep('Bug Hunt', ADVANCED[0] + 1, 12)
   })
 
   it('clearing the boss completes the game; replay starts again at module 01', () => {
@@ -255,7 +267,7 @@ describe('playing through the tiers', () => {
     expect(
       screen.getByText('Mastered', { selector: '.feedback__mastered' }),
     ).toBeInTheDocument()
-    expectTotalXp(1000)
+    expectTotalXp(bugHuntModules.length * 100)
     nextModule(true)
     expect(screen.getByText('Bug Hunt · Game mastered')).toBeInTheDocument()
     click('Back to games')
@@ -264,7 +276,7 @@ describe('playing through the tiers', () => {
       .closest('li')!
     expect(within(card).getByText('Boss Mastered')).toBeInTheDocument()
     click('Replay Bug Hunt')
-    expectStep('Bug Hunt', 1, 10)
+    expectStep('Bug Hunt', 1, 12)
   })
 
   it('stamps a boss cleared after a miss, and keeps it after a reload', () => {
@@ -305,7 +317,7 @@ describe('playing through the tiers', () => {
       .getByRole('heading', { name: 'Bug Hunt' })
       .closest('li')!
     expect(within(card).getByText('Core 07/07')).toBeInTheDocument()
-    expect(within(card).getByText('Advanced 02/02')).toBeInTheDocument()
+    expect(within(card).getByText('Advanced 04/04')).toBeInTheDocument()
     expect(within(card).getByText('Boss Ready')).toBeInTheDocument()
   })
 })
