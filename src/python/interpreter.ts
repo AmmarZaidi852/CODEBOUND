@@ -26,6 +26,24 @@ const MAX_DEPTH = 50
 
 const BUILTINS = ['print', 'len', 'range', 'str', 'int']
 
+/** Timeouts already blamed on a specific `while` loop. */
+const explained = new WeakSet<PyError>()
+
+/** The step limit hit inside a `while`: name its condition and variables. */
+function endlessLoop(stmt: Extract<Stmt, { k: 'while' }>): PyError {
+  const names = stmt.names.map((n) => `\`${n}\``)
+  const hint = names.length
+    ? ` Does the loop change ${names.join(' or ')}?`
+    : ' Nothing inside the loop can change it.'
+  const error = new PyError(
+    'Timeout',
+    `\`while ${stmt.source}\` never became False.${hint}`,
+    stmt.line,
+  )
+  explained.add(error)
+  return error
+}
+
 export const int = (v: number): Value => ({ t: 'int', v })
 export const str = (v: string): Value => ({ t: 'str', v })
 export const list = (items: Value[]): Value => ({ t: 'list', items })
@@ -213,6 +231,24 @@ class Interpreter {
         }
         return
       }
+      case 'while':
+        try {
+          while (truthy(this.eval(stmt.test, scope))) {
+            this.tick(stmt.line)
+            this.run(stmt.body, scope)
+          }
+        } catch (e) {
+          // The innermost endless loop names its own condition.
+          if (
+            e instanceof PyError &&
+            e.kind === 'Timeout' &&
+            !explained.has(e)
+          ) {
+            throw endlessLoop(stmt)
+          }
+          throw e
+        }
+        return
       case 'def':
         scope.set(stmt.name, {
           t: 'func',

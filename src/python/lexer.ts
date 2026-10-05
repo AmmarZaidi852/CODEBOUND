@@ -29,6 +29,7 @@ export const KEYWORDS = new Set([
   'elif',
   'else',
   'for',
+  'while',
   'in',
   'def',
   'return',
@@ -43,7 +44,6 @@ export const KEYWORDS = new Set([
 
 /** Real Python keywords this terminal does not run. */
 export const UNSUPPORTED = new Set([
-  'while',
   'import',
   'from',
   'class',

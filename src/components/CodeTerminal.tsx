@@ -27,7 +27,7 @@ const INDENT = '    '
 // Display-only colouring. Words and numbers keep their meaning in plain
 // text too; colour is never the only signal.
 const TOKEN =
-  /(#.*$)|("[^"]*"?|'[^']*'?)|(\b\d+(?:\.\d+)?\b)|(\b(?:if|elif|else|for|in|def|return|and|or|not|True|False|None|pass)\b)|(\b(?:print|len|range|str|int|append|pop)\b)/g
+  /(#.*$)|("[^"]*"?|'[^']*'?)|(\b\d+(?:\.\d+)?\b)|(\b(?:if|elif|else|for|while|in|def|return|and|or|not|True|False|None|pass)\b)|(\b(?:print|len|range|str|int|append|pop)\b)/g
 const CLASSES = ['', 'comment', 'string', 'number', 'keyword', 'builtin']
 
 function highlight(line: string): ReactNode[] {

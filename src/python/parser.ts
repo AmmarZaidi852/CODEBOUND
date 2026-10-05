@@ -34,6 +34,15 @@ export type Stmt =
       line: number
     }
   | { k: 'for'; name: string; iter: Expr; body: Stmt[]; line: number }
+  | {
+      k: 'while'
+      test: Expr
+      body: Stmt[]
+      /** The condition as typed, and the variables it reads (for feedback). */
+      source: string
+      names: string[]
+      line: number
+    }
   | { k: 'def'; name: string; params: string[]; body: Stmt[]; line: number }
   | { k: 'return'; value: Expr | null; line: number }
   | { k: 'pass'; line: number }
@@ -50,7 +59,7 @@ export function parse(source: string): Stmt[] {
       line,
     )
   }
-  return new Parser(tokenize(source)).program()
+  return new Parser(tokenize(source), source.split('\n')).program()
 }
 
 /** Parses one expression, e.g. a test-case value like `[1, 2]` or `"Alex"`. */
@@ -64,9 +73,11 @@ export function parseExpression(source: string): Expr {
 class Parser {
   private pos = 0
   private readonly tokens: Token[]
+  private readonly lines: string[]
 
-  constructor(tokens: Token[]) {
+  constructor(tokens: Token[], lines: string[] = []) {
     this.tokens = tokens
+    this.lines = lines
   }
 
   private get tok(): Token {
@@ -128,6 +139,7 @@ class Parser {
     }
     if (this.isWord('if')) return this.ifStatement()
     if (this.isWord('for')) return this.forStatement()
+    if (this.isWord('while')) return this.whileStatement()
     if (this.isWord('def')) return this.defStatement()
     if (this.isWord('elif') || this.isWord('else')) {
       this.fail(
@@ -249,6 +261,27 @@ class Parser {
     this.take()
     const iter = this.expression()
     return { k: 'for', name, iter, body: this.block(), line }
+  }
+
+  private whileStatement(): Stmt {
+    const line = this.take().line
+    const test = this.condition()
+    const body = this.block()
+    if (this.isWord('else')) {
+      throw new PyError(
+        'Unsupported',
+        '`while ... else` is not part of this terminal yet. Use what the lessons cover.',
+        this.tok.line,
+      )
+    }
+    return {
+      k: 'while',
+      test,
+      body,
+      source: conditionText(this.lines[line - 1] ?? ''),
+      names: [...new Set(readNames(test))],
+      line,
+    }
   }
 
   private defStatement(): Stmt {
@@ -426,5 +459,40 @@ class Parser {
     }
     if (t.type === 'indent') this.fail('This line is indented too far.')
     this.fail(`Python did not expect ${t.value || 'this'} here.`)
+  }
+}
+
+/** `while energy > 0:` → `energy > 0` (the condition as the player typed it). */
+function conditionText(line: string): string {
+  const rest = line.trim().replace(/^while\s+/, '')
+  return (rest.endsWith(':') ? rest.slice(0, -1) : rest.split(':')[0]).trim()
+}
+
+/** Variable names an expression reads (not the functions it calls). */
+function readNames(expr: Expr): string[] {
+  switch (expr.k) {
+    case 'name':
+      return [expr.id]
+    case 'list':
+      return expr.items.flatMap(readNames)
+    case 'bin':
+    case 'bool':
+      return [...readNames(expr.left), ...readNames(expr.right)]
+    case 'cmp':
+      return expr.operands.flatMap(readNames)
+    case 'not':
+    case 'neg':
+      return readNames(expr.operand)
+    case 'call':
+      return [
+        ...(expr.func.k === 'name' ? [] : readNames(expr.func)),
+        ...expr.args.flatMap(readNames),
+      ]
+    case 'index':
+      return [...readNames(expr.target), ...readNames(expr.index)]
+    case 'attr':
+      return readNames(expr.target)
+    default:
+      return []
   }
 }

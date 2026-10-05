@@ -160,7 +160,7 @@ describe('write modules', () => {
         challenge.starter.join('\n'),
         '',
         'def (',
-        'while True:\n    pass',
+        'try:\n    pass',
         'import os',
       ]) {
         const verdict = checkCode(challenge, source)

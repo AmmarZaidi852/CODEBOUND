@@ -189,7 +189,7 @@ describe('Python subset simulator', () => {
   it('refuses code outside the subset instead of running it', () => {
     for (const code of [
       'import os',
-      'while True:\n    pass',
+      'try:\n    pass',
       'class A:\n    pass',
       'f = lambda x: x',
       'print(f"{x}")',
@@ -230,5 +230,170 @@ describe('Python subset simulator', () => {
 
   it('ignores comments, including # inside text', () => {
     expect(out('# setup\nx = "#1"  # label\nprint(x)')).toEqual(['#1'])
+  })
+})
+
+describe('while loops', () => {
+  it('runs 0, 1 and N times, checking the condition before every pass', () => {
+    const count = (start: number) =>
+      out(
+        lines(
+          `n = ${start}`,
+          'while n > 0:',
+          '    print(n)',
+          '    n = n - 1',
+          'print("done")',
+        ),
+      )
+    expect(count(0)).toEqual(['done'])
+    expect(count(1)).toEqual(['1', 'done'])
+    expect(count(4)).toEqual(['4', '3', '2', '1', 'done'])
+  })
+
+  it('stops as soon as the body changes the condition', () => {
+    const code = lines(
+      'locked = True',
+      'tries = 0',
+      'while locked:',
+      '    tries = tries + 1',
+      '    if tries == 3:',
+      '        locked = False',
+      'print(tries, locked)',
+    )
+    expect(out(code)).toEqual(['3 False'])
+  })
+
+  it('updates with += and -=', () => {
+    const code = lines(
+      'total = 0',
+      'n = 5',
+      'while n > 0:',
+      '    total += n',
+      '    n -= 2',
+      'print(total, n)',
+    )
+    expect(out(code)).toEqual(['9 -1'])
+  })
+
+  it('works inside if, inside a function, and with a for loop inside', () => {
+    const insideIf = lines(
+      'power = 3',
+      'if power > 0:',
+      '    while power > 0:',
+      '        power -= 1',
+      'else:',
+      '    print("never")',
+      'print(power)',
+    )
+    expect(out(insideIf)).toEqual(['0'])
+
+    const inFunction = lines(
+      'def countdown(n):',
+      '    steps = 0',
+      '    while n > 0:',
+      '        n -= 1',
+      '        steps += 1',
+      '    return steps',
+      'print(countdown(4), countdown(0))',
+    )
+    expect(out(inFunction)).toEqual(['4 0'])
+
+    const forInside = lines(
+      'rounds = 2',
+      'while rounds > 0:',
+      '    for x in [1, 2]:',
+      '        print(rounds * x)',
+      '    rounds -= 1',
+    )
+    expect(out(forInside)).toEqual(['2', '4', '1', '2'])
+  })
+
+  it('reads lists in its condition', () => {
+    const code = lines(
+      'queue = [4, 8, 15]',
+      'while len(queue) > 1:',
+      '    queue.pop(0)',
+      'print(queue)',
+    )
+    expect(out(code)).toEqual(['[15]'])
+  })
+
+  it('stops an endless loop safely and names its condition', () => {
+    const code = lines(
+      'energy = 5',
+      'while energy > 0:',
+      '    print("charging")',
+    )
+    const result = out(code)
+    expect(result.at(-1)).toBe(
+      'Timeout: `while energy > 0` never became False. Does the loop change `energy`?',
+    )
+    expect(runProgram(code).error?.line).toBe(2)
+    // Output before the limit is kept, and the limit is the existing one.
+    expect(result.length).toBeGreaterThan(1)
+    expect(out('while True:\n    pass')).toEqual([
+      'Timeout: `while True` never became False. Nothing inside the loop can change it.',
+    ])
+    expect(
+      out('a = 1\nb = 2\nwhile a < b and len([a]) > 0:\n    pass').at(-1),
+    ).toBe(
+      'Timeout: `while a < b and len([a]) > 0` never became False. Does the loop change `a` or `b`?',
+    )
+  })
+
+  it('blames the innermost endless loop', () => {
+    const code = lines(
+      'x = 1',
+      'y = 1',
+      'while x > 0:',
+      '    while y > 0:',
+      '        pass',
+      '    x -= 1',
+    )
+    expect(out(code).at(-1)).toBe(
+      'Timeout: `while y > 0` never became False. Does the loop change `y`?',
+    )
+  })
+
+  it('an endless loop inside a function stops the call too', () => {
+    const result = runProgram('def spin(n):\n    while n > 0:\n        pass')
+    expect(result.error).toBeNull()
+    expect(result.call('spin', [int(1)]).error?.message).toBe(
+      '`while n > 0` never became False. Does the loop change `n`?',
+    )
+  })
+
+  it('keeps break, continue and while ... else unsupported', () => {
+    expect(out('n = 1\nwhile n > 0:\n    break').at(-1)).toBe(
+      'Unsupported: `break` is not part of this terminal yet. Use what the lessons cover.',
+    )
+    expect(out('n = 1\nwhile n > 0:\n    continue').at(-1)).toBe(
+      'Unsupported: `continue` is not part of this terminal yet. Use what the lessons cover.',
+    )
+    expect(
+      out('n = 0\nwhile n > 0:\n    n -= 1\nelse:\n    print("done")').at(-1),
+    ).toBe(
+      'Unsupported: `while ... else` is not part of this terminal yet. Use what the lessons cover.',
+    )
+    // Nothing ran: unsupported code is refused before it starts.
+    expect(
+      out('print("a")\nn = 0\nwhile n > 0:\n    n -= 1\nelse:\n    pass'),
+    ).toHaveLength(1)
+  })
+
+  it('explains common while syntax mistakes', () => {
+    expect(out('n = 1\nwhile n > 0\n    n -= 1').at(-1)).toMatch(
+      /^SyntaxError: This line needs a : at the end\./,
+    )
+    expect(out('n = 1\nwhile n = 0:\n    n -= 1').at(-1)).toMatch(
+      /^SyntaxError: Use == to compare/,
+    )
+    expect(out('n = 1\nwhile n > 0:\nn -= 1').at(-1)).toMatch(
+      /^SyntaxError: The lines inside this block need to be indented\./,
+    )
+  })
+
+  it('cannot be used as a variable name', () => {
+    expect(out('while = 3').at(-1)).toMatch(/^SyntaxError/)
   })
 })
