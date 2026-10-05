@@ -121,6 +121,12 @@
   color: var(--color-text-strong);
 }
 
+/* A loop that never ends prints thousands of lines: scroll, don't grow. */
+.code-round__output {
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
 .code-round__error {
   border-left: 3px solid var(--color-danger);
   color: var(--color-danger);
