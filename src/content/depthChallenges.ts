@@ -7,7 +7,8 @@ import type { FunctionForgeChallenge } from '../challenges/functionForge.ts'
 /*
  * ADVANCED and BOSS modules. Each one combines concepts the player has
  * already met in Foundations and the game's CORE modules; none introduces
- * new Python. ADVANCED combines two ideas, a BOSS several in one program.
+ * new Python. ADVANCED combines two or more ideas, a BOSS several in one
+ * program. More ADVANCED modules live in workshopChallenges.ts.
  */
 
 // ── Bug Hunt ─────────────────────────────────────────────────────────────

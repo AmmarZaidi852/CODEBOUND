@@ -168,25 +168,29 @@ Every game mixes four kinds of play: **Choose** (pick a patch, condition or line
 
 Each game is played in three short sections, so a session stays small and the next step is always clear:
 
-| Tier     | Modules             | What it asks                                                       |
-| -------- | ------------------- | ------------------------------------------------------------------ |
-| CORE     | the game's own 7–10 | One idea at a time (the modules above, write modules included).    |
-| ADVANCED | 2                   | Two taught ideas combined; a mix of Choose, Build, Predict, Write. |
-| BOSS     | 1                   | One real program that brings 3+ ideas together. Always Write.      |
+| Tier     | Modules             | What it asks                                                               |
+| -------- | ------------------- | -------------------------------------------------------------------------- |
+| CORE     | the game's own 7–10 | One idea at a time (the modules above, write modules included).            |
+| ADVANCED | 4–5                 | Two or more taught ideas combined; a mix of Choose, Build, Predict, Write. |
+| BOSS     | 1                   | One real program that brings 3+ ideas together. Always Write.              |
 
-| Game           | Advanced                                           | Boss                       |
-| -------------- | -------------------------------------------------- | -------------------------- |
-| Bug Hunt       | Member Discount (choose), Average Score (write)    | Shop Checkout (three bugs) |
-| Code Breaker   | Override Switch (predict), Shift Scheduler (write) | Vault Core                 |
-| Data Sorter    | Threshold Filter (build), Count Alerts (write)     | Sensor Repair              |
-| Function Forge | Fee Calculator (predict), Score Total (write)      | Shipping Rule              |
+| Game           | Advanced                                                                                                                | Boss                       |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Bug Hunt       | Member Discount (choose), Average Score (write), Life Counter (choose), Score Bonus (write)                             | Shop Checkout (three bugs) |
+| Code Breaker   | Override Switch (predict), Shift Scheduler (write), Twin Gates (predict), Cooling Relay (choose)                        | Vault Core                 |
+| Data Sorter    | Threshold Filter (build), Count Alerts (write), Inventory Shuffle (build), Shifted Slot (choose), Running Total (build) | Sensor Repair              |
+| Function Forge | Fee Calculator (predict), Score Total (write), Double Trace (predict), Bonus Chain (predict), Power Limiter (write)     | Shipping Rule              |
+
+The first two Advanced modules of each game came with the tiers (Phase 9). The rest (Phase 13) ask the player to trace or repair code: a variable updated across lines, `or` versus `and`, `elif` boundaries, list indexes that shift after a `pop`, a total carried through a loop, returned values reused.
 
 Advanced and boss modules only use concepts the player has already been taught by that game's Foundations lessons and core modules.
 
 - **A run plays one section.** Its completion screen stamps _Core complete_, _Advanced complete_, _Boss cleared_ or _Boss mastered_ and suggests the next step: Retry unfinished, Play Advanced, Play Boss, or Replay.
 - **The boss unlocks** once every CORE and ADVANCED module is complete (a missed module still has to be solved). Continue walks CORE → ADVANCED → BOSS.
 - **Same rules everywhere:** XP, mastery, hints and replay work exactly as for any module. A first-try boss is _mastered_; a missed or hinted one is _cleared_.
-- **Where it shows:** cartridges read `CORE 07/07 · ADVANCED 01/02 · BOSS LOCKED / READY / CLEARED / MASTERED`; missions carry a small ADVANCED / BOSS MODULE tag; the boss gets a heavier frame and a _SYSTEM CRITICAL · FINAL TEST_ strip. The Conditions, Lists, Loops and Functions lessons mention where the idea is combined later.
+- **Where it shows:** cartridges read `CORE 07/07 · ADVANCED 01/04 · BOSS LOCKED / READY / CLEARED / MASTERED`; missions carry a small ADVANCED / BOSS MODULE tag; the boss gets a heavier frame and a _SYSTEM CRITICAL · FINAL TEST_ strip. The Conditions, Lists, Loops and Functions lessons mention where the idea is combined later.
+- **When a boss is already cleared** (replaying the Advanced section of a finished game), the completion screen says _Boss already cleared_ / _mastered_ and offers **Replay Boss**, never "Boss module ready".
+- **Saves from before new Advanced modules were added** (Phase 13) keep everything they earned: XP, records, boss cleared / mastered and the Arcade unlock. The game reads _In progress_ again (`ADVANCED 02/04 · BOSS MASTERED`), Continue opens the first new module, and each new module pays the normal XP. The Mastery Lab lists them as _New challenge_, so Home's Lab panel reads _Practise your next targets_ until they are cleared. The boss is not locked again.
 
 ## Arcade Run
 
@@ -262,9 +266,9 @@ Variables starts open. Answering a concept's micro-challenge completes it and un
 
 ## Games
 
-- **Bug Hunt** (playable, 10 modules: 7 core + 2 advanced + 1 boss): find the broken line in a short script and choose the patch that fixes it (variables, arithmetic, strings, booleans, if/else), plus 2 write modules where the player fixes the code by typing.
-- **Code Breaker** (playable, 10 modules: 5 locks + 2 write modules + 2 advanced + 1 boss; in the write modules the player repairs or writes the condition and it is tested against several system states): break security locks with logic instead of fixing bugs. Each lock shows a rule and the system's current values. The player picks the condition or operator that enforces the rule (it fills a slot in the lock's code), or predicts what the code prints. Lessons cover `if`, comparison operators, `if / elif / else`, `and` / `or` / `not`, and combined conditions. The HUD's security status shows Locked → Unlocked / Still locked.
-- **Function Forge** (playable, 13 modules: 10 core + 2 advanced + 1 boss): configure function "modules" (define → call → one parameter → `return` → write a `return` → two parameters → write a two-parameter function → trace → build → write a call). The player assembles code from tokens, taps arguments into a call's parameter slots, or picks a line / predicts a return value. The code updates live, and an INPUT → `function()` → OUTPUT pipeline shows the call; after running, a wrong call shows what it really returned (e.g. `-7` or a `NameError`). Forge status goes Ready → Online / Fault.
-- **Data Sorter** (playable, 12 modules: 7 terminals + 2 write modules + 2 advanced + 1 boss; in the write modules the player types the list operation and sees the resulting list as cells): organise data by working with the list itself instead of picking from text answers. The player taps a cell ("what is at index 2?", "what does `pop(2)` remove?") or builds the resulting list from value tiles (assignment, `append()`, combined operations, `for`-loop output with `len()`). Lists are drawn as cells with zero-based index labels. Feedback shows the resulting list, what happened step by step, and the rule to remember.
+- **Bug Hunt** (playable, 12 modules: 7 core + 4 advanced + 1 boss): find the broken line in a short script and choose the patch that fixes it (variables, arithmetic, strings, booleans, if/else), plus 2 write modules where the player fixes the code by typing.
+- **Code Breaker** (playable, 12 modules: 5 locks + 2 write modules + 4 advanced + 1 boss; in the write modules the player repairs or writes the condition and it is tested against several system states): break security locks with logic instead of fixing bugs. Each lock shows a rule and the system's current values. The player picks the condition or operator that enforces the rule (it fills a slot in the lock's code), or predicts what the code prints. Lessons cover `if`, comparison operators, `if / elif / else`, `and` / `or` / `not`, and combined conditions. The HUD's security status shows Locked → Unlocked / Still locked.
+- **Function Forge** (playable, 16 modules: 10 core + 5 advanced + 1 boss): configure function "modules" (define → call → one parameter → `return` → write a `return` → two parameters → write a two-parameter function → trace → build → write a call). The player assembles code from tokens, taps arguments into a call's parameter slots, or picks a line / predicts a return value. The code updates live, and an INPUT → `function()` → OUTPUT pipeline shows the call; after running, a wrong call shows what it really returned (e.g. `-7` or a `NameError`). Forge status goes Ready → Online / Fault.
+- **Data Sorter** (playable, 15 modules: 7 terminals + 2 write modules + 5 advanced + 1 boss; in the write modules the player types the list operation and sees the resulting list as cells): organise data by working with the list itself instead of picking from text answers. The player taps a cell ("what is at index 2?", "what does `pop(2)` remove?") or builds the resulting list from value tiles (assignment, `append()`, combined operations, `for`-loop output with `len()`). Lists are drawn as cells with zero-based index labels. Feedback shows the resulting list, what happened step by step, and the rule to remember.
 
 _More detailed game design will be added only as phases are authorized._

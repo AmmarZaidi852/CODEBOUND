@@ -5,7 +5,7 @@ import type { ConceptId } from './foundations.ts'
  * interaction. Lives on the challenge object itself (one source of truth).
  */
 
-/** CORE: one idea. ADVANCED: two ideas combined. BOSS: several, one real problem. */
+/** CORE: one idea. ADVANCED: two or more ideas combined. BOSS: several, one real problem. */
 export type Tier = 'core' | 'advanced' | 'boss'
 
 /** How the player answers: pick, assemble, foresee the result, or type code. */
