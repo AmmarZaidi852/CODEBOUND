@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { checkCode, type CodeChallenge } from '../challenges/code.ts'
+import type { ConceptId } from '../challenges/foundations.ts'
 import { interactionOf } from '../challenges/interaction.ts'
 import { tierOf } from '../challenges/meta.ts'
 import {
@@ -87,11 +88,25 @@ describe('arcade run selection', () => {
     expect(final.module.concepts.length).toBeGreaterThanOrEqual(3)
   })
 
-  it('covers every Foundations concept, and uses no other', () => {
+  it('covers exactly the original eight Foundations concepts (not While loops)', () => {
+    // The Arcade was designed around the first eight concepts; While loops
+    // (concept 9, Phase 15) is practised in Code Breaker only.
+    const intended = new Set<ConceptId>([
+      'variables',
+      'data-types',
+      'operators',
+      'conditions',
+      'lists',
+      'indexing',
+      'loops',
+      'functions',
+    ])
     const taught = new Set(foundations.map((c) => c.id))
     const used = new Set(arcadeModules.flatMap((m) => m.module.concepts))
     for (const c of used) expect(taught.has(c)).toBe(true)
-    expect(used).toEqual(taught)
+    expect(used).toEqual(intended)
+    expect(used.has('while')).toBe(false)
+    expect([...taught].filter((c) => !used.has(c))).toEqual(['while'])
   })
 })
 

@@ -342,7 +342,7 @@ describe('pointing players to write modules', () => {
     click('PLAY')
     for (const [name, count] of [
       ['Bug Hunt', 5],
-      ['Code Breaker', 4],
+      ['Code Breaker', 5],
       ['Data Sorter', 4],
       ['Function Forge', 6],
     ] as const) {

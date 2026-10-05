@@ -10,6 +10,7 @@ export type ConceptId =
   | 'indexing'
   | 'loops'
   | 'functions'
+  | 'while'
 
 export interface MicroOption extends Choice {
   code: string

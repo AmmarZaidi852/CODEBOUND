@@ -45,6 +45,7 @@ import {
   shiftedSlot,
   twinGates,
 } from './workshopChallenges.ts'
+import { countdownLock, retryLimit, stuckLoop } from './whileChallenges.ts'
 import { functionForgeChallenges as ff } from './functionForgeChallenges.ts'
 import type { GameId } from './games.ts'
 
@@ -84,6 +85,9 @@ export const codeBreakerModules: (CodeBreakerChallenge | CodeChallenge)[] = [
   shiftScheduler,
   twinGates,
   coolingRelay,
+  countdownLock,
+  retryLimit,
+  stuckLoop,
   vaultCore,
 ]
 

@@ -23,9 +23,9 @@ describe('game module lists', () => {
     const writes = (list: object[]) =>
       list.filter((m) => (m as CodeChallenge).kind === 'code').length
     // CORE write modules (Phase 8), ADVANCED / BOSS ones (Phase 9), and
-    // Score Bonus and Power Limiter (Phase 13).
+    // Score Bonus and Power Limiter (Phase 13), Stuck Loop (Phase 15).
     expect(writes(bugHuntModules)).toBe(5)
-    expect(writes(codeBreakerModules)).toBe(4)
+    expect(writes(codeBreakerModules)).toBe(5)
     expect(writes(dataSorterModules)).toBe(4)
     expect(writes(functionForgeModules)).toBe(6)
   })

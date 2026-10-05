@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { foundations } from '../content/foundations.ts'
 import { games } from '../content/games.ts'
+import { runProgram } from '../python/interpreter.ts'
 import {
   correctAnswerText,
   isCorrectMicro,
@@ -11,7 +12,7 @@ import {
 const byId = (id: ConceptId) => foundations.find((c) => c.id === id)!
 
 describe('Python Foundations content', () => {
-  it('has the 8 concepts in learning order', () => {
+  it('has the 9 concepts in learning order', () => {
     expect(foundations.map((c) => c.id)).toEqual([
       'variables',
       'data-types',
@@ -21,6 +22,7 @@ describe('Python Foundations content', () => {
       'indexing',
       'loops',
       'functions',
+      'while',
     ])
   })
 
@@ -61,6 +63,7 @@ describe('Python Foundations content', () => {
     expect(byId('conditions').game).toBe('code-breaker')
     expect(byId('indexing').game).toBe('data-sorter')
     expect(byId('functions').game).toBe('function-forge')
+    expect(byId('while').game).toBe('code-breaker')
   })
 
   it('gives every playable game at least one concept', () => {
@@ -91,6 +94,25 @@ describe('micro-challenge validation', () => {
       false,
     )
     expect(correctAnswerText(indexing.micro)).toBe('10 (index 1)')
+  })
+
+  it('the While loops answer is what the simulator really prints', () => {
+    const { micro } = byId('while')
+    if (micro.kind !== 'choice') throw new Error('expected a choice')
+    const printed = runProgram(micro.code!.join('\n')).output
+    expect(printed).toEqual(['1', '2', '4'])
+    expect(correctAnswerText(micro)).toBe(String(printed.length))
+    expect(isCorrectMicro(micro, { kind: 'choice', optionId: 'a' })).toBe(true)
+    expect(isCorrectMicro(micro, { kind: 'choice', optionId: 'b' })).toBe(false)
+  })
+
+  it('the While loops example prints a countdown and stops', () => {
+    expect(runProgram(byId('while').example.join('\n')).output).toEqual([
+      '3',
+      '2',
+      '1',
+      'Empty',
+    ])
   })
 
   it('rejects an answer of the wrong kind', () => {

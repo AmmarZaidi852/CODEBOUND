@@ -100,11 +100,11 @@ describe('persistent progress', () => {
     ).toBeInTheDocument()
     expectTotalXp(125)
     expect(
-      screen.getByText('Python Foundations · 1/8 concepts'),
+      screen.getByText('Python Foundations · 1/9 concepts'),
     ).toBeInTheDocument()
 
     click('CONTINUE LEARNING')
-    expect(screen.getByText('1 / 8 concepts completed')).toBeInTheDocument()
+    expect(screen.getByText('1 / 9 concepts completed')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Review Variables' }),
     ).toBeEnabled()

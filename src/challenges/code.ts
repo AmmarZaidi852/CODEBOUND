@@ -135,7 +135,8 @@ const quote = (lines: string[]) =>
 function describeFailure(f: CodeFailure): string {
   const when = f.test.given ? `When ${describeGiven(f.test)}, your` : 'Your'
   if (f.error) {
-    return `${when} code stopped with an error: ${f.error.message}.`
+    const end = /[.?!]$/.test(f.error.message) ? '' : '.'
+    return `${when} code stopped with an error: ${f.error.message}${end}`
   }
   if (f.test.output && !sameLines(f.output, f.test.output)) {
     return f.output.length === 0

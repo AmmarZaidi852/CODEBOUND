@@ -14,7 +14,7 @@ describe('foundations progression', () => {
     expect(isConceptUnlocked(foundations, [], 'data-types')).toBe(false)
     expect(isConceptUnlocked(foundations, [], 'functions')).toBe(false)
     expect(currentConcept(foundations, [])?.id).toBe('variables')
-    expect(foundationsProgress(foundations, [])).toEqual({ done: 0, total: 8 })
+    expect(foundationsProgress(foundations, [])).toEqual({ done: 0, total: 9 })
   })
 
   it('unlocks the next concept when one is completed', () => {
@@ -32,14 +32,34 @@ describe('foundations progression', () => {
     expect(nextConcept(foundations, 'operators')?.id).toBe('conditions')
     expect(foundationsProgress(foundations, completed)).toEqual({
       done: 3,
-      total: 8,
+      total: 9,
     })
   })
 
-  it('ends with Functions and has nothing current once all are done', () => {
+  it('opens While loops after Functions, and only then', () => {
+    const firstEight = foundations
+      .map((c) => c.id)
+      .filter((id) => id !== 'while')
+    expect(
+      isConceptUnlocked(foundations, firstEight.slice(0, 7), 'while'),
+    ).toBe(false)
+    expect(isConceptUnlocked(foundations, firstEight, 'while')).toBe(true)
+    expect(nextConcept(foundations, 'functions')?.id).toBe('while')
+    // A player who finished the original eight: still 8 done, While is next.
+    expect(currentConcept(foundations, firstEight)?.id).toBe('while')
+    expect(foundationsProgress(foundations, firstEight)).toEqual({
+      done: 8,
+      total: 9,
+    })
+    for (const id of firstEight) {
+      expect(isConceptUnlocked(foundations, firstEight, id)).toBe(true)
+    }
+  })
+
+  it('ends with While loops and has nothing current once all are done', () => {
     const all = foundations.map((c) => c.id)
-    expect(nextConcept(foundations, 'functions')).toBeNull()
+    expect(nextConcept(foundations, 'while')).toBeNull()
     expect(currentConcept(foundations, all)).toBeNull()
-    expect(foundationsProgress(foundations, all)).toEqual({ done: 8, total: 8 })
+    expect(foundationsProgress(foundations, all)).toEqual({ done: 9, total: 9 })
   })
 })

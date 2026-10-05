@@ -284,4 +284,51 @@ export const foundations: Concept[] = [
       'Calling `add(2, 3)` sets `a` to 2 and `b` to 3, so `return a + b` sends back 5.',
     game: 'function-forge',
   },
+  {
+    id: 'while',
+    title: 'While loops',
+    summary:
+      'A `while` loop repeats its block for as long as its condition is `True`, checking the condition before every pass.',
+    later:
+      "Code Breaker's Advanced modules use while loops for countdowns, retry limits and a loop that never ends.",
+    example: [
+      'energy = 3',
+      'while energy > 0:',
+      '    print(energy)',
+      '    energy = energy - 1',
+      'print("Empty")',
+    ],
+    exampleNote:
+      'It prints 3, 2 and 1. When `energy` reaches 0, `energy > 0` is `False`, so the loop stops and Empty is printed. The body must change `energy`, or the loop would never end.',
+    micro: {
+      kind: 'choice',
+      prompt: 'How many times does `print(n)` run?',
+      code: ['n = 1', 'while n < 8:', '    print(n)', '    n = n * 2'],
+      options: [
+        { id: 'a', code: '3' },
+        {
+          id: 'b',
+          code: '4',
+          whyNot:
+            'After printing 4, `n` becomes 8. `8 < 8` is `False`, so the loop stops before a fourth print.',
+        },
+        {
+          id: 'c',
+          code: '8',
+          whyNot:
+            '8 is the value that stops the loop, not the number of passes. `n` doubles: 1, 2, 4, then 8 ends it.',
+        },
+        {
+          id: 'd',
+          code: 'It never stops',
+          whyNot:
+            '`n = n * 2` changes `n` on every pass, so `n < 8` becomes `False` after three passes.',
+        },
+      ],
+      correctOptionId: 'a',
+    },
+    explanation:
+      '`n` is 1, 2 and then 4 when the condition is checked, so `print(n)` runs 3 times. Then `n` becomes 8, `8 < 8` is `False`, and the loop ends.',
+    game: 'code-breaker',
+  },
 ]

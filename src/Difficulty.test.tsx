@@ -61,10 +61,11 @@ const all = (indexes: number[], r: Result = 'right') =>
   Object.fromEntries(indexes.map((i) => [i, r]))
 
 describe('difficulty metadata', () => {
-  // Phase 9 added two ADVANCED modules per game; Phase 13 added 2 / 2 / 3 / 3.
+  // Phase 9 added two ADVANCED modules per game; Phase 13 added 2 / 2 / 3 / 3;
+  // Phase 15 added Code Breaker's three while-loop modules.
   const advancedCount: Record<GameId, number> = {
     'bug-hunt': 4,
-    'code-breaker': 4,
+    'code-breaker': 7,
     'data-sorter': 5,
     'function-forge': 5,
   }

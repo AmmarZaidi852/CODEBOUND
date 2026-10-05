@@ -62,7 +62,7 @@ describe('App', () => {
         name: codeBreakerChallenges[0].system,
       }),
     ).toBeInTheDocument()
-    expectStep('Code Breaker', 1, 12)
+    expectStep('Code Breaker', 1, 15)
   })
 
   it('returns home from game selection', () => {

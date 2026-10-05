@@ -225,7 +225,7 @@ describe('Mastery Lab completion and concepts', () => {
 
   it('derives each concept from the modules that use it', () => {
     const fresh = conceptStatus(newProgress())
-    expect(fresh.map((c) => c.label)).toEqual(Array(8).fill('new'))
+    expect(fresh.map((c) => c.label)).toEqual(Array(9).fill('new'))
     const lists = fresh.find((c) => c.id === 'lists')!
     expect(lists.mastered).toBe(0)
     expect(lists.total).toBeGreaterThan(5)
