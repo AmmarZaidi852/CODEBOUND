@@ -1,8 +1,8 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 13 — Advanced workshop modules (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 14.
+- **Current phase:** Phase 14 — Advanced tier consolidation (complete)
+- **Next authorized phase:** none. Wait for the user to authorize Phase 15.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -127,7 +127,15 @@ Mastery Lab (a practice surface, not a game): recommends existing modules from s
   - **Placement:** appended after each game's existing ADVANCED modules, before the BOSS. Games now have 12 / 12 / 15 / 16 modules. CORE is untouched, so saved Core progress and unlocks (including the Arcade unlock) are unchanged; the boss now also needs the new advanced modules complete.
   - **Rules unchanged:** XP, mastery, recovery, hints, replay, Lab ranking. No new saved fields (schema still `version: 1`).
   - Tests (501 total): `content/workshopChallenges.test.ts` (metadata and placement, unique ids, concepts, interaction mix, every wrong option explained, answers proven by running the code in the simulator, write-module solutions / equivalent fixes / mistakes / typed answers). Existing tests that hard-coded module counts now use the new counts or read them from the module lists; no assertions weakened. Lint, format check and build pass; working tree clean after the feature commit.
-  - Not browser-verified (content only, rendered through the existing rounds; no UI changes).
+  - Not browser-verified (content only, rendered through the existing rounds; no UI changes). Verified in Phase 14.
+
+- **Phase 14 — Advanced tier consolidation:**
+  - **Fix (`RunSummary.tsx`):** after an Advanced run whose boss was already cleared or mastered, the completion screen said "Boss module ready" with **Play Boss**. It now says "Boss already cleared / mastered: replay it any time." with **Replay Boss** (same `boss` start). Hit by saves from before Phase 13 and by Advanced replays of a finished game. Fresh play is unchanged (Play Boss when the boss is first ready).
+  - **Older saves (behaviour defined, no code change needed):** a game cleared before Phase 13 reads In progress, `CORE n/n · ADVANCED 02/04 · BOSS MASTERED / CLEARED`; Continue opens the first new Advanced module; new modules pay normal XP; XP, records and boss state are kept; the boss is not relocked; the Arcade stays unlocked (Core only). The Lab lists the new modules as New challenge, Home's Lab panel reads "Practise your next targets" until they are cleared, then "All current modules cleared" again.
+  - **Docs:** `DESIGN.md` (ADVANCED 4–5, all 18 Advanced modules with interactions, module totals per game, cartridge example, Replay Boss, older-save behaviour), `ARCHITECTURE.md` (`workshopChallenges.ts` in the module list, Replay Boss), stale comments in `meta.ts`, `depthChallenges.ts`, `GameSelectScreen.css`.
+  - **Rules unchanged:** content, simulator, XP, mastery, recovery, hints, Lab ranking, Arcade, schema (`version: 1`), no migration.
+  - Tests (512 total): new `OlderSave.test.tsx` (11): per game In progress + boss kept (mastered and cleared) + Continue index + advanced counts; XP and records unchanged on load; cartridge labels; Continue → new modules at +100 each → "Boss already …" + Replay Boss (no Play Boss) → boss module opens and stays mastered / cleared; Lab queues exactly the 10 new modules as new with 0 needing practice; all cleared again after solving them; Arcade still unlocked. The two summary tests fail without the fix. No existing test changed.
+  - Browser-verified in Chrome (older save seeded through the app's own `applyAnswer` / `saveProgress`: 47 pre-Phase 13 records, 4700 XP): Home (Arcade ready, Lab "Practise your next targets"); cartridges 10/12 · 10/12 · 12/15 · 13/16 with ADVANCED 02/0n · BOSS MASTERED, Continue + Replay. All 10 modules played for real: Life Counter wrong (+25, explanation) then retried → RECOVERED +75; Score Bonus typed with real keys (Enter auto-indent, Backspace dedent), `>=` diagnosed "exactly 40 got the bonus" (+25), fixed → RECOVERED +75; Twin Gates wrong (+25); Cooling Relay, Shifted Slot, Running Total, Double Trace, Bonus Chain first try (+100, mastered); Inventory Shuffle wrong build (+25, step-by-step); Power Limiter typed after a hint → +100, COMPLETE not mastered. Bug Hunt and Function Forge summaries: "Boss already mastered: replay it any time." + Replay Boss → MODULE 12 / 12 boss, MASTERED mark. XP 5550 matched by hand; reload kept it. Home "3 modules need practice"; Lab: Twin Gates, Inventory Shuffle (Missed before), Power Limiter (Advanced practice); Twin Gates practised from the Lab → RECOVERED +75 and left the queue. Full Arcade run 8/8 (+0, all earned) with best run recorded. 375px same-origin frame (fresh older save): Home, cartridges, every new module and its feedback, write editors and hints, summary with Replay Boss, Lab: no page overflow, no clipped titles, no buttons under 40px. No console errors.
 
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
 
@@ -171,11 +179,16 @@ Real Python execution (write modules use the controlled subset simulator), free-
 - Cartridge segments show recovered modules like completed ones (no separate segment style); the word RECOVERED appears on the HUD, chip and summary.
 - Lab recommendations follow fixed rules (no history of when a module was last practised), so the top target only changes when its saved state changes; Next practice skips the module just practised.
 - Concept bars count every released module using the concept, including ones still locked.
+- A boss cleared before Phase 13 stays cleared / mastered while its Advanced tier has unfinished new modules (by design: earned state is never taken away). Such a game reads In progress until the new modules are complete.
+- Advanced sections are now 4–5 modules, longer than the "small session" Core → Advanced → Boss steps first designed; not changed.
+- Retry unfinished / Continue play to the end of the section, so modules already solved after the unfinished one are replayed (0 XP), as before.
+- Browser checks used a seeded save and, for the Arcade and the 375px pass, an in-page helper that clicks the real controls with each module's correct answer; the 10 Phase 13 modules themselves were played by mouse and keyboard at desktop width.
 - Practice opened from a concept uses the same reason tags as the main queue; the Lab does not track separate per-concept practice.
 
 ## Git
 
 - Branch: `main`
+- Phase 14 work starts after `05d817f` (end of Phase 13): fix + tests `1511a3a`, docs `8fec79a`, then this closeout.
 - Phase 13 work starts after `23e069d` (end of Phase 12): content + tests `a9b5a66` (`feat: add 10 workshop modules to the Advanced tier of each game`), then docs.
 - Phase 12 work starts after `da77da7` (end of Phase 11): model `c0c38e6`, Lab + game UI `aa77e48`, tests `4ef20ee`, then docs.
 - Phase 11 work starts after `5894924` (end of Phase 10): engine `17dc581`, UI `ce33e0d`, tests `913c0fc`, then docs.
