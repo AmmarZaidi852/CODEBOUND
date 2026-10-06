@@ -1,8 +1,9 @@
 # CODEBOUND — Project Memory
 
 - **Project:** CODEBOUND — game-style Python learning platform
-- **Current phase:** Phase 14 — Advanced tier consolidation (complete)
-- **Next authorized phase:** none. Wait for the user to authorize Phase 15.
+- **Current phase:** Phase 15 — While Loops, Foundations concept 9 (complete)
+- **Status:** **CODEBOUND is frozen after Phase 15.** Phase 15 was the final planned development phase.
+- **Next authorized phase:** none. No further phases are planned; any future work needs a new, explicit authorization from the user.
 - **Repo:** https://github.com/AmmarZaidi852/CODEBOUND (`main` tracks `origin/main`)
 
 ## Stack
@@ -11,18 +12,19 @@ React 19 · TypeScript 6 · Vite 8 · `@fontsource/jersey-10` (self-hosted displ
 
 ## Learning path → games
 
-| #   | Concept    | Micro-challenge                            | Practised in   |
-| --- | ---------- | ------------------------------------------ | -------------- |
-| 1   | Variables  | What does the example print?               | Bug Hunt       |
-| 2   | Data types | Type of `"42"`?                            | Bug Hunt       |
-| 3   | Operators  | `print(10 == 5 * 2)`?                      | Code Breaker   |
-| 4   | Conditions | Which branch runs when `energy = 80`?      | Code Breaker   |
-| 5   | Lists      | `len([4, 8, 15, 16])`?                     | Data Sorter    |
-| 6   | Indexing   | Tap `nums[1]` (list cells)                 | Data Sorter    |
-| 7   | Loops      | How many times does the loop body run?     | Data Sorter    |
-| 8   | Functions  | What does `add(2, 3)` return? (def/params) | Function Forge |
+| #   | Concept     | Micro-challenge                                   | Practised in   |
+| --- | ----------- | ------------------------------------------------- | -------------- |
+| 1   | Variables   | What does the example print?                      | Bug Hunt       |
+| 2   | Data types  | Type of `"42"`?                                   | Bug Hunt       |
+| 3   | Operators   | `print(10 == 5 * 2)`?                             | Code Breaker   |
+| 4   | Conditions  | Which branch runs when `energy = 80`?             | Code Breaker   |
+| 5   | Lists       | `len([4, 8, 15, 16])`?                            | Data Sorter    |
+| 6   | Indexing    | Tap `nums[1]` (list cells)                        | Data Sorter    |
+| 7   | Loops       | How many times does the loop body run?            | Data Sorter    |
+| 8   | Functions   | What does `add(2, 3)` return? (def/params)        | Function Forge |
+| 9   | While loops | How many times does `print(n)` run? (`n` doubles) | Code Breaker   |
 
-Games (all playable), modules = CORE + ADVANCED (4–5) + 1 BOSS: Bug Hunt 12, Code Breaker 12, Data Sorter 15, Function Forge 16. Write modules per game (core + advanced + boss): 5 / 4 / 4 / 6.
+Games (all playable), modules = CORE + ADVANCED (4–7) + 1 BOSS: Bug Hunt 12, Code Breaker 15, Data Sorter 15, Function Forge 16. Write modules per game (core + advanced + boss): 5 / 5 / 4 / 6.
 
 Arcade Run (a mode, not a game): 8 mixed modules, unlocked once all four Core tiers are complete.
 
@@ -137,7 +139,29 @@ Mastery Lab (a practice surface, not a game): recommends existing modules from s
   - Tests (512 total): new `OlderSave.test.tsx` (11): per game In progress + boss kept (mastered and cleared) + Continue index + advanced counts; XP and records unchanged on load; cartridge labels; Continue → new modules at +100 each → "Boss already …" + Replay Boss (no Play Boss) → boss module opens and stays mastered / cleared; Lab queues exactly the 10 new modules as new with 0 needing practice; all cleared again after solving them; Arcade still unlocked. The two summary tests fail without the fix. No existing test changed.
   - Browser-verified in Chrome (older save seeded through the app's own `applyAnswer` / `saveProgress`: 47 pre-Phase 13 records, 4700 XP): Home (Arcade ready, Lab "Practise your next targets"); cartridges 10/12 · 10/12 · 12/15 · 13/16 with ADVANCED 02/0n · BOSS MASTERED, Continue + Replay. All 10 modules played for real: Life Counter wrong (+25, explanation) then retried → RECOVERED +75; Score Bonus typed with real keys (Enter auto-indent, Backspace dedent), `>=` diagnosed "exactly 40 got the bonus" (+25), fixed → RECOVERED +75; Twin Gates wrong (+25); Cooling Relay, Shifted Slot, Running Total, Double Trace, Bonus Chain first try (+100, mastered); Inventory Shuffle wrong build (+25, step-by-step); Power Limiter typed after a hint → +100, COMPLETE not mastered. Bug Hunt and Function Forge summaries: "Boss already mastered: replay it any time." + Replay Boss → MODULE 12 / 12 boss, MASTERED mark. XP 5550 matched by hand; reload kept it. Home "3 modules need practice"; Lab: Twin Gates, Inventory Shuffle (Missed before), Power Limiter (Advanced practice); Twin Gates practised from the Lab → RECOVERED +75 and left the queue. Full Arcade run 8/8 (+0, all earned) with best run recorded. 375px same-origin frame (fresh older save): Home, cartridges, every new module and its feedback, write editors and hints, summary with Replay Boss, Lab: no page overflow, no clipped titles, no buttons under 40px. No console errors.
 
+- **Phase 15 — While Loops (Foundations concept 9):**
+  - **Simulator** (`src/python/`): `while <condition>:` parses and runs; `while` moved from `UNSUPPORTED` to `KEYWORDS` (so it can't be a variable name) and is highlighted in `CodeTerminal`. Every pass ticks the existing step limit (20,000). A `while` node keeps its condition text and the variables it reads; a timeout inside a loop is re-raised by the innermost `while` as "`while energy > 0` never became False. Does the loop change `energy`?" (or "Nothing inside the loop can change it." for `while True`). `break`, `continue` and `while … else` stay unsupported (`while … else` with its own message). No other syntax added. `checkCode`'s generic error sentence no longer adds a "." after a message ending in "?".
+  - **Foundations:** concept 9 "While loops" after Functions (countdown example; micro-challenge "How many times does `print(n)` run?" with `n` doubling, answer 3), practised in Code Breaker. Added last so no existing unlock changes; a player with the original eight done sees 8/9 and CONTINUE LEARNING with While loops current. No new art (rows use the existing CSS icons).
+  - **Code Breaker** (`src/content/whileChallenges.ts`, ADVANCED, after Cooling Relay, before Vault Core): **Countdown Lock** (predict what `while timer > 0` prints), **Retry Limit** (choose the condition for exactly 3 tries: `tries < 3` vs `<=`, `==`, `>`), **Stuck Loop** (write: repair a fan loop that never lowers `heat`; diagnoses the endless loop, print-after-update, cooling by 1, `>` instead of `>=`; requires `while`). Concepts: while + operators (+ variables). Code Breaker: 15 modules (7 core, 7 advanced, 1 boss), 5 write modules.
+  - **Fix found in the browser:** an endless loop prints until the step limit (1,666 lines for Stuck Loop's starter) and the YOUR OUTPUT block grew to ~39,000px, pushing Try again off-screen. `.code-round__output` now has `max-height: 14rem` and scrolls (224px).
+  - **Progression (no rule changes, no new fields, schema `version: 1`, no migration):** Core untouched, so Core completion and the Arcade unlock are unchanged. Older saves: a cleared / mastered Code Breaker boss stays so; a boss that was ready but unplayed is Locked again until the three new modules are complete, then Ready; Continue opens Countdown Lock (module 12). Lab: a While loops concept row (0/3) and the new modules as New challenge once Code Breaker Core is complete (never before). The Arcade is unchanged and has no while content.
+  - Tests (558 total, 37 files): simulator `while loops` block (0 / 1 / N passes, condition changed in the body, `+=` / `-=`, inside `if`, inside a function, `for` inside `while`, list condition, endless loop with named condition and line, innermost loop blamed, endless loop inside a called function, `break` / `continue` / `while … else` refused before anything runs, syntax mistakes, `while` not a variable name); `content/whileChallenges.test.ts` (placement and counts, ids, concepts, taught syntax only, interactions, every wrong option explained, not in the Arcade, Countdown Lock and Retry Limit answers proven by running the code, Stuck Loop solution / starter / malformed / unsupported / endless with the exact error line / decrement outside the loop / four equivalent fixes / three diagnosed mistakes / typed answers / a `for` loop refused / hints); `WhileLoops.test.tsx` (older save: Core 7/7, Advanced 4/7, boss locked → ready, Continue index, cleared boss kept with XP and records, ready → locked → ready in the app with +100 each and Play Boss, cleared boss → Replay Boss; Stuck Loop endless starter +25 with the Timeout line then fix +75 RECOVERED; hinted solve not mastered; Lab row, queue, Practice While loops; Arcade still ready); Foundations (9 concepts, While after Functions, 8/9 save, wrong answer, Practise in Code Breaker, 9/9 → REVIEW LEARNING; the micro answer and the example output are checked by running them).
+  - **Changed test assertions (none weakened):**
+    - `interpreter.test.ts`, `arcade.test.ts`, `depthChallenges.test.ts`, `workshopChallenges.test.ts`: the "unsupported code" input `while True: pass` became `try: pass` (`while` is now supported; the same assertions still test refusal).
+    - `arcade.test.ts`: "covers every Foundations concept, and uses no other" became "covers exactly the original eight Foundations concepts (not While loops)": `used` equals an explicit set of the 8, `used` has no `while`, and taught minus used is exactly `['while']`.
+    - `foundations.test.ts`: the concept order now ends with `'while'`; While loops is linked to Code Breaker.
+    - `foundationsProgress.test.ts`: totals 8 → 9; "ends with Functions" became "ends with While loops" (`nextConcept('functions')` is `while`, `nextConcept('while')` is null, 9/9); new test that While opens only after Functions and an all-8 player has it current at 8/9.
+    - `Foundations.test.tsx`: "0/8", "1/8", "8/8" texts → "/9"; lesson step `02 / 08` → `02 / 09`; While loops locked for a new player; "completes all eight, ending with Functions" → "all nine, ending with While loops" (9/9, 225 XP); the Functions practice test now walks to Functions by id and ends at 8/9; the Code Breaker card asserts `Operators · Conditions · While loops`; Code Breaker opens at `01 / 15`; new all-8-save test.
+    - `Progression.test.tsx`: "1/8" → "1/9". `lab.test.ts`: nine fresh concept labels instead of eight.
+    - `App.test.tsx`: Code Breaker `01 / 12` → `01 / 15`. `Difficulty.test.tsx`: Code Breaker advanced count 4 → 7. `gameChallenges.test.ts`: Code Breaker write modules 4 → 5. `CodeRound.test.tsx`: Code Breaker cartridge "5 modules where you type the code".
+  - **Browser-verified in Chrome:** fresh player: Home "0/9 concepts" with nine segments, path shows 09 While loops LOCKED; lessons 1–8 completed through the UI, While loops lesson (LESSON 09 / 09) answered wrong by mouse ("4"): SYSTEM ERROR, why-not and explanation, +25 (225 XP); 9/9 "All foundations complete", Home REVIEW LEARNING. All-8 save: Home "8/9" CONTINUE LEARNING, path 8/9, Start While loops, answered right by mouse (Got it, +25). Older save (56 records, 5600 XP, Code Breaker boss unplayed): cartridge CORE 07/07 · ADVANCED 04/07 · BOSS LOCKED, LEARN "Operators · Conditions · While loops", 5 write modules; Continue → MODULE 12 / 15 Countdown Lock; wrong pick (+25, explanation); Retry Limit right (MASTERED +100, slot shows `while tries < 3:`); Stuck Loop typed with real keys (Enter auto-indented `heat - 10`, `while` highlighted): check stopped in 12ms with "The loop never ends…" and "Line 1 · Timeout: `while heat >= 50` never became False. Does the loop change `heat`?", +25; output box fixed (page 40,463px → 1,437px); Try again, line 3 retyped as `heat = heat - 10` → RECOVERED +75, record `{solved, recovered, xp: 100}`, XP 5825 matched by hand; summary "1 module left" → Retry unfinished → Countdown Lock RECOVERED +75; cartridge ADVANCED 07/07 · BOSS READY, Continue → Vault Core (15 / 15, BOSS MODULE); boss solved → COMPLETE · BOSS MASTERED; Core replay → Play Advanced → Advanced replay summary "Boss already mastered: replay it any time." + REPLAY BOSS → Vault Core. Lab (fresh older save): Home "Practise your next targets"; targets Countdown Lock, Retry Limit, Stuck Loop (New challenge); While loops row 0/3 Not started with detail and Practice While loops; Stuck Loop practised from the Lab with hint 1 open → +100, no MASTERED chip, record mastered false, then the Lab lists it first (Advanced practice). Full Arcade run 8/8 (+0, all earned). 375px same-origin frame: Home, Foundations path, While lesson and feedback, game select, all three modules and their feedback, Stuck Loop editor, hint, endless-loop feedback (output box 224px), fixed, summary, Lab with the While row: no overflow from Phase 15 screens, no clipped titles, no buttons under 40px. No console errors.
+  - Browser note: midway the Chrome window lost focus, so real mouse / keyboard input stopped reaching the page. The lesson answers, Countdown Lock, Retry Limit and the Stuck Loop miss and fix were done with real input before that; the hinted solve, boss / replay checks, Arcade run and 375px pass then drove the app's own controls with DOM events.
+
 See `ARCHITECTURE.md` and `DESIGN.md` for details.
+
+## Project status: frozen after Phase 15
+
+CODEBOUND is complete for now. Final content: **9 Foundations concepts**; **4 games, 58 modules** (Bug Hunt 12, Code Breaker 15, Data Sorter 15, Function Forge 16: 33 core, 21 advanced, 4 bosses; 20 write modules); **Arcade Run** of 8 modules (2 Arcade-only write modules); **Mastery Lab** with 9 concept rows. 558 tests in 37 files; lint, format check and build pass. No phase after 15 is planned or authorized.
 
 ## Not implemented (by design)
 
@@ -158,7 +182,7 @@ Real Python execution (write modules use the controlled subset simulator), free-
 - Only one schema version exists; an unknown version starts a fresh player rather than migrating.
 - A concept completes on answering its micro-challenge, right or wrong (after the explanation), not after playing the game.
 - Function Forge assemble tasks accept only the exact expected token order (e.g. `h * w` is not offered as an alternative). Write modules accept equivalent code.
-- The simulator covers only the taught subset; valid Python outside it (`while`, f-strings, `in`, slicing, dicts, string methods…) is refused as "not part of this terminal yet" rather than run.
+- The simulator covers only the taught subset; valid Python outside it (`break`, `continue`, `while … else`, f-strings, `in`, slicing, dicts, string methods…) is refused as "not part of this terminal yet" rather than run.
 - Write modules check behaviour on their test cases plus a few token requirements; unusual but valid solutions that avoid a required form (e.g. Vault Threshold written as `power > 49`) are asked to use the taught form, with an explanation.
 - A hint opened, then the module left without checking, isn't remembered; mastery is still possible on a later first check.
 - Output is compared exactly, so a stray trailing space in printed text counts as different (the message shows what was printed).
@@ -180,14 +204,20 @@ Real Python execution (write modules use the controlled subset simulator), free-
 - Lab recommendations follow fixed rules (no history of when a module was last practised), so the top target only changes when its saved state changes; Next practice skips the module just practised.
 - Concept bars count every released module using the concept, including ones still locked.
 - A boss cleared before Phase 13 stays cleared / mastered while its Advanced tier has unfinished new modules (by design: earned state is never taken away). Such a game reads In progress until the new modules are complete.
-- Advanced sections are now 4–5 modules, longer than the "small session" Core → Advanced → Boss steps first designed; not changed.
+- Advanced sections are now 4–7 modules (Code Breaker 7), longer than the "small session" Core → Advanced → Boss steps first designed; not changed (Core sections are 7–10).
 - Retry unfinished / Continue play to the end of the section, so modules already solved after the unfinished one are replayed (0 XP), as before.
 - Browser checks used a seeded save and, for the Arcade and the 375px pass, an in-page helper that clicks the real controls with each module's correct answer; the 10 Phase 13 modules themselves were played by mouse and keyboard at desktop width.
 - Practice opened from a concept uses the same reason tags as the main queue; the Lab does not track separate per-concept practice.
+- (Phase 15) A Code Breaker boss that was ready but unplayed in an older save is Locked again until the three `while` modules are complete (the normal boss rule; nothing earned is lost).
+- (Phase 15) The While loops lesson's "Practise in Code Breaker" continues Code Breaker at its first unfinished module, which for a new player is Core, not the `while` modules (same as every lesson). The `while` modules open after Code Breaker's Core.
+- (Phase 15) The Arcade has no `while` content; While loops is practised only in Code Breaker (and the Lab).
+- (Phase 15) An endless loop prints until the step limit, so a printing loop shows up to a few thousand lines (in a scroll box). The endless-loop message blames the innermost `while` that was running, even if a heavy inner `for` loop was what used up the steps.
+- (Phase 15, pre-existing) On lesson screens at 375px, a 4-digit XP badge ("LV 19 · 5625 XP") next to "← FOUNDATIONS" overflows the top bar by ~13px when a classic scrollbar leaves 360px; the existing Variables lesson does the same. Not fixed (unrelated to Phase 15).
 
 ## Git
 
 - Branch: `main`
+- Phase 15 work starts after `a14bcce` (end of Phase 14): simulator `69329ca`, output box fix `ed5dd78`, concept + modules + tests `0037917`, app-level tests `da5115a`, docs `903111d`, then this closeout.
 - Phase 14 work starts after `05d817f` (end of Phase 13): fix + tests `1511a3a`, docs `8fec79a`, then this closeout.
 - Phase 13 work starts after `23e069d` (end of Phase 12): content + tests `a9b5a66` (`feat: add 10 workshop modules to the Advanced tier of each game`), then docs.
 - Phase 12 work starts after `da77da7` (end of Phase 11): model `c0c38e6`, Lab + game UI `aa77e48`, tests `4ef20ee`, then docs.
